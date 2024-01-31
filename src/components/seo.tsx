@@ -13,14 +13,14 @@ type Meta = React.DetailedHTMLProps<
   HTMLMetaElement
 >[]
 
-interface SEOProperties
-  extends Pick<Queries.MarkdownRemarkFrontmatter, "title"> {
+interface SEOProperties {
+  title?: Queries.Maybe<string>
   desc?: Queries.Maybe<string>
   image?: Queries.Maybe<string>
   meta?: Meta
 }
 
-const SEO: React.FC<SEOProperties> = ({ title, desc = "", image }) => {
+const SEO: React.FC<SEOProperties> = ({ title = "", desc = "", image }) => {
   const site = useSiteMetadata()
   const description = desc || site.description
   const ogImageUrl =
@@ -29,8 +29,8 @@ const SEO: React.FC<SEOProperties> = ({ title, desc = "", image }) => {
   return (
     <Helmet
       htmlAttributes={{ lang: site.lang ?? DEFAULT_LANG }}
-      title={title ?? ""}
-      titleTemplate={`%s | ${site.title}`}
+      title={title || site.title!}
+      titleTemplate={title || site.title!.replace(" 🍎", "")}
       meta={
         [
           {

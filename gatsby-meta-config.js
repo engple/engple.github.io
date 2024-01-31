@@ -17,14 +17,14 @@
 
 /** @type {MetaConfig} */
 const metaConfig = {
-  title: "Dev Ed",
-  description: `Ed's Blog`,
-  author: "Ed",
-  siteUrl: "https://gatsby-starter-apple.netlify.app",
-  lang: "en",
-  utterances: "sungik-choi/gatsby-starter-apple-comment",
+  title: "잉플 | 패턴으로 배우는 영어 공부 🍎",
+  description: `잉플과 함께 패턴으로 영어 공부를 해봐요 🚀. 영어 표현 및 영어 패턴과 더불어 공부한 것들을 연습해볼 수 있는 기회를 제공해요. 영어 패턴을 배우다 보면 어느새 영어가 자연스럽게 나오는 날이 올 거예요 😎.`,
+  author: "solaqua",
+  siteUrl: "https://solaqua.github.io/engple",
+  lang: "ko",
+  utterances: "",
   links: {
-    github: "https://github.com/sungik-choi/gatsby-starter-apple",
+    github: "https://github.com/solaqua/engple",
   },
   favicon: "src/images/icon.png",
 }

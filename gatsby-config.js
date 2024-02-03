@@ -9,20 +9,20 @@ const siteMetadata = {
   utterances: {
     repo: meta.utterances,
   },
-  postTitle: "All",
+  postTitle: "전체",
   menuLinks: [
     {
       link: "/",
       name: "Home",
     },
-    {
-      link: "/about/",
-      name: "About",
-    },
-    {
-      link: meta.links.github,
-      name: "Github",
-    },
+    // {
+    //   link: "/about/",
+    //   name: "About",
+    // },
+    // {
+    //   link: meta.links.github,
+    //   name: "Github",
+    // },
   ],
 }
 

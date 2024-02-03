@@ -55,7 +55,7 @@ const Home = ({
       <SEO />
       <Main>
         <Content>
-          <CategoryFilter categoryList={data.allMarkdownRemark.group} />
+          {/* <CategoryFilter categoryList={data.allMarkdownRemark.group} /> */}
           <PostTitle>{postTitle}</PostTitle>
           <PostGrid posts={posts} />
         </Content>

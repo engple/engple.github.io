@@ -166,6 +166,48 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     font-size: 85%;
     border-radius: 3px;
   }
+
+  details {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    line-height: 1.5;
+    margin: 1em 0;
+  }
+
+  details > span {
+    display: block;
+    padding: 0 24px;
+  }
+
+  summary {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0 8px;
+    background-color: #f7f5f5;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+  }
+
+  summary::before {
+    content: "▶";
+    width: 16px;
+    height: 16px;
+    font-size: 12px;
+    color: black;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    text-align: center;
+    margin-right: 8px;
+  }
+
+  details[open] summary {
+    border-radius: 4px 4px 0 0;
+  }
+
+  details[open] summary::before {
+    transform: rotate(90deg);
+  }
 `
 
 export default Markdown

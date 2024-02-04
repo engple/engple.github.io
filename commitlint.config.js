@@ -1,7 +1,7 @@
 module.exports = {
-  extends: ["@commitlint/config-conventional"],
+  extends: ["gitmoji"],
   rules: {
-    "body-max-length": [0, "always", Infinity],
-    "body-max-line-length": [0, "always", Infinity],
+    "subject-empty": [0, "always"],
+    "type-empty": [0, "always"],
   },
 }

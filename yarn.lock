@@ -1622,7 +1622,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/cli@npm:^18.4.3":
+"@commitlint/cli@npm:^18.4.3, @commitlint/cli@npm:^18.6.0":
   version: 18.6.0
   resolution: "@commitlint/cli@npm:18.6.0"
   dependencies:
@@ -1806,6 +1806,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@commitlint/types@npm:^17":
+  version: 17.8.1
+  resolution: "@commitlint/types@npm:17.8.1"
+  dependencies:
+    chalk: "npm:^4.1.0"
+  checksum: a4cfa8c417aa0209694b96da04330282e41150caae1e1d0cec596ea34e3ce15afb84b3263abe5b89758ec1f3f71a9de0ee2d593df66db17b283127dd5e7cd6ac
+  languageName: node
+  linkType: hard
+
 "@commitlint/types@npm:^18.6.0":
   version: 18.6.0
   resolution: "@commitlint/types@npm:18.6.0"
@@ -1930,6 +1939,32 @@ __metadata:
     html-entities: "npm:^2.3.3"
     strip-ansi: "npm:^6.0.0"
   checksum: 58f1bf6fe106e6b9fc3e2b6ec56b069307e891b25ceeee909c7871715ea794f66477922e339f7db4c5a252eacd52d7148028404d6241e46c111d2d11b08d12da
+  languageName: node
+  linkType: hard
+
+"@gitmoji/commit-types@npm:1.1.5":
+  version: 1.1.5
+  resolution: "@gitmoji/commit-types@npm:1.1.5"
+  checksum: 132aa891aff0b23e0db3e9aa629ed758e5432465e8af9bc32e6a7a186a9708fc83dced2d6ef75eb43b725a3de0ef33908012c7d0cf2e8e7a9716d170e2814adc
+  languageName: node
+  linkType: hard
+
+"@gitmoji/gitmoji-regex@npm:1.0.0":
+  version: 1.0.0
+  resolution: "@gitmoji/gitmoji-regex@npm:1.0.0"
+  dependencies:
+    emoji-regex: "npm:^10"
+    gitmojis: "npm:^3"
+  checksum: 92cb460250f9dfcb6a7f20cdd5bffc1a956079bd67066919cf9ac3248b3d8abbcd60c7d506b3ce393cc52f11eed5825254a2b9a910a09c942e0ef4454c69188a
+  languageName: node
+  linkType: hard
+
+"@gitmoji/parser-opts@npm:1.4.0":
+  version: 1.4.0
+  resolution: "@gitmoji/parser-opts@npm:1.4.0"
+  dependencies:
+    "@gitmoji/gitmoji-regex": "npm:1.0.0"
+  checksum: 4e39d5828539c6bbe5fd18695c689a7909e0d5d41b1342acbe472fec5671f76c7e162c80baf6cc2d68481b9a67cb79f31b2a203cddc68b6138f761c1372ea74b
   languageName: node
   linkType: hard
 
@@ -6736,6 +6771,41 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commitlint-config-gitmoji@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "commitlint-config-gitmoji@npm:2.3.1"
+  dependencies:
+    "@commitlint/types": "npm:^17"
+    "@gitmoji/commit-types": "npm:1.1.5"
+    "@gitmoji/parser-opts": "npm:1.4.0"
+    commitlint-plugin-gitmoji: "npm:2.2.6"
+  checksum: c11a4ecd0edc4c68de957f70e4f8cf350c5d291c3d09ee59ba304e5351554d7822908ef5af93d37dc5306ae33d900654f62703a468358edb3006a2de7d3c3032
+  languageName: node
+  linkType: hard
+
+"commitlint-plugin-gitmoji@npm:2.2.6":
+  version: 2.2.6
+  resolution: "commitlint-plugin-gitmoji@npm:2.2.6"
+  dependencies:
+    "@commitlint/types": "npm:^17"
+    "@gitmoji/gitmoji-regex": "npm:1.0.0"
+    gitmojis: "npm:^3"
+  checksum: cc025c63abef2031adc6afe3cec8bc85bcd1397eb3fd997a21b3bc38e0244ea66c828a70759fa4f42ddb7640267f521e2f2c73e9c6cf9fb815c2b7353a31f767
+  languageName: node
+  linkType: hard
+
+"commitlint@npm:^18.6.0":
+  version: 18.6.0
+  resolution: "commitlint@npm:18.6.0"
+  dependencies:
+    "@commitlint/cli": "npm:^18.6.0"
+    "@commitlint/types": "npm:^18.6.0"
+  bin:
+    commitlint: cli.js
+  checksum: 0467e95f757e15d72c330f9d104abc36ffa0520dca9c1f7312b74ddd83a7c3a160f93fd3bc7c91d0efc73fd344cb6d3ded91d54e843a79622a885cab7fb7b534
+  languageName: node
+  linkType: hard
+
 "common-ancestor-path@npm:^1.0.1":
   version: 1.0.1
   resolution: "common-ancestor-path@npm:1.0.1"
@@ -7947,7 +8017,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-regex@npm:^10.3.0":
+"emoji-regex@npm:^10, emoji-regex@npm:^10.3.0":
   version: 10.3.0
   resolution: "emoji-regex@npm:10.3.0"
   checksum: b9b084ebe904f13bb4b66ee4c29fb41a7a4a1165adcc33c1ce8056c0194b882cc91ebdc782f1a779b5d7ea7375c5064643a7734893d7c657b44c5c6b9d7bf1e7
@@ -10045,6 +10115,8 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^6.13.2"
     "@typescript-eslint/parser": "npm:^6.13.2"
     babel-plugin-styled-components: "npm:^2.1.4"
+    commitlint: "npm:^18.6.0"
+    commitlint-config-gitmoji: "npm:^2.3.1"
     dark-github-theme: "https://github.com/remorses/dark-github-theme.git#commit=3dde125a391f5557fcc42e0d95899750df4370bf"
     disable-scroll: "npm:^0.6.0"
     eslint: "npm:^8.55.0"
@@ -10537,6 +10609,13 @@ __metadata:
   version: 1.5.0
   resolution: "github-slugger@npm:1.5.0"
   checksum: c70988224578b3bdaa25df65973ffc8c24594a77a28550c3636e495e49d17aef5cdb04c04fa3f1744babef98c61eecc6a43299a13ea7f3cc33d680bf9053ffbe
+  languageName: node
+  linkType: hard
+
+"gitmojis@npm:^3":
+  version: 3.14.0
+  resolution: "gitmojis@npm:3.14.0"
+  checksum: 55d6f14454b67921d957a21ec1f766dbc8a79f2f80f45c93c053e3803b5e393bf81d29acb7b91caf47cea504b076ef7419f23dd589a64c644ba73db1f5fe3274
   languageName: node
   linkType: hard
 

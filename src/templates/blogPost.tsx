@@ -13,7 +13,7 @@ import { rhythm } from "~/src/styles/typography"
 
 const BlogPost: React.FC<PageProps<Queries.Query>> = ({ data }) => {
   const { markdownRemark } = data
-  const { frontmatter, html } = markdownRemark!
+  const { frontmatter, html, excerpt } = markdownRemark!
   const { title, desc, thumbnail, date, category } = frontmatter!
 
   const ogImagePath =
@@ -23,7 +23,7 @@ const BlogPost: React.FC<PageProps<Queries.Query>> = ({ data }) => {
 
   return (
     <Layout>
-      <SEO title={title} desc={desc} image={ogImagePath} />
+      <SEO title={title} desc={desc || excerpt} image={ogImagePath} />
       <main>
         <article>
           <OuterWrapper>
@@ -136,6 +136,7 @@ export const query = graphql`
   query BlogPostPage($slug: String!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {
       html
+      excerpt(format: PLAIN)
       frontmatter {
         title
         desc

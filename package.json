@@ -4,7 +4,7 @@
   "description": "Gatsby blog starter kit with beautiful and responsive design",
   "private": true,
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   },
   "scripts": {
     "build": "gatsby build",

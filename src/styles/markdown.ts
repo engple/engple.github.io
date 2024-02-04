@@ -168,9 +168,9 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
   }
 
   details {
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-gray-3);
     border-radius: 4px;
-    line-height: 1.5;
+    line-height: 2;
     margin: 1em 0;
   }
 
@@ -183,10 +183,11 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     cursor: pointer;
     font-weight: bold;
     padding: 0 8px;
-    background-color: #f7f5f5;
+    background-color: var(--color-gray-2);
     border-radius: 4px;
     display: flex;
     align-items: center;
+    focus: none;
   }
 
   summary::before {
@@ -199,6 +200,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     display: inline-block;
     text-align: center;
     margin-right: 8px;
+    lien-height: 16px;
   }
 
   details[open] summary {
@@ -207,6 +209,10 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
 
   details[open] summary::before {
     transform: rotate(90deg);
+  }
+
+  details summary::-webkit-details-marker {
+    display: none;
   }
 `
 

@@ -25,6 +25,7 @@
     "dark-github-theme": "https://github.com/remorses/dark-github-theme.git#commit=3dde125a391f5557fcc42e0d95899750df4370bf",
     "gatsby": "^5.12.12",
     "gatsby-plugin-feed": "^5.12.3",
+    "gatsby-plugin-google-gtag": "^5.13.1",
     "gatsby-plugin-image": "^3.12.3",
     "gatsby-plugin-manifest": "^5.12.3",
     "gatsby-plugin-offline": "^6.12.3",

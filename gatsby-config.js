@@ -180,6 +180,18 @@ const pwaPlugins = [
   "gatsby-plugin-offline",
 ]
 
+const gtagPlugins = [
+  {
+    resolve: "gatsby-plugin-google-gtag",
+    options: {
+      trackingIds: [meta.gtagTrackingId],
+      pluginConfig: {
+        head: true,
+      },
+    },
+  },
+]
+
 module.exports = {
   graphqlTypegen: true,
   siteMetadata,
@@ -190,5 +202,6 @@ module.exports = {
     ...markdownPlugins,
     ...searchPlugins,
     ...pwaPlugins,
+    ...gtagPlugins,
   ],
 }

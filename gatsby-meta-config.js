@@ -27,6 +27,7 @@ const metaConfig = {
     github: "https://github.com/engple/engple",
   },
   favicon: "src/images/icon.png",
+  gtagTrackingId: "G-02627QJ9HV",
 }
 
 // eslint-disable-next-line no-undef

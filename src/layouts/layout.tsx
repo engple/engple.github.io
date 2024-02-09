@@ -12,7 +12,7 @@ import styledTheme from "~/src/styles/styledTheme"
 const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { theme, themeToggler } = useTheme()
   const { title, author } = useSiteMetadata()
-  const copyrightString = `Copyright © ${author} 2024`
+  const copyrightString = `Copyright © engple 2024`
 
   return (
     <ThemeProvider theme={styledTheme}>

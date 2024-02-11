@@ -23,8 +23,7 @@ interface SEOProperties {
 const SEO: React.FC<SEOProperties> = ({ title = "", desc = "", image }) => {
   const site = useSiteMetadata()
   const description = desc || site.description
-  const ogImageUrl =
-    site.siteUrl ?? "" + (image || (defaultOpenGraphImage as string))
+  const ogImageUrl = image || (defaultOpenGraphImage as string)
 
   return (
     <Helmet

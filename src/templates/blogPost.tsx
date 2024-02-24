@@ -3,7 +3,6 @@ import React from "react"
 import { type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
-import Comment from "~/src/components/comment"
 import SEO from "~/src/components/seo"
 import Layout from "~/src/layouts/layout"
 import Category from "~/src/styles/category"
@@ -11,10 +10,59 @@ import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
 
-const BlogPost: React.FC<PageProps<Queries.Query>> = ({ data }) => {
-  const { markdownRemark } = data
-  const { frontmatter, html, excerpt } = markdownRemark!
+import PostNavigator from "../components/postNavigator"
+
+interface DataProps {
+  current: {
+    id: string
+    html: string
+    excerpt: string
+    frontmatter: Queries.MarkdownRemarkFrontmatter
+  }
+  next?: {
+    id: string
+    excerpt: string
+    frontmatter: Queries.MarkdownRemarkFrontmatter
+    fields: {
+      slug: string
+    }
+  }
+  prev?: {
+    id: string
+    excerpt: string
+    frontmatter: Queries.MarkdownRemarkFrontmatter
+    fields: {
+      slug: string
+    }
+  }
+}
+
+const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
+  const { frontmatter, html, excerpt } = data.current!
   const { title, desc, thumbnail, date, category } = frontmatter!
+
+  const nextPost = data.next
+    ? {
+        id: data.next.id,
+        ...data.next.frontmatter,
+        slug: data.next.fields.slug,
+        thumbnail:
+          data.next.frontmatter.thumbnail?.childImageSharp?.gatsbyImageData
+            ?.images?.fallback?.src,
+      }
+    : undefined
+  const prevPost = data.prev
+    ? {
+        id: data.prev.id,
+        ...data.prev.frontmatter,
+        slug: data.prev.fields.slug,
+        thumbnail:
+          data.prev.frontmatter.thumbnail?.childImageSharp?.gatsbyImageData
+            ?.images?.fallback?.src,
+      }
+    : undefined
+
+  console.log(nextPost, prevPost)
 
   const ogImagePath =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -46,9 +94,7 @@ const BlogPost: React.FC<PageProps<Queries.Query>> = ({ data }) => {
             </InnerWrapper>
           </OuterWrapper>
         </article>
-        <CommentWrap>
-          <Comment />
-        </CommentWrap>
+        <PostNavigator prevPost={prevPost} nextPost={nextPost} />
       </main>
     </Layout>
   )
@@ -69,17 +115,6 @@ const InnerWrapper = styled.div`
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     width: 87.5%;
-  }
-`
-
-const CommentWrap = styled.section`
-  width: 100%;
-  padding: 0 var(--padding-sm);
-  margin: 0 auto;
-  margin-bottom: var(--sizing-xl);
-
-  @media (max-width: ${({ theme }) => theme.device.sm}) {
-    width: auto;
   }
 `
 
@@ -133,8 +168,9 @@ const Title = styled.h1`
 `
 
 export const query = graphql`
-  query BlogPostPage($slug: String!) {
-    markdownRemark(fields: { slug: { eq: $slug } }) {
+  query BlogPostPage($slug: String, $nextSlug: String, $prevSlug: String) {
+    current: markdownRemark(fields: { slug: { eq: $slug } }) {
+      id
       html
       excerpt(format: PLAIN)
       frontmatter {
@@ -147,6 +183,44 @@ export const query = graphql`
         }
         date(formatString: "YYYY-MM-DD")
         category
+      }
+    }
+
+    next: markdownRemark(fields: { slug: { eq: $nextSlug } }) {
+      id
+      excerpt(format: PLAIN)
+      frontmatter {
+        title
+        desc
+        thumbnail {
+          childImageSharp {
+            gatsbyImageData(placeholder: BLURRED, layout: FIXED)
+          }
+        }
+        date(formatString: "YYYY-MM-DD")
+        category
+      }
+      fields {
+        slug
+      }
+    }
+
+    prev: markdownRemark(fields: { slug: { eq: $prevSlug } }) {
+      id
+      excerpt(format: PLAIN)
+      frontmatter {
+        title
+        desc
+        thumbnail {
+          childImageSharp {
+            gatsbyImageData(placeholder: BLURRED, layout: FIXED)
+          }
+        }
+        date(formatString: "YYYY-MM-DD")
+        category
+      }
+      fields {
+        slug
       }
     }
   }

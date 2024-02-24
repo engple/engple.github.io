@@ -17,9 +17,6 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
 exports.createPages = async ({ graphql, actions }) => {
   const { createPage } = actions
 
-  const mainTemplate = path.resolve(`./src/pages/index.tsx`)
-  const blogPostTemplate = path.resolve(`./src/templates/blogPost.tsx`)
-
   const result = await graphql(`
     {
       postsRemark: allMarkdownRemark(
@@ -29,6 +26,16 @@ exports.createPages = async ({ graphql, actions }) => {
       ) {
         edges {
           node {
+            fields {
+              slug
+            }
+          }
+          next {
+            fields {
+              slug
+            }
+          }
+          previous {
             fields {
               slug
             }
@@ -44,26 +51,36 @@ exports.createPages = async ({ graphql, actions }) => {
     }
   `)
 
-  const posts = result.data.postsRemark.edges
+  createPostPages({ result, createPage })
+  createCategoryPages({ result, createPage })
+}
 
-  posts.forEach(({ node }) => {
+function createCategoryPages({ result, createPage }) {
+  const template = path.resolve(`./src/pages/index.tsx`)
+
+  result.data.categoriesGroup.group.forEach(category => {
     createPage({
-      path: node.fields.slug,
-      component: blogPostTemplate,
+      path: `/category/${_.kebabCase(category.fieldValue)}/`,
+      component: template,
       context: {
-        slug: node.fields.slug,
+        category: category.fieldValue,
       },
     })
   })
+}
 
-  const categories = result.data.categoriesGroup.group
+const createPostPages = ({ result, createPage }) => {
+  const template = path.resolve(`./src/templates/blogPost.tsx`)
 
-  categories.forEach(category => {
+  result.data.postsRemark.edges.forEach(({ node, next, previous }) => {
     createPage({
-      path: `/category/${_.kebabCase(category.fieldValue)}/`,
-      component: mainTemplate,
+      path: node.fields.slug,
+      component: template,
       context: {
-        category: category.fieldValue,
+        // additional data can be passed via context
+        slug: node.fields.slug,
+        nextSlug: next?.fields.slug ?? "",
+        prevSlug: previous?.fields.slug ?? "",
       },
     })
   })

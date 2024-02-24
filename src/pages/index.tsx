@@ -3,7 +3,6 @@ import React, { useLayoutEffect, useState } from "react"
 import { type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
-import CategoryFilter from "~/src/components/catetgoryFilter"
 import PostGrid from "~/src/components/postGrid"
 import SEO from "~/src/components/seo"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
@@ -55,7 +54,6 @@ const Home = ({
       <SEO />
       <Main>
         <Content>
-          {/* <CategoryFilter categoryList={data.allMarkdownRemark.group} /> */}
           <PostTitle>{postTitle}</PostTitle>
           <PostGrid posts={posts} />
         </Content>

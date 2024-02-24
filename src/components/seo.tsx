@@ -76,9 +76,19 @@ const SEO: React.FC<SEOProperties> = ({ title = "", desc = "", image }) => {
             property: "twitter:image",
             content: ogImageUrl,
           },
+          {
+            property: "google-adsense-account",
+            content: "ca-pub-3580261224101097",
+          },
         ] as Meta
       }
-    />
+    >
+      <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3580261224101097"
+        crossOrigin="anonymous"
+      ></script>
+    </Helmet>
   )
 }
 

@@ -168,7 +168,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
   }
 
   details {
-    border: 1px solid var(--color-gray-3);
+    border: 1px solid var(--color-gray-2);
     border-radius: 4px;
     line-height: 2;
     margin: 1em 0;
@@ -183,7 +183,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     cursor: pointer;
     font-weight: bold;
     padding: 0 8px;
-    background-color: var(--color-gray-2);
+    background-color: var(--color-gray-1);
     border-radius: 4px;
     display: flex;
     align-items: center;

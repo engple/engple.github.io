@@ -43,15 +43,23 @@ const PostNavigator: React.FC<PostNavigatorProps> = ({
 const Container = styled.div`
   width: var(--post-width);
   margin: 0 auto;
+  margin-bottom: var(--padding-sm);
   display: flex;
   justify-content: space-between;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    width: 100%;
+    padding: 0 var(--padding-sm);
+    flex-direction: column;
+    gap: var(--padding-sm);
+  }
 `
 
 const Card = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  border: 1px solid var(--post-card-border-color);
+  background-color: var(--color-gray-1);
   border-radius: 6px;
   padding: 15px;
 `

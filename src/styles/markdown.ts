@@ -176,7 +176,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
 
   details > span {
     display: block;
-    padding: 0 24px;
+    padding: 0 32px;
   }
 
   summary {

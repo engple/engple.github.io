@@ -80,6 +80,10 @@ const SEO: React.FC<SEOProperties> = ({ title = "", desc = "", image }) => {
             property: "google-adsense-account",
             content: "ca-pub-3580261224101097",
           },
+          {
+            property: "naver-site-verification",
+            content: "7f4cdd0b74209a3bbf5b0c15b445fa439a8a2b9c",
+          },
         ] as Meta
       }
     >

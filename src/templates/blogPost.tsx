@@ -62,8 +62,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
       }
     : undefined
 
-  console.log(nextPost, prevPost)
-
   const ogImagePath =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     thumbnail &&

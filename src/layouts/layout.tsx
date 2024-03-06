@@ -11,7 +11,7 @@ import styledTheme from "~/src/styles/styledTheme"
 
 const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { theme, themeToggler } = useTheme()
-  const { title, author } = useSiteMetadata()
+  const { title } = useSiteMetadata()
   const copyrightString = `Copyright © engple 2024`
 
   return (
@@ -50,13 +50,6 @@ const Copyright = styled.span`
   font-size: var(--text-sm);
   font-weight: var(--font-weight-regular);
   color: var(--color-gray-6);
-`
-
-const RepoLink = styled.a`
-  color: var(--color-blue);
-  &:hover {
-    text-decoration: underline;
-  }
 `
 
 export default Layout

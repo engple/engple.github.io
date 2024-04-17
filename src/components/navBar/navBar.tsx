@@ -98,7 +98,7 @@ const Content = styled.div`
   }
 `
 
-const Title = styled.h1`
+const Title = styled.div`
   z-index: 9999;
   padding: 0;
   border: none;

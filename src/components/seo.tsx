@@ -78,7 +78,7 @@ const SEO: React.FC<SEOProperties> = ({ title = "", desc = "", image }) => {
           },
           {
             property: "google-adsense-account",
-            content: "ca-pub-3580261224101097",
+            content: "ca-pub-1465612013356152",
           },
           {
             property: "naver-site-verification",
@@ -89,7 +89,7 @@ const SEO: React.FC<SEOProperties> = ({ title = "", desc = "", image }) => {
     >
       <script
         async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3580261224101097"
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1465612013356152"
         crossOrigin="anonymous"
       ></script>
     </Helmet>

@@ -24,6 +24,8 @@ const Home = ({
         )
       : postData
 
+    console.log(filteredPostData)
+
     for (const { node } of filteredPostData) {
       const { id, fields, frontmatter } = node
       const { slug } = fields!

@@ -21,7 +21,7 @@ const CenteredImg: React.FC<CenteredImgProperties> = ({ src, alt }) => {
             id
             gatsbyImageData(
               layout: CONSTRAINED
-              aspectRatio: 1.77
+              aspectRatio: 1.77777777778
               placeholder: BLURRED
             )
           }
@@ -40,7 +40,12 @@ const CenteredImg: React.FC<CenteredImgProperties> = ({ src, alt }) => {
   return (
     <ThumbnailWrapper>
       <InnerWrapper>
-        <GatsbyImage image={image} loading="eager" alt={alt ?? DEFAULT_ALT} />
+        <GatsbyImage
+          image={image}
+          loading="eager"
+          alt={alt ?? DEFAULT_ALT}
+          imgStyle={{ aspectRatio: "16 / 9", width: "100%" }}
+        />
       </InnerWrapper>
     </ThumbnailWrapper>
   )

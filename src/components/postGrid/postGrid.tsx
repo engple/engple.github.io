@@ -84,7 +84,7 @@ const List = styled.li`
   a:hover,
   a:focus {
     .gatsby-image-wrapper {
-      transform: scale(1.03);
+      transform: scale(1.06);
     }
   }
 

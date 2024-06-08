@@ -2,7 +2,6 @@ import React, { useContext } from "react"
 
 import styled from "styled-components"
 
-import { DARK } from "~/src/constants/theme"
 import type { UseThemeReturnType } from "~/src/hooks/useTheme"
 import ThemeContext from "~/src/stores/themeContext"
 import Background from "~/src/styles/background"
@@ -17,7 +16,6 @@ const ThemeToggleButton: React.FC<ThemeToggleButtonProperties> = ({
   themeToggler,
 }) => {
   const theme = useContext(ThemeContext)
-  const LABEL_TEXT = theme === DARK ? "Light theme" : "Dark theme"
 
   return (
     <Button onClick={themeToggler}>
@@ -26,7 +24,6 @@ const ThemeToggleButton: React.FC<ThemeToggleButtonProperties> = ({
         <Icon version="1.1" x="0px" y="0px" viewBox="0 0 24 24">
           <ThemeIcon theme={theme} />
         </Icon>
-        <Text>{LABEL_TEXT}</Text>
       </Content>
     </Button>
   )
@@ -48,7 +45,7 @@ const Icon = styled.svg`
 const ButtonBackground = styled(Background)`
   border: none;
   background-color: var(--color-floating-button);
-  border-radius: var(--border-radius-lg);
+  border-radius: 100%;
   box-shadow: 0 3px 15px var(--color-floating-button-shadow);
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
@@ -65,18 +62,6 @@ const Content = styled.div`
   justify-content: center;
   align-items: center;
   background-color: transparent;
-`
-
-const Text = styled.span`
-  color: var(--color-floating-button-text);
-  margin-left: 6px;
-
-  @media (max-width: ${({ theme }) => theme.device.sm}) {
-    color: var(--color-text);
-    margin-left: 0;
-    font-weight: var(--font-weight-medium);
-    border-radius: 50%;
-  }
 `
 
 const Button = styled.button`
@@ -99,17 +84,14 @@ const Button = styled.button`
   @media (min-width: ${({ theme }) => theme.device.sm}) {
     &:hover {
       outline: none;
-      border: 1px solid var(--color-floating-button-border-hover);
 
-      ${Icon},
-      ${Text} {
+      ${Icon} {
         color: var(--color-floating-button-text-hover);
         fill: var(--color-floating-button-text-hover);
       }
 
       ${ButtonBackground} {
         background-color: var(--color-floating-button-hover);
-        box-shadow: 0 3px 15px var(--color-floating-button-shadow-hover);
       }
     }
   }
@@ -123,7 +105,7 @@ const Button = styled.button`
     padding: 0.5rem 0;
 
     &:hover {
-      ${Icon}, ${Text} {
+      ${Icon} {
         fill: var(--color-blue);
         color: var(--color-blue);
       }
@@ -134,7 +116,7 @@ const Button = styled.button`
     }
 
     &:focus-visible {
-      ${Icon}, ${Text} {
+      ${Icon} {
         fill: var(--color-blue);
         color: var(--color-blue);
       }

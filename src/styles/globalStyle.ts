@@ -81,7 +81,7 @@ const GlobalStyle = createGlobalStyle`
       --color-divider: rgba(0, 0, 0, 0.15);
       --color-dimmed: rgba(0, 0, 0, 0.15);
       --color-floating-button: rgba(255, 255, 255, 0.7);
-      --color-floating-button-hover: rgba(50, 50, 50, 0.7);
+      --color-floating-button-hover: rgba(50, 50, 50, 0.9);
       --color-floating-button-border: rgba(230, 230, 230, 0.7);
       --color-floating-button-border-hover: rgba(255, 255, 255, 0.2);
       --color-floating-button-text: #202020;
@@ -116,7 +116,7 @@ const GlobalStyle = createGlobalStyle`
       --color-divider: rgba(255, 255, 255, 0.15);
       --color-dimmed: rgba(0, 0, 0, 0.15);
       --color-floating-button: rgba(50, 50, 50, 0.7);
-      --color-floating-button-hover: rgba(255, 255, 255, 0.7);
+      --color-floating-button-hover: rgba(255, 255, 255, 0.9);
       --color-floating-button-border: rgba(255, 255, 255, 0.2);
       --color-floating-button-border-hover: rgba(230, 230, 230, 0.7);
       --color-floating-button-text: #d1d1d1;

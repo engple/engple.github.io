@@ -214,6 +214,12 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
   details summary::-webkit-details-marker {
     display: none;
   }
+
+  iframe.youtube {
+    width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    margin-bottom: var(--sizing-sm);
+  }
 `
 
 export default Markdown

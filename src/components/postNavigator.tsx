@@ -46,6 +46,7 @@ const Container = styled.div`
   margin-bottom: var(--padding-sm);
   display: flex;
   justify-content: space-between;
+  gap: var(--padding-sm);
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     width: 100%;

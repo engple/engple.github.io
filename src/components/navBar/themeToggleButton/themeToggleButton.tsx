@@ -76,7 +76,6 @@ const Button = styled.button`
   right: var(--sizing-md);
   bottom: var(--sizing-md);
   padding: var(--sizing-base);
-  padding-right: 20px;
   border: 1px solid var(--color-floating-button-border);
   border-radius: var(--border-radius-lg);
   font-weight: var(--font-weight-medium);

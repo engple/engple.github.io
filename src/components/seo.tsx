@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet"
 
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 
-import defaultOpenGraphImage from "../images/og-default.png"
+import defaultOpenGraphImage from "../images/og-thumbnail.png"
 
 const DEFAULT_LANG = "en"
 

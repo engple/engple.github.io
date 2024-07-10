@@ -1,9 +1,11 @@
 import React from "react"
 
 import { type PageProps, graphql } from "gatsby"
+import { type Article, type BreadcrumbList, type Graph } from "schema-dts"
 import styled from "styled-components"
 
 import SEO from "~/src/components/seo"
+import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
 import Category from "~/src/styles/category"
 import DateTime from "~/src/styles/dateTime"
@@ -18,6 +20,9 @@ interface DataProps {
     html: string
     excerpt: string
     frontmatter: Queries.MarkdownRemarkFrontmatter
+    fields: {
+      slug: string
+    }
   }
   next?: {
     id: string
@@ -38,8 +43,14 @@ interface DataProps {
 }
 
 const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
-  const { frontmatter, html, excerpt } = data.current!
+  const {
+    frontmatter,
+    html,
+    excerpt,
+    fields: { slug },
+  } = data.current!
   const { title, desc, thumbnail, date, category } = frontmatter!
+  const site = useSiteMetadata()
 
   const nextPost = data.next
     ? {
@@ -67,9 +78,65 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     thumbnail &&
     thumbnail?.childImageSharp?.gatsbyImageData!.images!.fallback!.src
 
+  const description = desc || excerpt
+
+  const articleJsonLd = {
+    "@type": "Article",
+    "@id": `${site.siteUrl}${slug}`,
+    headline: title,
+    datePublished: date,
+    dateModified: date, // TODO: last modified date
+    author: {
+      "@type": "Person",
+      "@id": `${site.siteUrl}/#person`,
+      name: "Engple Team",
+      url: "https://github.com/engple",
+    },
+    description,
+    url: `${site.siteUrl}${slug}`,
+    thumbnailUrl: `${site.siteUrl}${ogImagePath}`,
+    image: `${site.siteUrl}${ogImagePath}`,
+    copyrightHolder: { "@id": `${site.siteUrl}/#organization` },
+    publisher: { "@id": `${site.siteUrl}/#organization` },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${site.siteUrl}${slug}`,
+    },
+    wordCount: html?.split(" ").length,
+  } as Article
+
+  const breadcrumbJsonLd = {
+    "@type": "BreadcrumbList",
+    "@id": `${site.siteUrl}${slug}#breadcrumb`,
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        item: {
+          "@id": site.siteUrl,
+          name: "영어 표현",
+        },
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        item: {
+          "@id": `${site.siteUrl}${slug}`,
+          name: title,
+        },
+      },
+    ],
+  } as BreadcrumbList
+
+  const jsonLds = [articleJsonLd, breadcrumbJsonLd]
   return (
     <Layout>
-      <SEO title={title} desc={desc || excerpt} image={ogImagePath} />
+      <SEO
+        title={title}
+        desc={description}
+        image={ogImagePath}
+        jsonLds={jsonLds}
+      />
       <main>
         <article>
           <OuterWrapper>
@@ -78,10 +145,9 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 <header>
                   <Info>
                     <PostCategory>{category}</PostCategory>
-                    <Time dateTime={date!}>{date}</Time>
+                    <Time dateTime={date!}>{date?.split("T")[0]}</Time>
                   </Info>
                   <Title>{title}</Title>
-                  <Desc>{desc}</Desc>
                 </header>
                 <Divider />
                 <Markdown
@@ -97,7 +163,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     </Layout>
   )
 }
-
 const OuterWrapper = styled.div`
   margin-top: var(--sizing-xl);
 
@@ -128,17 +193,6 @@ const Info = styled.div`
 const Time = styled(DateTime)`
   display: block;
   margin-top: var(--sizing-xs);
-`
-
-const Desc = styled.p`
-  margin-top: var(--sizing-lg);
-  line-height: 1.5;
-  font-size: var(--text-lg);
-
-  @media (max-width: ${({ theme }) => theme.device.sm}) {
-    line-height: 1.31579;
-    font-size: 1.1875rem;
-  }
 `
 
 const Divider = styled.div`
@@ -179,8 +233,11 @@ export const query = graphql`
             gatsbyImageData(placeholder: BLURRED, layout: FIXED)
           }
         }
-        date(formatString: "YYYY-MM-DD")
+        date(formatString: "YYYY-MM-DDTHH:MM:SSZ")
         category
+      }
+      fields {
+        slug
       }
     }
 

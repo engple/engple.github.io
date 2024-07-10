@@ -1,7 +1,12 @@
 import React from "react"
 
 import { Helmet } from "react-helmet"
-import { type Graph } from "schema-dts"
+import {
+  type Graph,
+  type Organization,
+  type Thing,
+  type WebSite,
+} from "schema-dts"
 
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 
@@ -19,25 +24,25 @@ interface SEOProperties {
   desc?: Queries.Maybe<string>
   image?: Queries.Maybe<string>
   meta?: Meta
+  jsonLds?: Thing[]
 }
 
-const SEO: React.FC<SEOProperties> = ({ title = "", desc = "", image }) => {
+const SEO: React.FC<SEOProperties> = ({
+  title = "",
+  desc = "",
+  image,
+  jsonLds = [],
+}) => {
   const site = useSiteMetadata()
   const description = desc || site.description
   const ogImageUrl = image || (defaultOpenGraphImage as string)
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "WebSite",
-        name: "잉플 | 패턴으로 배우는 영어 공부 🍎",
-        alternateName: "Engple",
-        url: site.siteUrl,
-        description: site.description,
-        inLanguage: ["ko", "en"],
-      },
+      ...jsonLds,
       {
         "@type": "Organization",
+        "@id": `${site.siteUrl}/#organization`,
         name: "잉플 | 패턴으로 배우는 영어 공부 🍎",
         url: site.siteUrl,
         logo: {
@@ -47,7 +52,16 @@ const SEO: React.FC<SEOProperties> = ({ title = "", desc = "", image }) => {
         sameAs: [
           // "https://www.instagram.com/engple",
         ],
-      },
+      } as Organization,
+      {
+        "@type": "WebSite",
+        "@id": `${site.siteUrl}/#website`,
+        name: "잉플 | 패턴으로 배우는 영어 공부 🍎",
+        alternateName: "Engple",
+        url: site.siteUrl,
+        description: site.description,
+        inLanguage: ["ko", "en"],
+      } as WebSite,
     ],
   } as Graph
 

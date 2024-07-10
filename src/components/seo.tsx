@@ -1,6 +1,7 @@
 import React from "react"
 
 import { Helmet } from "react-helmet"
+import { type Graph } from "schema-dts"
 
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 
@@ -24,6 +25,31 @@ const SEO: React.FC<SEOProperties> = ({ title = "", desc = "", image }) => {
   const site = useSiteMetadata()
   const description = desc || site.description
   const ogImageUrl = image || (defaultOpenGraphImage as string)
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        name: "잉플 | 패턴으로 배우는 영어 공부 🍎",
+        alternateName: "Engple",
+        url: site.siteUrl,
+        description: site.description,
+        inLanguage: ["ko", "en"],
+      },
+      {
+        "@type": "Organization",
+        name: "잉플 | 패턴으로 배우는 영어 공부 🍎",
+        url: site.siteUrl,
+        logo: {
+          "@type": "ImageObject",
+          url: `${site.siteUrl}${defaultOpenGraphImage}`,
+        },
+        sameAs: [
+          // "https://www.instagram.com/engple",
+        ],
+      },
+    ],
+  } as Graph
 
   return (
     <Helmet
@@ -92,6 +118,7 @@ const SEO: React.FC<SEOProperties> = ({ title = "", desc = "", image }) => {
         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1465612013356152"
         crossOrigin="anonymous"
       ></script>
+      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
     </Helmet>
   )
 }

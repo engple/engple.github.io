@@ -1,7 +1,7 @@
 import React from "react"
 
 import { type PageProps, graphql } from "gatsby"
-import { type Article, type BreadcrumbList, type Graph } from "schema-dts"
+import { type Article, type BreadcrumbList } from "schema-dts"
 import styled from "styled-components"
 
 import SEO from "~/src/components/seo"

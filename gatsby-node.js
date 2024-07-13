@@ -11,6 +11,12 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
       name: `slug`,
       value: slug.replace("/season-1", ""),
     })
+    const fileNode = getNode(node.parent)
+    createNodeField({
+      node,
+      name: `modifiedTime`,
+      value: fileNode.modifiedTime,
+    })
   }
 }
 
@@ -28,6 +34,7 @@ exports.createPages = async ({ graphql, actions }) => {
           node {
             fields {
               slug
+              modifiedTime
             }
           }
           next {
@@ -79,6 +86,7 @@ const createPostPages = ({ result, createPage }) => {
       context: {
         // additional data can be passed via context
         slug: node.fields.slug,
+        modifiedTime: node.fields.modifiedTime,
         nextSlug: next?.fields.slug ?? "",
         prevSlug: previous?.fields.slug ?? "",
       },

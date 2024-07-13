@@ -22,6 +22,7 @@ interface DataProps {
     frontmatter: Queries.MarkdownRemarkFrontmatter
     fields: {
       slug: string
+      modifiedTime: string
     }
   }
   next?: {
@@ -47,7 +48,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     frontmatter,
     html,
     excerpt,
-    fields: { slug },
+    fields: { slug, modifiedTime },
   } = data.current!
   const { title, desc, thumbnail, date, category } = frontmatter!
   const site = useSiteMetadata()
@@ -85,7 +86,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     "@id": `${site.siteUrl}${slug}`,
     headline: title,
     datePublished: date,
-    dateModified: date, // TODO: last modified date
+    dateModified: modifiedTime || date,
     author: {
       "@type": "Person",
       "@id": `${site.siteUrl}/#person`,
@@ -163,6 +164,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     </Layout>
   )
 }
+
 const OuterWrapper = styled.div`
   margin-top: var(--sizing-xl);
 

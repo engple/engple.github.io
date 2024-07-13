@@ -34,7 +34,7 @@ const SEO: React.FC<SEOProperties> = ({
   jsonLds = [],
 }) => {
   const site = useSiteMetadata()
-  const description = desc || site.description
+  const description = desc || site.description || ""
   const ogImageUrl = image || (defaultOpenGraphImage as string)
   const jsonLd = {
     "@context": "https://schema.org",
@@ -74,7 +74,7 @@ const SEO: React.FC<SEOProperties> = ({
         [
           {
             name: "description",
-            content: description,
+            content: description?.slice(0, 160),
           },
           {
             property: "og:title",

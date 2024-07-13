@@ -1,7 +1,12 @@
 import React from "react"
 
 import { type PageProps, graphql } from "gatsby"
-import { type Article, type BreadcrumbList } from "schema-dts"
+import {
+  type Article,
+  type BreadcrumbList,
+  type FAQPage,
+  type Thing,
+} from "schema-dts"
 import styled from "styled-components"
 
 import SEO from "~/src/components/seo"
@@ -50,7 +55,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     excerpt,
     fields: { slug, modifiedTime },
   } = data.current!
-  const { title, desc, thumbnail, date, category } = frontmatter!
+  const { title, desc, thumbnail, date, category, faq = [] } = frontmatter!
   const site = useSiteMetadata()
 
   const nextPost = data.next
@@ -129,7 +134,26 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     ],
   } as BreadcrumbList
 
-  const jsonLds = [articleJsonLd, breadcrumbJsonLd]
+  const faqJsonLd = {
+    "@type": "FAQPage",
+    mainEntity: faq
+      ? faq.map(item => ({
+          "@type": "Question",
+          name: item?.question || "",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: item?.answer || "",
+          },
+        }))
+      : [],
+  } as FAQPage
+
+  const jsonLds: Thing[] = [articleJsonLd, breadcrumbJsonLd]
+  console.log(faq)
+  if (faq) {
+    jsonLds.push(faqJsonLd)
+  }
+
   return (
     <Layout>
       <SEO
@@ -237,6 +261,10 @@ export const query = graphql`
         }
         date(formatString: "YYYY-MM-DDTHH:MM:SSZ")
         category
+        faq {
+          question
+          answer
+        }
       }
       fields {
         slug

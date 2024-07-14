@@ -149,7 +149,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   } as FAQPage
 
   const jsonLds: Thing[] = [articleJsonLd, breadcrumbJsonLd]
-  console.log(faq)
+
   if (faq) {
     jsonLds.push(faqJsonLd)
   }

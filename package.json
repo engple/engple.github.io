@@ -50,8 +50,6 @@
     "vscode-theme-github-light": "https://github.com/yunlingz/vscode-theme-github-light.git#commit=38174065a9e6c8d93a20fab5fe7c7641c07aeca7"
   },
   "devDependencies": {
-    "@commitlint/cli": "^18.4.3",
-    "@commitlint/config-conventional": "^18.4.3",
     "@graphql-eslint/eslint-plugin": "^3.20.1",
     "@semantic-release/commit-analyzer": "^11.1.0",
     "@semantic-release/git": "^10.0.1",
@@ -64,8 +62,6 @@
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@typescript-eslint/parser": "^6.13.2",
     "babel-plugin-styled-components": "^2.1.4",
-    "commitlint": "^18.6.0",
-    "commitlint-config-gitmoji": "^2.3.1",
     "disable-scroll": "^0.6.0",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",

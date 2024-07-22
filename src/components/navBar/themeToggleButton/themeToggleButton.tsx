@@ -103,25 +103,15 @@ const Button = styled.button`
     width: 100%;
     padding: 0.5rem 0;
 
+    ${Icon} {
+      width: 1rem;
+      margin-right: 4px;
+    }
+
     &:hover {
       ${Icon} {
         fill: var(--color-blue);
         color: var(--color-blue);
-      }
-      ${Icon} {
-        width: 1rem;
-        margin-right: 4px;
-      }
-    }
-
-    &:focus-visible {
-      ${Icon} {
-        fill: var(--color-blue);
-        color: var(--color-blue);
-      }
-      ${Icon} {
-        width: 1rem;
-        margin-right: 4px;
       }
     }
   }

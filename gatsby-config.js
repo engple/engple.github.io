@@ -77,6 +77,7 @@ const markdownPlugins = [
     options: {
       plugins: [
         "gatsby-remark-copy-linked-files",
+        "gatsby-remark-autolink-headers",
         {
           resolve: "gatsby-remark-vscode",
           options: {

@@ -3,12 +3,14 @@ import styled from "styled-components"
 import type typography from "./typography"
 
 const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
+  min-width: 100%;
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
+    scroll-margin-top: var(--sizing-xl);
     font-weight: var(--font-weight-bold);
   }
 

@@ -9747,6 +9747,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"gatsby-remark-autolink-headers@npm:^6.13.1":
+  version: 6.13.1
+  resolution: "gatsby-remark-autolink-headers@npm:6.13.1"
+  dependencies:
+    "@babel/runtime": "npm:^7.20.13"
+    github-slugger: "npm:^1.5.0"
+    lodash: "npm:^4.17.21"
+    mdast-util-to-string: "npm:^2.0.0"
+    unist-util-visit: "npm:^2.0.3"
+  peerDependencies:
+    gatsby: ^5.0.0-next
+    react: ^18.0.0 || ^0.0.0
+    react-dom: ^18.0.0 || ^0.0.0
+  checksum: ae221124945507aa7e6ed09bb24c9cf2f9b245e157722fea21eb6ba22b3eefed1e78d7321be79fabc7117590b2cec3c3cd8eb229b2ca2796883cf9c3832003ac
+  languageName: node
+  linkType: hard
+
 "gatsby-remark-copy-linked-files@npm:^6.12.0":
   version: 6.13.1
   resolution: "gatsby-remark-copy-linked-files@npm:6.13.1"
@@ -9880,6 +9897,7 @@ __metadata:
     gatsby-plugin-styled-components: "npm:^6.12.0"
     gatsby-plugin-typescript: "npm:^5.12.1"
     gatsby-plugin-typography: "npm:^5.12.0"
+    gatsby-remark-autolink-headers: "npm:^6.13.1"
     gatsby-remark-copy-linked-files: "npm:^6.12.0"
     gatsby-remark-images: "npm:^7.12.3"
     gatsby-remark-vscode: "npm:^3.3.1"
@@ -10333,7 +10351,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"github-slugger@npm:^1.2.1":
+"github-slugger@npm:^1.2.1, github-slugger@npm:^1.5.0":
   version: 1.5.0
   resolution: "github-slugger@npm:1.5.0"
   checksum: c70988224578b3bdaa25df65973ffc8c24594a77a28550c3636e495e49d17aef5cdb04c04fa3f1744babef98c61eecc6a43299a13ea7f3cc33d680bf9053ffbe

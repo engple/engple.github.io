@@ -18,11 +18,17 @@ import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
 
 import PostNavigator from "../components/postNavigator"
+import TableOfContents from "../components/tableOfContents"
 
 interface DataProps {
   current: {
     id: string
     html: string
+    headings: {
+      id: string
+      depth: number
+      value: string
+    }[]
     excerpt: string
     frontmatter: Queries.MarkdownRemarkFrontmatter
     fields: {
@@ -53,6 +59,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     frontmatter,
     html,
     excerpt,
+    headings,
     fields: { slug, modifiedTime },
   } = data.current!
   const { title, desc, thumbnail, date, category, faq = [] } = frontmatter!
@@ -175,10 +182,13 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   <Title>{title}</Title>
                 </header>
                 <Divider />
-                <Markdown
-                  dangerouslySetInnerHTML={{ __html: html ?? "" }}
-                  rhythm={rhythm}
-                />
+                <ContentWrapper>
+                  <Markdown
+                    dangerouslySetInnerHTML={{ __html: html ?? "" }}
+                    rhythm={rhythm}
+                  />
+                  <TableOfContents headings={headings} />
+                </ContentWrapper>
               </div>
             </InnerWrapper>
           </OuterWrapper>
@@ -205,6 +215,10 @@ const InnerWrapper = styled.div`
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     width: 87.5%;
   }
+`
+
+const ContentWrapper = styled.div`
+  display: flex;
 `
 
 const PostCategory = styled(Category)`
@@ -250,6 +264,11 @@ export const query = graphql`
     current: markdownRemark(fields: { slug: { eq: $slug } }) {
       id
       html
+      headings {
+        id
+        depth
+        value
+      }
       excerpt(format: PLAIN)
       frontmatter {
         title

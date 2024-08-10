@@ -16,9 +16,11 @@ const GlobalStyle = createGlobalStyle`
     --grid-gap-sm: 10px;
     --grid-gap-lg: 24px;
     --grid-gap-xl: 36px;
-
+    
+    --padding-xs: 8px;
     --padding-sm: 16px;
     --padding-lg: 22px;
+    --padding-xl: 32px;
 
     --border-radius-sm: 6px;
     --border-radius-base: 8px;

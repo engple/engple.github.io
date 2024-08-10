@@ -16,7 +16,7 @@ const PostNavigator: React.FC<PostNavigatorProps> = ({
 }) => {
   return (
     <Container>
-      <div className="post-navigator-card-wrapper">
+      <CardWrapper>
         {nextPost && (
           <Link key={nextPost.id} to={nextPost.slug as string}>
             <Card>
@@ -25,8 +25,8 @@ const PostNavigator: React.FC<PostNavigatorProps> = ({
             </Card>
           </Link>
         )}
-      </div>
-      <div className="post-navigator-card-wrapper">
+      </CardWrapper>
+      <CardWrapper>
         {prevPost && (
           <Link key={prevPost.id} to={prevPost.slug as string}>
             <Card>
@@ -35,7 +35,7 @@ const PostNavigator: React.FC<PostNavigatorProps> = ({
             </Card>
           </Link>
         )}
-      </div>
+      </CardWrapper>
     </Container>
   )
 }
@@ -56,10 +56,18 @@ const Container = styled.div`
   }
 `
 
+const CardWrapper = styled.div`
+  flex: 1;
+  max-width: 50%;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    max-width: 100%;
+  }
+`
+
 const Card = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
   background-color: var(--color-gray-1);
   border-radius: 6px;
   padding: 15px;

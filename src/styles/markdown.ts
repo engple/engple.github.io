@@ -131,6 +131,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
 
   img {
     display: block;
+    margin-bottom: var(--sizing-base);
   }
 
   pre,

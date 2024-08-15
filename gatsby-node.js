@@ -14,7 +14,7 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
     const fileNode = getNode(node.parent)
     createNodeField({
       node,
-      name: `modifiedTime`,
+      name: `lastmod`,
       value: fileNode.modifiedTime,
     })
   }
@@ -34,7 +34,7 @@ exports.createPages = async ({ graphql, actions }) => {
           node {
             fields {
               slug
-              modifiedTime
+              lastmod
             }
           }
           next {
@@ -86,7 +86,7 @@ const createPostPages = ({ result, createPage }) => {
       context: {
         // additional data can be passed via context
         slug: node.fields.slug,
-        modifiedTime: node.fields.modifiedTime,
+        lastmod: node.fields.lastmod,
         nextSlug: next?.fields.slug ?? "",
         prevSlug: previous?.fields.slug ?? "",
       },

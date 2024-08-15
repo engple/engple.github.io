@@ -33,7 +33,7 @@ interface DataProps {
     frontmatter: Queries.MarkdownRemarkFrontmatter
     fields: {
       slug: string
-      modifiedTime: string
+      lastmod: string
     }
   }
   next?: {
@@ -60,7 +60,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     html,
     excerpt,
     headings,
-    fields: { slug, modifiedTime },
+    fields: { slug, lastmod },
   } = data.current!
   const { title, desc, thumbnail, date, category, faq = [] } = frontmatter!
   const site = useSiteMetadata()
@@ -98,7 +98,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     "@id": `${site.siteUrl}${slug}`,
     headline: title,
     datePublished: date,
-    dateModified: modifiedTime || date,
+    dateModified: lastmod || date,
     author: {
       "@type": "Person",
       "@id": `${site.siteUrl}/#person`,
@@ -287,6 +287,7 @@ export const query = graphql`
       }
       fields {
         slug
+        lastmod
       }
     }
 

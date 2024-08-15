@@ -127,7 +127,52 @@ const markdownPlugins = [
 ]
 
 const searchPlugins = [
-  "gatsby-plugin-sitemap",
+  {
+    resolve: "gatsby-plugin-sitemap",
+    options: {
+      query: `
+        {
+          allSitePage {
+            nodes {
+              path
+            }
+          }
+          allMarkdownRemark {
+            nodes {
+              fields {
+                slug
+                lastmod
+              }
+              frontmatter {
+                date
+              }
+            }
+          }
+        }
+      `,
+      resolveSiteUrl: () => meta.siteUrl,
+      resolvePages: ({
+        allSitePage: { nodes: allPages },
+        allMarkdownRemark: { nodes: allPosts },
+      }) => {
+        const postsByPath = allPosts.reduce((acc, post) => {
+          const { slug, lastmod } = post.fields
+          acc[slug] = post
+          return acc
+        }, {})
+
+        return allPages.map(page => {
+          return { ...page, ...postsByPath[page.path] }
+        })
+      },
+      serialize: ({ path, frontmatter, lastmod }) => {
+        return {
+          url: path,
+          lastmod: lastmod || frontmatter?.date,
+        }
+      },
+    },
+  },
   "gatsby-plugin-robots-txt",
   {
     resolve: `gatsby-plugin-feed`,

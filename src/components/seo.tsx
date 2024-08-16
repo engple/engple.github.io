@@ -12,7 +12,7 @@ import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 
 import defaultOpenGraphImage from "../images/og-thumbnail.png"
 
-const DEFAULT_LANG = "en"
+const DEFAULT_LANG = "en-US"
 
 type Meta = React.DetailedHTMLProps<
   React.MetaHTMLAttributes<HTMLMetaElement>,
@@ -25,11 +25,13 @@ interface SEOProperties {
   image?: Queries.Maybe<string>
   meta?: Meta
   jsonLds?: Thing[]
+  url?: Queries.Maybe<string>
 }
 
 const SEO: React.FC<SEOProperties> = ({
   title = "",
   desc = "",
+  url = "",
   image,
   jsonLds = [],
 }) => {
@@ -43,24 +45,24 @@ const SEO: React.FC<SEOProperties> = ({
       {
         "@type": "Organization",
         "@id": `${site.siteUrl}/#organization`,
-        name: "잉플 | 패턴으로 배우는 영어 공부 🍎",
+        name: site.title,
         url: site.siteUrl,
         logo: {
           "@type": "ImageObject",
           url: `${site.siteUrl}${defaultOpenGraphImage}`,
         },
         sameAs: [
-          // "https://www.instagram.com/engple",
+          // "https://www.instagram.com/username",
         ],
       } as Organization,
       {
         "@type": "WebSite",
         "@id": `${site.siteUrl}/#website`,
-        name: "잉플 | 패턴으로 배우는 영어 공부 🍎",
-        alternateName: "Engple",
+        name: site.title,
+        alternateName: site.title,
         url: site.siteUrl,
         description: site.description,
-        inLanguage: ["ko", "en"],
+        inLanguage: site.lang ?? DEFAULT_LANG,
       } as WebSite,
     ],
   } as Graph
@@ -73,20 +75,44 @@ const SEO: React.FC<SEOProperties> = ({
       meta={
         [
           {
+            property: "google-adsense-account",
+            content: site.googleAdsense,
+          },
+          {
+            property: "image",
+            content: ogImageUrl,
+          },
+          {
             name: "description",
             content: description?.slice(0, 160),
           },
           {
-            property: "og:title",
-            content: title,
+            property: "naver-site-verification",
+            content: site.naverSiteVerification,
           },
           {
             property: "og:description",
             content: description,
           },
           {
+            property: "og:image",
+            content: ogImageUrl,
+          },
+          {
+            property: "og:title",
+            content: title,
+          },
+          {
             property: "og:type",
             content: "website",
+          },
+          {
+            property: "og:url",
+            content: url || site.siteUrl,
+          },
+          {
+            property: "twitter:image",
+            content: ogImageUrl,
           },
           {
             name: "twitter:card",
@@ -97,39 +123,19 @@ const SEO: React.FC<SEOProperties> = ({
             content: site.author,
           },
           {
-            name: "twitter:title",
-            content: title,
-          },
-          {
             name: "twitter:description",
             content: description,
           },
           {
-            property: "image",
-            content: ogImageUrl,
-          },
-          {
-            property: "og:image",
-            content: ogImageUrl,
-          },
-          {
-            property: "twitter:image",
-            content: ogImageUrl,
-          },
-          {
-            property: "google-adsense-account",
-            content: "ca-pub-1465612013356152",
-          },
-          {
-            property: "naver-site-verification",
-            content: "7f4cdd0b74209a3bbf5b0c15b445fa439a8a2b9c",
+            name: "twitter:title",
+            content: title,
           },
         ] as Meta
       }
     >
       <script
         async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1465612013356152"
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${site.googleAdsense}`}
         crossOrigin="anonymous"
       ></script>
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>

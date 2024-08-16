@@ -166,6 +166,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
       <SEO
         title={title}
         desc={description}
+        url={`${site.siteUrl}${slug}`}
         image={ogImagePath}
         jsonLds={jsonLds}
       />

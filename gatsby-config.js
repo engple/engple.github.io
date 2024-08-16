@@ -9,6 +9,9 @@ const siteMetadata = {
   utterances: {
     repo: meta.utterances,
   },
+  gtagTrackingId: meta.gtagTrackingId,
+  googleAdsense: meta.googleAdsense,
+  naverSiteVerification: meta.naverSiteVerification,
   postTitle: "전체",
   menuLinks: [
     {

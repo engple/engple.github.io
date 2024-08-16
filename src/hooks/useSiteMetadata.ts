@@ -16,6 +16,9 @@ const useSiteMetadata = () => {
           author
           siteUrl
           lang
+          gtagTrackingId
+          googleAdsense
+          naverSiteVerification
           utterances {
             repo
           }

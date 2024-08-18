@@ -59,6 +59,8 @@ const Container = styled.div`
 const CardWrapper = styled.div`
   flex: 1;
   max-width: 50%;
+  background-color: var(--color-gray-1);
+  border-radius: 6px;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     max-width: 100%;
@@ -68,8 +70,6 @@ const CardWrapper = styled.div`
 const Card = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: var(--color-gray-1);
-  border-radius: 6px;
   padding: 15px;
 `
 

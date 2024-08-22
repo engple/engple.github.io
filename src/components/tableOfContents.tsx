@@ -12,7 +12,6 @@ const TableOfContents = ({
     value: string
   }[]
 }) => {
-  console.log(headings)
   const [activeId, setActiveId] = useState("")
   useEffect(() => {
     const observer = new IntersectionObserver(

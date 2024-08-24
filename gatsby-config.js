@@ -176,7 +176,14 @@ const searchPlugins = [
       },
     },
   },
-  "gatsby-plugin-robots-txt",
+  {
+    resolve: "gatsby-plugin-robots-txt",
+    options: {
+      host: "https://engple.github.io",
+      sitemap: null,
+      policy: [{ userAgent: "*", allow: "/" }],
+    },
+  },
   {
     resolve: `gatsby-plugin-feed`,
     options: {

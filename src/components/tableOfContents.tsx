@@ -76,7 +76,7 @@ const TocNav = styled.nav`
   overflow: hidden auto;
   background-color: var(--color-gray-1);
 
-  @media (max-width: 1396px) {
+  @media (max-width: 1256px) {
     display: none;
   }
 `

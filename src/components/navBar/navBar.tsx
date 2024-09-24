@@ -12,6 +12,8 @@ import {
   navBackgroundAnimationCSS,
 } from "~/src/styles/navBarAnimation"
 
+import SearchBar from "../searchBar"
+
 import LinkList from "./linkList"
 import MenuIcon from "./menuIcon"
 import ThemeToggleButton from "./themeToggleButton"
@@ -55,6 +57,7 @@ const NavBar: React.FC<NavBarProperties> = ({ title, themeToggler }) => {
             </LinkUl>
           </LinkContent>
         </LinkWrap>
+        <SearchBar />
       </Content>
     </Nav>
   )
@@ -85,7 +88,7 @@ const Content = styled.div`
   height: 100%;
   z-index: 2;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
 
   li {

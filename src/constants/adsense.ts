@@ -1,0 +1,3 @@
+export const VERTICAL_AD_SLOT = "8652747802"
+
+export const RECTANGLE_TOC_AD_SLOT = "7571562431"

@@ -3,11 +3,14 @@ import React, { useLayoutEffect, useState } from "react"
 import { type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
+import Adsense from "~/src/components/adsense"
 import PostGrid from "~/src/components/postGrid"
 import SEO from "~/src/components/seo"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
 import type Post from "~/src/types/Post"
+
+import { VERTICAL_AD_SLOT } from "../constants/adsense"
 
 const Home = ({
   pageContext,
@@ -58,6 +61,16 @@ const Home = ({
           <PostGrid posts={posts} />
         </Content>
       </Main>
+      <RightAd>
+        <Adsense
+          adClient={site.googleAdsense ?? ""}
+          adSlot={VERTICAL_AD_SLOT}
+          adFormat="auto"
+          fullWidthResponsive={true}
+          width={300}
+          height={600}
+        />
+      </RightAd>
     </Layout>
   )
 }
@@ -66,6 +79,7 @@ const Main = styled.main`
   min-width: var(--min-width);
   min-height: calc(100vh - var(--nav-height) - var(--footer-height));
   background-color: var(--color-background);
+  position: relative;
 `
 
 const Content = styled.div`
@@ -90,6 +104,20 @@ const PostTitle = styled.h2`
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     font-size: 1.75rem;
+  }
+`
+
+const RightAd = styled.div`
+  position: absolute;
+  top: 50vh;
+  transform: translateY(-50%);
+  right: var(--sizing-md);
+  width: 300px;
+  height: 600px;
+  display: none;
+
+  @media (min-width: 1684px) {
+    display: block;
   }
 `
 

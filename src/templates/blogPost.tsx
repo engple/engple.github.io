@@ -17,8 +17,10 @@ import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
 
+import Adsense from "../components/adsense"
 import PostNavigator from "../components/postNavigator"
 import TableOfContents from "../components/tableOfContents"
+import { RECTANGLE_TOC_AD_SLOT, VERTICAL_AD_SLOT } from "../constants/adsense"
 
 interface DataProps {
   current: {
@@ -188,10 +190,32 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                     dangerouslySetInnerHTML={{ __html: html ?? "" }}
                     rhythm={rhythm}
                   />
-                  <TableOfContents headings={headings} />
+                  <div>
+                    <TocAd>
+                      <Adsense
+                        adClient={site.googleAdsense ?? ""}
+                        adSlot={RECTANGLE_TOC_AD_SLOT}
+                        adFormat="auto"
+                        fullWidthResponsive={true}
+                        width={320}
+                        height={250}
+                      />
+                    </TocAd>
+                    <TableOfContents headings={headings} />
+                  </div>
                 </ContentWrapper>
               </div>
             </InnerWrapper>
+            <LeftAd>
+              <Adsense
+                adClient={site.googleAdsense ?? ""}
+                adSlot={VERTICAL_AD_SLOT}
+                adFormat="auto"
+                fullWidthResponsive={true}
+                width={300}
+                height={600}
+              />
+            </LeftAd>
           </OuterWrapper>
         </article>
         <PostNavigator prevPost={prevPost} nextPost={nextPost} />
@@ -202,6 +226,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
 
 const OuterWrapper = styled.div`
   margin-top: var(--sizing-xl);
+  position: relative;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     margin-top: var(--sizing-lg);
@@ -215,6 +240,18 @@ const InnerWrapper = styled.div`
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     width: 87.5%;
+  }
+`
+
+const TocAd = styled.div`
+  width: 300px;
+  height: 250px;
+  display: none;
+  margin-left: var(--padding-xl);
+  margin-bottom: var(--padding-xl);
+
+  @media (min-width: 1440px) {
+    display: block;
   }
 `
 
@@ -257,6 +294,18 @@ const Title = styled.h1`
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     line-height: 1.21875;
     font-size: 2rem;
+  }
+`
+const LeftAd = styled.div`
+  width: 300px;
+  height: 600px;
+  position: absolute;
+  top: 252px;
+  left: var(--sizing-lg);
+  display: none;
+
+  @media (min-width: 1440px) {
+    display: block;
   }
 `
 

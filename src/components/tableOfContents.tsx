@@ -64,7 +64,7 @@ const TableOfContents = ({
 
 const TocNav = styled.nav`
   position: sticky;
-  top: 120px;
+  top: 124px;
   margin-left: var(--padding-xl);
   padding: var(--padding-xs);
   border-radius: var(--border-radius-sm);
@@ -75,9 +75,10 @@ const TocNav = styled.nav`
   line-height: 1.8;
   overflow: hidden auto;
   background-color: var(--color-gray-1);
+  display: none;
 
-  @media (max-width: 1256px) {
-    display: none;
+  @media (min-width: 1440px) {
+    display: block;
   }
 `
 

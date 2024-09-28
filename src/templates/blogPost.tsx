@@ -301,7 +301,7 @@ const LeftAd = styled.div`
   height: 600px;
   position: absolute;
   top: 252px;
-  left: var(--sizing-lg);
+  right: calc(50% + var(--post-width) / 2 + var(--sizing-lg));
   display: none;
 
   @media (min-width: 1440px) {

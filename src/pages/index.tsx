@@ -60,17 +60,17 @@ const Home = ({
           <PostTitle>{postTitle}</PostTitle>
           <PostGrid posts={posts} />
         </Content>
+        <RightAd>
+          <Adsense
+            adClient={site.googleAdsense ?? ""}
+            adSlot={VERTICAL_AD_SLOT}
+            adFormat="auto"
+            fullWidthResponsive={true}
+            width={300}
+            height={600}
+          />
+        </RightAd>
       </Main>
-      <RightAd>
-        <Adsense
-          adClient={site.googleAdsense ?? ""}
-          adSlot={VERTICAL_AD_SLOT}
-          adFormat="auto"
-          fullWidthResponsive={true}
-          width={300}
-          height={600}
-        />
-      </RightAd>
     </Layout>
   )
 }
@@ -109,9 +109,9 @@ const PostTitle = styled.h2`
 
 const RightAd = styled.div`
   position: absolute;
-  top: 50vh;
+  top: 400px;
   transform: translateY(-50%);
-  right: var(--sizing-md);
+  left: calc(50% + var(--width) / 2 + var(--sizing-md));
   width: 300px;
   height: 600px;
   display: none;

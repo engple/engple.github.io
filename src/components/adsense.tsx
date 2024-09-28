@@ -20,6 +20,17 @@ const Adsense: React.FC<AdsenseProps> = ({
   height = 600,
 }) => {
   const isDev = process.env.NODE_ENV === "development"
+
+  React.useEffect(() => {
+    if (!isDev) {
+      try {
+        ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+      } catch (error) {
+        console.error("Adsbygoogle error:", error)
+      }
+    }
+  }, [isDev])
+
   return (
     <Container width={width} height={height}>
       {isDev ? (

@@ -199,6 +199,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                         fullWidthResponsive={true}
                         width={320}
                         height={250}
+                        extraClassName="lg-only-ads"
                       />
                     </TocAd>
                     <TableOfContents headings={headings} />
@@ -214,6 +215,16 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 fullWidthResponsive={true}
                 width={300}
                 height={600}
+                extraClassName="lg-only-ads"
+              />
+              <Adsense
+                adClient={site.googleAdsense ?? ""}
+                adSlot={VERTICAL_AD_SLOT}
+                adFormat="auto"
+                fullWidthResponsive={true}
+                width={300}
+                height={600}
+                extraClassName="lg-only-ads"
               />
             </LeftAd>
           </OuterWrapper>
@@ -246,13 +257,8 @@ const InnerWrapper = styled.div`
 const TocAd = styled.div`
   width: 300px;
   height: 250px;
-  display: none;
   margin-left: var(--padding-xl);
   margin-bottom: var(--padding-xl);
-
-  @media (min-width: 1440px) {
-    display: block;
-  }
 `
 
 const ContentWrapper = styled.div`
@@ -302,11 +308,10 @@ const LeftAd = styled.div`
   position: absolute;
   top: 252px;
   right: calc(50% + var(--post-width) / 2 + var(--sizing-lg));
-  display: none;
-
-  @media (min-width: 1440px) {
-    display: block;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sizing-md);
 `
 
 export const query = graphql`

@@ -7,8 +7,8 @@ const GlobalStyle = createGlobalStyle`
   :root {
     font-size: 100%;
 
-    --width: 980px;
     --min-width: 320px;
+    --max-width: 760px;
     --post-width: 680px;
     --nav-height: 54px;
     --footer-height: 60px;
@@ -32,6 +32,8 @@ const GlobalStyle = createGlobalStyle`
     --sizing-md: 24px;
     --sizing-lg: 40px;
     --sizing-xl: 64px;
+    --sizing-xxl: 96px;
+    --sizing-xxxl: 128px;
 
     --text-xs: 0.625rem;
     --text-sm: 0.75rem;
@@ -128,6 +130,10 @@ const GlobalStyle = createGlobalStyle`
       --color-blue: #0a84ff;
       --color-icon: #d1d1d1;
     }
+
+    @media (min-width: ${({ theme }) => theme.device.xl}) {
+      --max-width: 980px;
+    }
   }
 
   html, body, #___gatsby, #gatsby-focus-wrapper {
@@ -181,6 +187,16 @@ const GlobalStyle = createGlobalStyle`
     overflow: hidden;
     clip: rect(1px, 1px, 1px, 1px);
     white-space: no-wrap;
+  }
+
+  .lg-only-ads {
+    display: none !important;
+  }
+
+  @media (min-width: ${({ theme }) => theme.device.lg}) {
+    .lg-only-ads {
+      display: block !important;
+    }
   }
 `
 

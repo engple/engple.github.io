@@ -77,7 +77,7 @@ const TocNav = styled.nav`
   background-color: var(--color-gray-1);
   display: none;
 
-  @media (min-width: 1440px) {
+  @media (min-width: ${({ theme }) => theme.device.lg}) {
     display: block;
   }
 `

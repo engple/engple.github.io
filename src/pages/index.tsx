@@ -19,7 +19,6 @@ const Home = ({
   const [posts, setPosts] = useState<Post[]>([])
   const currentCategory = pageContext.category
   const postData = data.allMarkdownRemark.edges
-
   useLayoutEffect(() => {
     const filteredPostData = currentCategory
       ? postData.filter(
@@ -56,6 +55,17 @@ const Home = ({
     <Layout>
       <SEO />
       <Main>
+        <LeftAd>
+          <Adsense
+            adClient={site.googleAdsense ?? ""}
+            adSlot={VERTICAL_AD_SLOT}
+            adFormat="auto"
+            fullWidthResponsive={true}
+            width={300}
+            height={600}
+            extraClassName="lg-only-ads"
+          />
+        </LeftAd>
         <Content>
           <PostTitle>{postTitle}</PostTitle>
           <PostGrid posts={posts} />
@@ -68,6 +78,7 @@ const Home = ({
             fullWidthResponsive={true}
             width={300}
             height={600}
+            extraClassName="lg-only-ads"
           />
         </RightAd>
       </Main>
@@ -85,14 +96,13 @@ const Main = styled.main`
 const Content = styled.div`
   box-sizing: content-box;
   width: 87.5%;
-  max-width: var(--width);
-  padding-top: var(--sizing-lg);
+  max-width: var(--max-width);
+  padding-top: var(--grid-gap-lg);
   padding-bottom: var(--sizing-lg);
   margin: 0 auto;
 
-  @media (max-width: ${({ theme }) => theme.device.sm}) {
-    padding-top: var(--grid-gap-lg);
-    width: 87.5%;
+  @media (min-width: ${({ theme }) => theme.device.sm}) {
+    padding-top: var(--sizing-lg);
   }
 `
 
@@ -107,18 +117,22 @@ const PostTitle = styled.h2`
   }
 `
 
+const LeftAd = styled.div`
+  position: absolute;
+  top: 400px;
+  transform: translateY(-50%);
+  right: calc(50% + var(--max-width) / 2 + var(--sizing-md));
+  width: 300px;
+  height: 600px;
+`
+
 const RightAd = styled.div`
   position: absolute;
   top: 400px;
   transform: translateY(-50%);
-  left: calc(50% + var(--width) / 2 + var(--sizing-md));
+  left: calc(50% + var(--max-width) / 2 + var(--sizing-md));
   width: 300px;
   height: 600px;
-  display: none;
-
-  @media (min-width: 1684px) {
-    display: block;
-  }
 `
 
 export const query = graphql`

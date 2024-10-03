@@ -4,6 +4,7 @@ const styledTheme = {
     sm: "767px",
     md: "1023px",
     lg: "1441px",
+    xl: "1920px",
   },
 } as const
 

@@ -9,6 +9,7 @@ interface AdsenseProps {
   fullWidthResponsive?: boolean
   width?: number
   height?: number
+  extraClassName?: string
 }
 
 const Adsense: React.FC<AdsenseProps> = ({
@@ -18,6 +19,7 @@ const Adsense: React.FC<AdsenseProps> = ({
   fullWidthResponsive = true,
   width = 300,
   height = 600,
+  extraClassName,
 }) => {
   const isDev = process.env.NODE_ENV === "development"
 
@@ -32,7 +34,7 @@ const Adsense: React.FC<AdsenseProps> = ({
   }, [isDev])
 
   return (
-    <Container width={width} height={height}>
+    <Container width={width} height={height} className={extraClassName}>
       {isDev ? (
         <FakeAd width={width} height={height}>
           광고영역
@@ -41,10 +43,8 @@ const Adsense: React.FC<AdsenseProps> = ({
         <ins
           style={{
             display: "block",
-            width: `${width}px`,
-            height: `${height}px`,
           }}
-          className="adsbygoogle"
+          className={`adsbygoogle ${extraClassName || ""}`}
           data-ad-client={adClient}
           data-ad-slot={adSlot}
           data-ad-format={adFormat}
@@ -64,7 +64,7 @@ const FakeAd = styled.div<{ width: number; height: number }>`
   width: ${props => props.width}px;
   height: ${props => props.height}px;
   background-color: var(--color-gray-3);
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   color: var(--color-gray-6);

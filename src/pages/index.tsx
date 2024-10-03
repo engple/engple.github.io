@@ -65,12 +65,30 @@ const Home = ({
             height={600}
             extraClassName="lg-only-ads"
           />
+          <Adsense
+            adClient={site.googleAdsense ?? ""}
+            adSlot={VERTICAL_AD_SLOT}
+            adFormat="auto"
+            fullWidthResponsive={true}
+            width={300}
+            height={600}
+            extraClassName="lg-only-ads"
+          />
         </LeftAd>
         <Content>
           <PostTitle>{postTitle}</PostTitle>
           <PostGrid posts={posts} />
         </Content>
         <RightAd>
+          <Adsense
+            adClient={site.googleAdsense ?? ""}
+            adSlot={VERTICAL_AD_SLOT}
+            adFormat="auto"
+            fullWidthResponsive={true}
+            width={300}
+            height={600}
+            extraClassName="lg-only-ads"
+          />
           <Adsense
             adClient={site.googleAdsense ?? ""}
             adSlot={VERTICAL_AD_SLOT}
@@ -124,6 +142,9 @@ const LeftAd = styled.div`
   right: calc(50% + var(--max-width) / 2 + var(--sizing-md));
   width: 300px;
   height: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 100vh;
 `
 
 const RightAd = styled.div`
@@ -133,6 +154,9 @@ const RightAd = styled.div`
   left: calc(50% + var(--max-width) / 2 + var(--sizing-md));
   width: 300px;
   height: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 100vh;
 `
 
 export const query = graphql`

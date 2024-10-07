@@ -61,8 +61,8 @@ const Home = ({
             adSlot={VERTICAL_AD_SLOT}
             adFormat="auto"
             fullWidthResponsive={true}
-            width={300}
-            height={600}
+            width={"300px"}
+            height={"600px"}
             extraClassName="lg-only-ads"
           />
           <Adsense
@@ -70,8 +70,8 @@ const Home = ({
             adSlot={VERTICAL_AD_SLOT}
             adFormat="auto"
             fullWidthResponsive={true}
-            width={300}
-            height={600}
+            width={"300px"}
+            height={"600px"}
             extraClassName="lg-only-ads"
           />
         </LeftAd>
@@ -85,8 +85,8 @@ const Home = ({
             adSlot={VERTICAL_AD_SLOT}
             adFormat="auto"
             fullWidthResponsive={true}
-            width={300}
-            height={600}
+            width={"300px"}
+            height={"600px"}
             extraClassName="lg-only-ads"
           />
           <Adsense
@@ -94,8 +94,8 @@ const Home = ({
             adSlot={VERTICAL_AD_SLOT}
             adFormat="auto"
             fullWidthResponsive={true}
-            width={300}
-            height={600}
+            width={"300px"}
+            height={"600px"}
             extraClassName="lg-only-ads"
           />
         </RightAd>

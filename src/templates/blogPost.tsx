@@ -20,7 +20,11 @@ import { rhythm } from "~/src/styles/typography"
 import Adsense from "../components/adsense"
 import PostNavigator from "../components/postNavigator"
 import TableOfContents from "../components/tableOfContents"
-import { RECTANGLE_TOC_AD_SLOT, VERTICAL_AD_SLOT } from "../constants/adsense"
+import {
+  HORIZONTAL_AD_SLOT,
+  RECTANGLE_TOC_AD_SLOT,
+  VERTICAL_AD_SLOT,
+} from "../constants/adsense"
 
 interface DataProps {
   current: {
@@ -197,14 +201,22 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                         adSlot={RECTANGLE_TOC_AD_SLOT}
                         adFormat="auto"
                         fullWidthResponsive={true}
-                        width={320}
-                        height={250}
+                        width={"320px"}
+                        height={"250px"}
                         extraClassName="lg-only-ads"
                       />
                     </TocAd>
                     <TableOfContents headings={headings} />
                   </div>
                 </ContentWrapper>
+                <Adsense
+                  adClient={site.googleAdsense ?? ""}
+                  adSlot={HORIZONTAL_AD_SLOT}
+                  adFormat="auto"
+                  fullWidthResponsive={true}
+                  width={"100%"}
+                  height={"100px"}
+                />
               </div>
             </InnerWrapper>
             <LeftAd>
@@ -213,8 +225,8 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 adSlot={VERTICAL_AD_SLOT}
                 adFormat="auto"
                 fullWidthResponsive={true}
-                width={300}
-                height={600}
+                width={"300px"}
+                height={"600px"}
                 extraClassName="lg-only-ads"
               />
               <Adsense
@@ -222,8 +234,8 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 adSlot={VERTICAL_AD_SLOT}
                 adFormat="auto"
                 fullWidthResponsive={true}
-                width={300}
-                height={600}
+                width={"300px"}
+                height={"600px"}
                 extraClassName="lg-only-ads"
               />
             </LeftAd>
@@ -263,6 +275,7 @@ const TocAd = styled.div`
 
 const ContentWrapper = styled.div`
   display: flex;
+  margin: var(--sizing-md) 0;
 `
 
 const PostCategory = styled(Category)`

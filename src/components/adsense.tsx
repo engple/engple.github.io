@@ -7,8 +7,8 @@ interface AdsenseProps {
   adSlot: string
   adFormat?: string
   fullWidthResponsive?: boolean
-  width?: number
-  height?: number
+  width?: string
+  height?: string
   extraClassName?: string
 }
 
@@ -17,8 +17,8 @@ const Adsense: React.FC<AdsenseProps> = ({
   adSlot,
   adFormat = "auto",
   fullWidthResponsive = true,
-  width = 300,
-  height = 600,
+  width = "100%",
+  height = "100%",
   extraClassName,
 }) => {
   const isDev = process.env.NODE_ENV === "development"
@@ -55,14 +55,14 @@ const Adsense: React.FC<AdsenseProps> = ({
   )
 }
 
-const Container = styled.div<{ width: number; height: number }>`
-  width: ${props => props.width}px;
-  height: ${props => props.height}px;
+const Container = styled.div<{ width: string; height: string }>`
+  width: ${props => props.width};
+  height: ${props => props.height};
 `
 
-const FakeAd = styled.div<{ width: number; height: number }>`
-  width: ${props => props.width}px;
-  height: ${props => props.height}px;
+const FakeAd = styled.div<{ width: string; height: string }>`
+  width: ${props => props.width};
+  height: ${props => props.height};
   background-color: var(--color-gray-3);
   display: flex !important;
   align-items: center;

@@ -1,3 +1,5 @@
 export const VERTICAL_AD_SLOT = "8652747802"
 
 export const RECTANGLE_TOC_AD_SLOT = "7571562431"
+
+export const HORIZONTAL_AD_SLOT = "2106896038"

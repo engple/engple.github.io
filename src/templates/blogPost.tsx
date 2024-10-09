@@ -229,15 +229,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 height={"600px"}
                 extraClassName="lg-only-ads"
               />
-              <Adsense
-                adClient={site.googleAdsense ?? ""}
-                adSlot={VERTICAL_AD_SLOT}
-                adFormat="auto"
-                fullWidthResponsive={true}
-                width={"300px"}
-                height={"600px"}
-                extraClassName="lg-only-ads"
-              />
             </LeftAd>
           </OuterWrapper>
         </article>
@@ -320,11 +311,7 @@ const LeftAd = styled.div`
   height: 600px;
   position: absolute;
   top: 252px;
-  right: calc(50% + var(--post-width) / 2 + var(--sizing-lg));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--sizing-md);
+  right: calc(50% + var(--post-width) / 2 + var(--padding-xl));
 `
 
 export const query = graphql`

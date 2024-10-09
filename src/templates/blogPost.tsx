@@ -194,7 +194,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                     dangerouslySetInnerHTML={{ __html: html ?? "" }}
                     rhythm={rhythm}
                   />
-                  <div>
+                  <RightWrapper>
                     <TocAd>
                       <Adsense
                         adClient={site.googleAdsense ?? ""}
@@ -207,7 +207,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                       />
                     </TocAd>
                     <TableOfContents headings={headings} />
-                  </div>
+                  </RightWrapper>
                 </ContentWrapper>
                 <Adsense
                   adClient={site.googleAdsense ?? ""}
@@ -312,6 +312,16 @@ const LeftAd = styled.div`
   position: absolute;
   top: 252px;
   right: calc(50% + var(--post-width) / 2 + var(--padding-xl));
+
+  @media (max-width: ${({ theme }) => theme.device.lg}) {
+    display: none;
+  }
+`
+
+const RightWrapper = styled.div`
+  @media (max-width: ${({ theme }) => theme.device.lg}) {
+    display: none;
+  }
 `
 
 export const query = graphql`

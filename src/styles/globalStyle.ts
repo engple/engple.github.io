@@ -9,7 +9,7 @@ const GlobalStyle = createGlobalStyle`
 
     --min-width: 320px;
     --max-width: 760px;
-    --post-width: 680px;
+    --post-width: 720px;
     --nav-height: 54px;
     --footer-height: 60px;
 

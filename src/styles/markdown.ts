@@ -77,11 +77,15 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     margin-top: ${({ rhythm }) => rhythm(1)};
   }
 
+  ol {
+    list-style-type: decimal;
+  }
+
   ul,
   ol {
     margin-top: ${({ rhythm }) => rhythm(1)};
     margin-bottom: ${({ rhythm }) => rhythm(1)};
-    margin-left: ${({ rhythm }) => rhythm(1.25)};
+    margin-left: ${({ rhythm }) => rhythm(1)};
   }
 
   li > ul,

@@ -9,6 +9,8 @@ import ThemeContext from "~/src/stores/themeContext"
 import GlobalStyle from "~/src/styles/globalStyle"
 import styledTheme from "~/src/styles/styledTheme"
 
+import ThemeToggleButton from "../components/navBar/themeToggleButton"
+
 const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { theme, themeToggler } = useTheme()
   const { title } = useSiteMetadata()
@@ -19,12 +21,13 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <ThemeContext.Provider value={theme}>
         <GlobalStyle />
         <Container>
-          <NavBar title={title} themeToggler={themeToggler} />
+          <NavBar title={title} />
           {children}
         </Container>
         <Footer role="contentinfo">
           <Copyright aria-label="Copyright">{copyrightString}</Copyright>
         </Footer>
+        <ThemeToggleButton onClick={themeToggler} />
       </ThemeContext.Provider>
     </ThemeProvider>
   )

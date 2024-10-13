@@ -109,6 +109,7 @@ const Main = styled.main`
   min-height: calc(100vh - var(--nav-height) - var(--footer-height));
   background-color: var(--color-background);
   position: relative;
+  overflow: hidden;
 `
 
 const Content = styled.div`

@@ -241,6 +241,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
 const OuterWrapper = styled.div`
   margin-top: var(--sizing-xl);
   position: relative;
+  overflow: hidden;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     margin-top: var(--sizing-lg);

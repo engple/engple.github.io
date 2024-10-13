@@ -31,6 +31,16 @@ const NavBar: React.FC<NavBarProperties> = ({ title }) => {
     device,
   })
 
+  const handleSearch = async (searchTerm: string) => {
+    if (searchTerm.length < 2) {
+      alert("검색어는 2글자 이상이어야 합니다.")
+      return
+    }
+
+    window.location.href = `/search?q=${searchTerm}`
+    setIsSearchOpen(false)
+  }
+
   return (
     <Nav ref={navReference} aria-label="Global Navigation">
       <NavBackground toggle={toggle} />
@@ -47,7 +57,7 @@ const NavBar: React.FC<NavBarProperties> = ({ title }) => {
         <SearchBar
           onClickOutside={() => setIsSearchOpen(false)}
           onEscape={() => setIsSearchOpen(false)}
-          onSearch={() => setIsSearchOpen(false)}
+          onSearch={handleSearch}
         />
       )}
     </Nav>

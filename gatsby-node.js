@@ -60,6 +60,7 @@ exports.createPages = async ({ graphql, actions }) => {
 
   createPostPages({ result, createPage })
   createCategoryPages({ result, createPage })
+  createSearchPage({ createPage })
 }
 
 function createCategoryPages({ result, createPage }) {
@@ -91,5 +92,14 @@ const createPostPages = ({ result, createPage }) => {
         prevSlug: previous?.fields.slug ?? "",
       },
     })
+  })
+}
+
+const createSearchPage = ({ createPage }) => {
+  const searchTemplate = path.resolve(`./src/pages/search.tsx`)
+  createPage({
+    path: `/search`,
+    component: searchTemplate,
+    context: {},
   })
 }

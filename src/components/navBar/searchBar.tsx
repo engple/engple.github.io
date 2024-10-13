@@ -64,7 +64,7 @@ const SearchOverlay = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 100px;
+  padding-top: calc(var(--nav-height) + var(--sizing-xxxl));
   z-index: 1000;
 `
 

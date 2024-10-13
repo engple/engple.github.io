@@ -1,14 +1,22 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef } from "react"
 
+import { useHotkeys } from "react-hotkeys-hook"
 import styled from "styled-components"
 
 interface SearchBarProps {
-  onClickOutside: () => void
+  onClickOutside?: () => void
+  onEscape?: () => void
+  onSearch?: (searchTerm: string) => void
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onClickOutside }) => {
-  const [searchTerm, setSearchTerm] = useState("")
+const SearchBar: React.FC<SearchBarProps> = ({
+  onClickOutside = () => {},
+  onEscape = () => {},
+  onSearch = () => {},
+}) => {
   const searchContainerRef = useRef<HTMLDivElement>(null)
+
+  useHotkeys("escape", onEscape, { enableOnFormTags: true })
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -26,14 +34,19 @@ const SearchBar: React.FC<SearchBarProps> = ({ onClickOutside }) => {
     }
   }, [onClickOutside])
 
+  const handleKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      onSearch(event.currentTarget.value)
+    }
+  }
+
   return (
     <SearchOverlay>
       <SearchContainer ref={searchContainerRef}>
         <SearchInput
           type="text"
           placeholder="🔍 검색어를 입력하세요"
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
+          onKeyUp={handleKeyUp}
           autoFocus
         />
       </SearchContainer>

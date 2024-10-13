@@ -27,13 +27,14 @@ const StyledSearchIcon = styled.button`
   border: none;
   cursor: pointer;
   color: var(--color-text);
-  padding: var(--sizing-sm);
+  padding: var(--sizing-xs);
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: var(--border-radius-base);
 
   &:hover {
-    color: var(--color-blue);
+    background-color: var(--color-gray-2);
   }
 `
 

@@ -44,7 +44,11 @@ const NavBar: React.FC<NavBarProperties> = ({ title }) => {
         </IconWrapper>
       </Content>
       {isSearchOpen && (
-        <SearchBar onClickOutside={() => setIsSearchOpen(false)} />
+        <SearchBar
+          onClickOutside={() => setIsSearchOpen(false)}
+          onEscape={() => setIsSearchOpen(false)}
+          onSearch={() => setIsSearchOpen(false)}
+        />
       )}
     </Nav>
   )

@@ -9912,6 +9912,7 @@ __metadata:
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     react-helmet: "npm:^6.1.0"
+    react-hotkeys-hook: "npm:^4.5.1"
     react-typography: "npm:^0.16.23"
     react-use-fusejs: "npm:^2.0.2"
     schema-dts: "npm:^1.1.2"
@@ -16123,6 +16124,16 @@ __metadata:
   peerDependencies:
     react: ">=16.3.0"
   checksum: eff25231384bb0a229870a0552839953a59af17f0ff5e8bca1b8c8fdf19a329e4c00c7fa2fcedc8be5d73f5c7bebb30cf9a32ea58efc7c8f726a10dba51f48a2
+  languageName: node
+  linkType: hard
+
+"react-hotkeys-hook@npm:^4.5.1":
+  version: 4.5.1
+  resolution: "react-hotkeys-hook@npm:4.5.1"
+  peerDependencies:
+    react: ">=16.8.1"
+    react-dom: ">=16.8.1"
+  checksum: cf988ad62be77dc68482d39f0c90f3afff2b066d9f7250d2885d4e387dfd59cc55f3c2382b1fbb496d2ea4db6ec38bba7376902f62b7695fa384a05326c2922d
   languageName: node
   linkType: hard
 

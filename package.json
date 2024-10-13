@@ -44,6 +44,7 @@
     "gatsby-transformer-remark": "^6.12.3",
     "gatsby-transformer-sharp": "^5.12.3",
     "react-helmet": "^6.1.0",
+    "react-hotkeys-hook": "^4.5.1",
     "react-typography": "^0.16.23",
     "react-use-fusejs": "^2.0.2",
     "styled-components": "^6.1.1",

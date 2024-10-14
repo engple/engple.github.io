@@ -64,15 +64,6 @@ const SearchPage: React.FC<PageProps<Queries.Query>> = ({ location, data }) => {
             height={"600px"}
             extraClassName="lg-only-ads"
           />
-          <Adsense
-            adClient={site.googleAdsense ?? ""}
-            adSlot={VERTICAL_AD_SLOT}
-            adFormat="auto"
-            fullWidthResponsive={true}
-            width={"300px"}
-            height={"600px"}
-            extraClassName="lg-only-ads"
-          />
         </LeftAd>
         <Content>
           <SearchTitle>'{searchQuery}'에 대한 검색 결과</SearchTitle>
@@ -92,15 +83,6 @@ const SearchPage: React.FC<PageProps<Queries.Query>> = ({ location, data }) => {
             height={"600px"}
             extraClassName="lg-only-ads"
           />
-          <Adsense
-            adClient={site.googleAdsense ?? ""}
-            adSlot={VERTICAL_AD_SLOT}
-            adFormat="auto"
-            fullWidthResponsive={true}
-            width={"300px"}
-            height={"600px"}
-            extraClassName="lg-only-ads"
-          />
         </RightAd>
       </Main>
     </Layout>
@@ -111,7 +93,6 @@ const Main = styled.main`
   min-width: var(--min-width);
   min-height: calc(100vh - var(--nav-height) - var(--footer-height));
   background-color: var(--color-background);
-  position: relative;
   overflow: hidden;
 `
 
@@ -140,8 +121,8 @@ const SearchTitle = styled.h1`
 `
 
 const LeftAd = styled.div`
-  position: absolute;
-  top: 400px;
+  position: fixed;
+  top: calc(var(--nav-height) + 400px);
   transform: translateY(-50%);
   right: calc(50% + var(--max-width) / 2 + var(--sizing-md));
   width: 300px;
@@ -152,8 +133,8 @@ const LeftAd = styled.div`
 `
 
 const RightAd = styled.div`
-  position: absolute;
-  top: 400px;
+  position: fixed;
+  top: calc(var(--nav-height) + 400px);
   transform: translateY(-50%);
   left: calc(50% + var(--max-width) / 2 + var(--sizing-md));
   width: 300px;

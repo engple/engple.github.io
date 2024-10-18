@@ -206,6 +206,17 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                         extraClassName="lg-only-ads"
                       />
                     </TocAd>
+                    <TocAd>
+                      <Adsense
+                        adClient={site.googleAdsense ?? ""}
+                        adSlot={RECTANGLE_TOC_AD_SLOT}
+                        adFormat="auto"
+                        fullWidthResponsive={true}
+                        width={"320px"}
+                        height={"250px"}
+                        extraClassName="lg-only-ads"
+                      />
+                    </TocAd>
                     <TableOfContents headings={headings} />
                   </RightWrapper>
                 </ContentWrapper>
@@ -241,7 +252,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
 const OuterWrapper = styled.div`
   margin-top: var(--sizing-xl);
   position: relative;
-  overflow: hidden;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     margin-top: var(--sizing-lg);
@@ -261,7 +271,6 @@ const InnerWrapper = styled.div`
 const TocAd = styled.div`
   width: 300px;
   height: 250px;
-  margin-left: var(--padding-xl);
   margin-bottom: var(--padding-xl);
 `
 
@@ -311,8 +320,8 @@ const LeftAd = styled.div`
   width: 300px;
   height: 600px;
   position: absolute;
-  top: 252px;
-  right: calc(50% + var(--post-width) / 2 + var(--padding-xl));
+  top: calc(252px + var(--nav-height));
+  right: calc(50% + var(--post-width) / 2 + var(--sizing-xl));
 
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
@@ -320,6 +329,7 @@ const LeftAd = styled.div`
 `
 
 const RightWrapper = styled.div`
+  margin-left: var(--sizing-xl);
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
   }

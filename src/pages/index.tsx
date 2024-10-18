@@ -122,7 +122,7 @@ const LeftAd = styled.div`
   position: fixed;
   top: calc(var(--nav-height) + 400px);
   transform: translateY(-50%);
-  right: calc(50% + var(--max-width) / 2 + var(--sizing-md));
+  right: calc(50% + var(--max-width) / 2 + var(--sizing-xl));
   width: 300px;
   height: 600px;
   display: flex;
@@ -134,7 +134,7 @@ const RightAd = styled.div`
   position: fixed;
   top: calc(var(--nav-height) + 400px);
   transform: translateY(-50%);
-  left: calc(50% + var(--max-width) / 2 + var(--sizing-md));
+  left: calc(50% + var(--max-width) / 2 + var(--sizing-xl));
   width: 300px;
   height: 600px;
   display: flex;

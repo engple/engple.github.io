@@ -132,7 +132,7 @@ const GlobalStyle = createGlobalStyle`
     }
 
     @media (min-width: ${({ theme }) => theme.device.xl}) {
-      --max-width: 980px;
+      --max-width: 1096px;
     }
   }
 

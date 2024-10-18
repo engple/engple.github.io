@@ -49,16 +49,18 @@ const PostGrid: React.FC<PostGridProperties> = ({ posts }) => {
 
 const Grid = styled.ul`
   display: grid;
-  grid-gap: var(--grid-gap-xl);
+
   grid-template-columns: repeat(2, 1fr);
+  grid-gap: var(--grid-gap-lg);
   list-style: none;
 
   & > li {
     margin-bottom: 0;
   }
 
-  @media (max-width: ${({ theme }) => theme.device.sm}) {
-    grid-gap: var(--grid-gap-lg);
+  @media (min-width: ${({ theme }) => theme.device.xl}) {
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: var(--grid-gap-xl);
   }
 `
 

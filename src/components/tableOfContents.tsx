@@ -65,7 +65,6 @@ const TableOfContents = ({
 const TocNav = styled.nav`
   position: sticky;
   top: 124px;
-  margin-left: var(--padding-xl);
   padding: var(--padding-xs);
   border-radius: var(--border-radius-sm);
   width: fit-content;

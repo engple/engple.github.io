@@ -63,16 +63,12 @@ const Text = styled.div`
 
 const Title = styled.h3`
   margin-top: var(--sizing-xs);
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
   font-weight: var(--font-weight-bold);
   line-height: 1.3;
 
   @media (max-width: ${({ theme }) => theme.device.md}) {
-    font-size: 1.3125rem;
-  }
-
-  @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: var(--text-md);
+    font-size: var(--text-base);
   }
 `
 

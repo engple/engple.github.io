@@ -128,6 +128,10 @@ const LeftAd = styled.div`
   display: flex;
   flex-direction: column;
   gap: 100vh;
+
+  @media (max-width: ${({ theme }) => theme.device.lg}) {
+    display: none;
+  }
 `
 
 const RightAd = styled.div`

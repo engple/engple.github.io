@@ -135,8 +135,8 @@ const LeftAd = styled.div`
 `
 
 const RightAd = styled.div`
-  position: fixed;
-  top: calc(var(--nav-height) + 400px);
+  position: absolute;
+  top: 400px;
   transform: translateY(-50%);
   left: calc(50% + var(--max-width) / 2 + var(--sizing-xl));
   width: 300px;

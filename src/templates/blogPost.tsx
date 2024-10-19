@@ -190,22 +190,22 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 </header>
                 <Divider />
                 <ContentWrapper>
+                  <LeftAd>
+                    <Adsense
+                      adClient={site.googleAdsense ?? ""}
+                      adSlot={VERTICAL_AD_SLOT}
+                      adFormat="auto"
+                      fullWidthResponsive={true}
+                      width={"300px"}
+                      height={"600px"}
+                      extraClassName="lg-only-ads"
+                    />
+                  </LeftAd>
                   <Markdown
                     dangerouslySetInnerHTML={{ __html: html ?? "" }}
                     rhythm={rhythm}
                   />
                   <RightWrapper>
-                    <TocAd>
-                      <Adsense
-                        adClient={site.googleAdsense ?? ""}
-                        adSlot={RECTANGLE_TOC_AD_SLOT}
-                        adFormat="auto"
-                        fullWidthResponsive={true}
-                        width={"320px"}
-                        height={"250px"}
-                        extraClassName="lg-only-ads"
-                      />
-                    </TocAd>
                     <TocAd>
                       <Adsense
                         adClient={site.googleAdsense ?? ""}
@@ -230,17 +230,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 />
               </div>
             </InnerWrapper>
-            <LeftAd>
-              <Adsense
-                adClient={site.googleAdsense ?? ""}
-                adSlot={VERTICAL_AD_SLOT}
-                adFormat="auto"
-                fullWidthResponsive={true}
-                width={"300px"}
-                height={"600px"}
-                extraClassName="lg-only-ads"
-              />
-            </LeftAd>
           </OuterWrapper>
         </article>
         <PostNavigator prevPost={prevPost} nextPost={nextPost} />
@@ -277,6 +266,8 @@ const TocAd = styled.div`
 const ContentWrapper = styled.div`
   display: flex;
   margin: var(--sizing-md) 0;
+  justify-content: center;
+  gap: var(--sizing-xl);
 `
 
 const PostCategory = styled(Category)`
@@ -319,17 +310,14 @@ const Title = styled.h1`
 const LeftAd = styled.div`
   width: 300px;
   height: 600px;
-  position: absolute;
-  top: calc(252px + var(--nav-height));
-  right: calc(50% + var(--post-width) / 2 + var(--sizing-xl));
-
+  position: sticky;
+  top: 124px;
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
   }
 `
 
 const RightWrapper = styled.div`
-  margin-left: var(--sizing-xl);
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
   }

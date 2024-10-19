@@ -58,6 +58,8 @@ const Adsense: React.FC<AdsenseProps> = ({
 const Container = styled.div<{ width: string; height: string }>`
   width: ${props => props.width};
   height: ${props => props.height};
+  display: flex;
+  justify-content: center;
 `
 
 const FakeAd = styled.div<{ width: string; height: string }>`

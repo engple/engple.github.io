@@ -1,5 +1,5 @@
 ---
-title: "'확인하다' 영어로 어떻게 표현할까 - 살펴보다, 해보다"
+title: "'확인하다' 영어로 어떻게 표현할까 - 살펴보다 영어로, 해보다 영어로"
 category: "영어표현"
 date: "2024-10-10 13:35 +09:00"
 thumbnail: "./104.png"
@@ -26,18 +26,6 @@ faq:
 
 또 다른 예로, 가게에서 물건을 계산할 때나 호텔에서 퇴실할 때도 'check out' 이라는 표현을 사용할 수 있어요. 이 부분은 다음에 추가적으로 다뤄볼게요!
 
-## 📖 예문
-
-"이 새 책 한번 봐봐."
-
-"Check out this new book."
-
-"야, 내가 다운받은 새 앱 한번 봐봐. 진짜 대박이야!"
-
-"Hey, check out this new app I downloaded. It's awesome!"
-
-자, 이제 "check out"을 사용한 다양한 예문을 살펴볼까요? 꼭 소리내어 말하면서 연습해보세요! 🚀
-
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1465612013356152"
      crossorigin="anonymous"></script>
 <!-- engple-horizontal-ad -->
@@ -52,6 +40,18 @@ faq:
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
+
+## 📖 예문
+
+"이 새 책 한번 봐봐."
+
+"Check out this new book."
+
+"야, 내가 다운받은 새 앱 한번 봐봐. 진짜 대박이야!"
+
+"Hey, check out this new app I downloaded. It's awesome!"
+
+자, 이제 "check out"을 사용한 다양한 예문을 살펴볼까요? 꼭 소리내어 말하면서 연습해보세요! 🚀
 
 ## 💬 연습해보기
 

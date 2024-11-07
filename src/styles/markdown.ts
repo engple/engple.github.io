@@ -223,6 +223,10 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     aspect-ratio: 16 / 9 !important;
     margin-bottom: var(--sizing-sm);
   }
+
+  iframe {
+    max-width: 100%;
+  }
 `
 
 export default Markdown

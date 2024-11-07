@@ -225,9 +225,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   adSlot={HORIZONTAL_AD_SLOT}
                   adFormat="auto"
                   fullWidthResponsive={true}
-                  width={"100%"}
-                  height={"240px"}
-                  delay={500}
+                  noContainer={true}
                 />
               </div>
             </InnerWrapper>

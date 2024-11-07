@@ -10,7 +10,7 @@ interface AdsenseProps {
   width?: string
   height?: string
   extraClassName?: string
-  delay?: number
+  noContainer?: boolean
 }
 
 const Adsense: React.FC<AdsenseProps> = ({
@@ -21,23 +21,40 @@ const Adsense: React.FC<AdsenseProps> = ({
   width = "100%",
   height = "100%",
   extraClassName,
-  delay = 0,
+  noContainer = false,
 }) => {
   const isDev = process.env.NODE_ENV === "development"
 
   React.useEffect(() => {
     if (!isDev) {
-      setTimeout(() => {
-        try {
-          ;(window.adsbygoogle = window.adsbygoogle || []).push({})
-        } catch (error) {
-          console.error("Adsbygoogle error:", error)
-        }
-      }, delay)
+      try {
+        ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+      } catch (error) {
+        console.error("Adsbygoogle error:", error)
+      }
     }
   }, [isDev])
 
-  return (
+  return noContainer ? (
+    <>
+      {isDev ? (
+        <FakeAd width={width} height={height}>
+          광고영역
+        </FakeAd>
+      ) : (
+        <ins
+          style={{
+            display: "block",
+          }}
+          className={`adsbygoogle ${extraClassName || ""}`}
+          data-ad-client={adClient}
+          data-ad-slot={adSlot}
+          data-ad-format={adFormat}
+          data-full-width-responsive={fullWidthResponsive.toString()}
+        ></ins>
+      )}
+    </>
+  ) : (
     <Container width={width} height={height} className={extraClassName}>
       {isDev ? (
         <FakeAd width={width} height={height}>

@@ -226,7 +226,8 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   adFormat="auto"
                   fullWidthResponsive={true}
                   width={"100%"}
-                  height={"100px"}
+                  height={"240px"}
+                  delay={500}
                 />
               </div>
             </InnerWrapper>

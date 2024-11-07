@@ -10,6 +10,7 @@ interface AdsenseProps {
   width?: string
   height?: string
   extraClassName?: string
+  delay?: number
 }
 
 const Adsense: React.FC<AdsenseProps> = ({
@@ -20,16 +21,19 @@ const Adsense: React.FC<AdsenseProps> = ({
   width = "100%",
   height = "100%",
   extraClassName,
+  delay = 0,
 }) => {
   const isDev = process.env.NODE_ENV === "development"
 
   React.useEffect(() => {
     if (!isDev) {
-      try {
-        ;(window.adsbygoogle = window.adsbygoogle || []).push({})
-      } catch (error) {
-        console.error("Adsbygoogle error:", error)
-      }
+      setTimeout(() => {
+        try {
+          ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+        } catch (error) {
+          console.error("Adsbygoogle error:", error)
+        }
+      }, delay)
     }
   }, [isDev])
 

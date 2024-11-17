@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 
 import { type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
+import SpeakBanner from "~/src/components/SpeakBanner"
 import Adsense from "~/src/components/adsense"
 import PostGrid from "~/src/components/postGrid"
 import SEO from "~/src/components/seo"
@@ -10,12 +11,52 @@ import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
 import type Post from "~/src/types/Post"
 
-import { VERTICAL_AD_SLOT } from "../constants/adsense"
+import {
+  ONE_DAY_MS,
+  SPEAK_BANNER_KEY,
+  SPEAK_LINK,
+  VERTICAL_AD_SLOT,
+} from "../constants"
+import { useExpiryKey } from "../hooks/useExpiryKey"
 
 const SearchPage: React.FC<PageProps<Queries.Query>> = ({ location, data }) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<Post[]>([])
   const site = useSiteMetadata()
+
+  const { isExpired: bannerEnabled, refresh: closeBanner } = useExpiryKey(
+    SPEAK_BANNER_KEY,
+    {
+      ttl: ONE_DAY_MS,
+    },
+  )
+
+  const performSearch = useCallback(
+    (query: string) => {
+      const allPosts = data.allMarkdownRemark.edges.map(({ node }) => ({
+        id: node.id,
+        slug: node.fields?.slug || "",
+        title: node.frontmatter?.title || "",
+        desc: node.frontmatter?.desc || "",
+        date: node.frontmatter?.date || "",
+        category: node.frontmatter?.category || "",
+        thumbnail: node.frontmatter?.thumbnail?.childImageSharp?.id,
+        alt: node.frontmatter?.alt || "",
+        excerpt: node.excerpt || "",
+      }))
+
+      const filteredPosts = allPosts.filter(
+        post =>
+          post.title.toLowerCase().includes(query.toLowerCase()) ||
+          post.desc.toLowerCase().includes(query.toLowerCase()) ||
+          post.category.toLowerCase().includes(query.toLowerCase()) ||
+          post.excerpt.toLowerCase().includes(query.toLowerCase()),
+      )
+
+      setSearchResults(filteredPosts)
+    },
+    [data],
+  )
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -24,31 +65,7 @@ const SearchPage: React.FC<PageProps<Queries.Query>> = ({ location, data }) => {
       setSearchQuery(query)
       performSearch(query)
     }
-  }, [location.search, data])
-
-  const performSearch = (query: string) => {
-    const allPosts = data.allMarkdownRemark.edges.map(({ node }) => ({
-      id: node.id,
-      slug: node.fields?.slug || "",
-      title: node.frontmatter?.title || "",
-      desc: node.frontmatter?.desc || "",
-      date: node.frontmatter?.date || "",
-      category: node.frontmatter?.category || "",
-      thumbnail: node.frontmatter?.thumbnail?.childImageSharp?.id,
-      alt: node.frontmatter?.alt || "",
-      excerpt: node.excerpt || "",
-    }))
-
-    const filteredPosts = allPosts.filter(
-      post =>
-        post.title.toLowerCase().includes(query.toLowerCase()) ||
-        post.desc.toLowerCase().includes(query.toLowerCase()) ||
-        post.category.toLowerCase().includes(query.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(query.toLowerCase()),
-    )
-
-    setSearchResults(filteredPosts)
-  }
+  }, [location.search, data, performSearch])
 
   return (
     <Layout>
@@ -85,6 +102,7 @@ const SearchPage: React.FC<PageProps<Queries.Query>> = ({ location, data }) => {
           />
         </RightAd>
       </Main>
+      {bannerEnabled && <SpeakBanner href={SPEAK_LINK} onClose={closeBanner} />}
     </Layout>
   )
 }

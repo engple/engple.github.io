@@ -17,14 +17,19 @@ import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
 
+import SpeakBanner from "../components/SpeakBanner"
 import Adsense from "../components/adsense"
 import PostNavigator from "../components/postNavigator"
 import TableOfContents from "../components/tableOfContents"
 import {
   HORIZONTAL_AD_SLOT,
+  ONE_DAY_MS,
   RECTANGLE_TOC_AD_SLOT,
+  SPEAK_BANNER_KEY as SPEAK_BANNER_EXPIRY_KEY,
+  SPEAK_LINK,
   VERTICAL_AD_SLOT,
-} from "../constants/adsense"
+} from "../constants"
+import { useExpiryKey } from "../hooks/useExpiryKey"
 
 interface DataProps {
   current: {
@@ -61,6 +66,12 @@ interface DataProps {
 }
 
 const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
+  const { isExpired: bannerEnabled, refresh: closeBanner } = useExpiryKey(
+    SPEAK_BANNER_EXPIRY_KEY,
+    {
+      ttl: ONE_DAY_MS,
+    },
+  )
   const {
     frontmatter,
     html,
@@ -233,6 +244,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         </article>
         <PostNavigator prevPost={prevPost} nextPost={nextPost} />
       </main>
+      {bannerEnabled && <SpeakBanner href={SPEAK_LINK} onClose={closeBanner} />}
     </Layout>
   )
 }

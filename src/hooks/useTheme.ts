@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 
-import { DARK, LIGHT } from "~/src/constants/theme"
+import { DARK, LIGHT } from "~/src/constants"
 
 /** @see gatsby-ssr.js */
 declare global {

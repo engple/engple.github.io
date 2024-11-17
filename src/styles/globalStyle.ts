@@ -60,6 +60,7 @@ const GlobalStyle = createGlobalStyle`
     --font-weight-extra-bold: 800;
 
     --color-outline: rgba(0,125,250,0.6);
+    --speak-color: rgb(28, 73, 255);
 
     body.light {
       --color-text: #1d1d1d;
@@ -198,6 +199,7 @@ const GlobalStyle = createGlobalStyle`
       display: block !important;
     }
   }
+    
 `
 
 export default GlobalStyle

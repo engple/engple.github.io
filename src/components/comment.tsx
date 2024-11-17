@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef } from "react"
 
-import { DARK } from "~/src/constants/theme"
+import { DARK } from "~/src/constants"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import ThemeContext from "~/src/stores/themeContext"
 

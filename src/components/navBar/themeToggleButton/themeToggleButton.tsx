@@ -60,7 +60,7 @@ const Button = styled.button`
   background-color: transparent;
   z-index: 100;
   right: var(--sizing-md);
-  bottom: var(--sizing-md);
+  bottom: calc(var(--sizing-md));
   padding: var(--sizing-base);
   border: none;
   font-weight: var(--font-weight-medium);

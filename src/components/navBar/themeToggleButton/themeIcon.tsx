@@ -1,6 +1,6 @@
 import React from "react"
 
-import { DARK } from "~/src/constants/theme"
+import { DARK } from "~/src/constants"
 import type { UseThemeReturnType } from "~/src/hooks/useTheme"
 
 interface ThemeIconProperties {

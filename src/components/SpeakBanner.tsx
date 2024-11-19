@@ -1,6 +1,6 @@
 import React from "react"
 
-import styled from "styled-components"
+import styled, { keyframes } from "styled-components"
 
 import speakLogoWhite from "../images/speak-logo-white.png"
 
@@ -19,10 +19,10 @@ const Banner: React.FC<BannerProps> = ({ href, onClose = () => {} }) => {
             <img src={speakLogoWhite} alt="Speak Logo" />
           </LogoWrapper>
           <Slogan>
-            <Prelude>이제 영어로 미친듯이 말해요</Prelude>
+            <Prelude>이 링크를 통해 누릴 수 있는 특별한 혜택!</Prelude>
             <div>
               <Title>
-                최대 <Highlight>64% 할인</Highlight>된 가격으로 영어공부 제대로
+                최대 <Highlight>60% 할인</Highlight>된 가격으로 영어공부 제대로
                 시작하세요!
               </Title>
             </div>
@@ -86,17 +86,15 @@ const Container = styled.div`
 const LogoAndSlogan = styled.div`
   display: flex;
   align-items: center;
-  gap: var(--sizing-md);
-
-  img {
-    object-fit: contain;
-  }
+  flex-wrap: wrap;
+  gap: var(--padding-sm);
 `
 
 const LogoWrapper = styled.div`
   display: flex;
   align-items: center;
   img {
+    object-fit: contain;
     height: 24px;
     width: auto;
   }
@@ -105,12 +103,19 @@ const LogoWrapper = styled.div`
 const Slogan = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
 `
 
 const Prelude = styled.div`
   font-size: 0.9rem;
   color: white;
+  transform-origin: center center;
+  width: max-content;
+  animation: ${keyframes`
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-0.2deg); }
+    75% { transform: rotate(0.2deg); } 
+  `} 0.5s ease-in-out infinite;
   span {
     color: #ffd700;
   }
@@ -145,6 +150,7 @@ const Button = styled.div`
 
 const CloseButton = styled.div`
   cursor: pointer;
+  padding: var(--padding-xs);
 
   @media (min-width: ${({ theme }) => theme.device.sm}) {
     position: absolute;

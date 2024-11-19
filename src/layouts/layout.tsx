@@ -47,7 +47,11 @@ const Footer = styled.footer`
   align-items: center;
   height: var(--footer-height);
   background-color: var(--color-gray-1);
-  margin-top: var(--sizing-xl);
+
+  margin-top: var(--sizing-xxl);
+  @media (min-width: ${({ theme }) => theme.device.sm}) {
+    margin-top: var(--sizing-xl);
+  }
 `
 
 const Copyright = styled.span`

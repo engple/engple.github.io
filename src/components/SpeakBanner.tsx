@@ -11,6 +11,15 @@ interface BannerProps {
 }
 
 const Banner: React.FC<BannerProps> = ({ href, onClose = () => {} }) => {
+  const today = new Date()
+  const blackFriday = new Date("2024-11-25")
+  const daysLeft = Math.max(
+    0,
+    Math.floor(
+      (blackFriday.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    ),
+  )
+
   return (
     <BannerWrapper href={href} target="_blank">
       <Container>
@@ -19,11 +28,16 @@ const Banner: React.FC<BannerProps> = ({ href, onClose = () => {} }) => {
             <img src={speakLogoWhite} alt="Speak Logo" />
           </LogoWrapper>
           <Slogan>
-            <Prelude>이 링크를 통해 누릴 수 있는 특별한 혜택!</Prelude>
+            <Prelude>
+              블랙프라이데이 할인 혜택{" "}
+              <Highlight>
+                {daysLeft === 0 ? "오늘 마감" : `D-${daysLeft}`}
+              </Highlight>
+            </Prelude>
             <div>
               <Title>
-                최대 <Highlight>60% 할인</Highlight>된 가격으로 영어공부 제대로
-                시작하세요!
+                이 링크를 통해 <Highlight>70% 할인</Highlight>된 가격으로
+                영어공부 제대로 시작하세요!
               </Title>
             </div>
           </Slogan>
@@ -113,9 +127,9 @@ const Prelude = styled.div`
   width: max-content;
   animation: ${keyframes`
     0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-0.2deg); }
-    75% { transform: rotate(0.2deg); } 
-  `} 0.5s ease-in-out infinite;
+    25% { transform: rotate(-2deg); }
+    75% { transform: rotate(2deg); } 
+  `} 0.25s ease-in-out infinite;
   span {
     color: #ffd700;
   }

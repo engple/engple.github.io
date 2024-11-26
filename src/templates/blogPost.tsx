@@ -244,7 +244,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         </article>
         <PostNavigator prevPost={prevPost} nextPost={nextPost} />
       </main>
-      {bannerEnabled && <SpeakBanner href={SPEAK_LINK} onClose={closeBanner} />}
+      {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />}
     </Layout>
   )
 }

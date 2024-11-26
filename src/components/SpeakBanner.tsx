@@ -5,23 +5,28 @@ import styled, { keyframes } from "styled-components"
 import speakLogoWhite from "../images/speak-logo-white.png"
 
 interface BannerProps {
-  href: string
-  ctaLabel?: string
+  link: string
   onClose?: () => void
 }
 
-const Banner: React.FC<BannerProps> = ({ href, onClose = () => {} }) => {
-  const today = new Date()
-  const blackFriday = new Date("2024-11-25")
-  const daysLeft = Math.max(
-    0,
-    Math.floor(
-      (blackFriday.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
-    ),
-  )
+const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
+  // const today = new Date()
+  // const blackFriday = new Date("2024-11-25")
+  // const daysLeft = Math.max(
+  //   0,
+  //   Math.floor(
+  //     (blackFriday.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  //   ),
+  // )
 
   return (
-    <BannerWrapper href={href} target="_blank">
+    <BannerButton
+      onClick={e => {
+        e.preventDefault()
+        e.stopPropagation()
+        window.open(link, "_blank")
+      }}
+    >
       <Container>
         <LogoAndSlogan>
           <LogoWrapper>
@@ -29,14 +34,12 @@ const Banner: React.FC<BannerProps> = ({ href, onClose = () => {} }) => {
           </LogoWrapper>
           <Slogan>
             <Prelude>
-              블랙프라이데이 할인 혜택{" "}
-              <Highlight>
-                {daysLeft === 0 ? "오늘 마감" : `D-${daysLeft}`}
-              </Highlight>
+              이제 영어공부 제대로 해봐요!!!&nbsp;
+              <Highlight>(시크릿 링크)</Highlight>
             </Prelude>
             <div>
               <Title>
-                이 링크를 통해 <Highlight>70% 할인</Highlight>된 가격으로
+                이 링크를 통해 <Highlight>64% 할인</Highlight>된 가격으로
                 영어공부 제대로 시작하세요!
               </Title>
             </div>
@@ -49,6 +52,7 @@ const Banner: React.FC<BannerProps> = ({ href, onClose = () => {} }) => {
       <CloseButton
         onClick={e => {
           e.preventDefault()
+          e.stopPropagation()
           onClose()
         }}
       >
@@ -65,21 +69,23 @@ const Banner: React.FC<BannerProps> = ({ href, onClose = () => {} }) => {
           />
         </svg>
       </CloseButton>
-    </BannerWrapper>
+    </BannerButton>
   )
 }
 
-const BannerWrapper = styled.a`
+const BannerButton = styled.button`
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  text-decoration: none;
   color: white;
   display: flex;
   justify-content: center;
   align-items: center;
   background: #0b0c15;
+  border: none;
+  cursor: pointer;
+  text-align: left;
 
   overflow: hidden;
   line-height: 1.25;
@@ -162,9 +168,11 @@ const Button = styled.div`
   }
 `
 
-const CloseButton = styled.div`
+const CloseButton = styled.button`
   cursor: pointer;
   padding: var(--padding-xs);
+  background: none;
+  border: none;
 
   @media (min-width: ${({ theme }) => theme.device.sm}) {
     position: absolute;

@@ -102,7 +102,7 @@ const SearchPage: React.FC<PageProps<Queries.Query>> = ({ location, data }) => {
           />
         </RightAd>
       </Main>
-      {bannerEnabled && <SpeakBanner href={SPEAK_LINK} onClose={closeBanner} />}
+      {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />}
     </Layout>
   )
 }

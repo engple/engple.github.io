@@ -34,12 +34,12 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
           </LogoWrapper>
           <Slogan>
             <Prelude>
-              이제 영어공부 제대로 해봐요!!!&nbsp;
+              새해 전 영어공부 시작하자!!&nbsp;
               <Highlight>(시크릿 링크)</Highlight>
             </Prelude>
             <div>
               <Title>
-                이 링크를 통해 <Highlight>64% 할인</Highlight>된 가격으로
+                이 링크를 통해 <Highlight>60% 할인</Highlight>된 가격으로
                 영어공부 제대로 시작하세요!
               </Title>
             </div>

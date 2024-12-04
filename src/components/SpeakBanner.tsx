@@ -33,14 +33,12 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
             <img src={speakLogoWhite} alt="Speak Logo" />
           </LogoWrapper>
           <Slogan>
-            <Prelude>
-              새해 전 영어공부 시작하자!!&nbsp;
-              <Highlight>(시크릿 링크)</Highlight>
-            </Prelude>
+            <Prelude>새해 전 영어공부 시작하자!!!</Prelude>
             <div>
               <Title>
-                이 링크를 통해 <Highlight>60% 할인</Highlight>된 가격으로
-                영어공부 제대로 시작하세요!
+                이 <Highlight>시크릿 링크</Highlight>를 통해&nbsp;
+                <Highlight>60% 할인</Highlight>된 가격으로 영어공부 제대로
+                시작하세요!
               </Title>
             </div>
           </Slogan>

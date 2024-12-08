@@ -160,6 +160,7 @@ const Button = styled.div`
   padding: 0.5rem 1rem;
   border-radius: 4px;
   font-weight: 500;
+  min-width: fit-content;
 
   @media (min-width: ${({ theme }) => theme.device.md}) {
     display: block;

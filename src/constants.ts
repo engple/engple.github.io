@@ -9,7 +9,7 @@ export const LIGHT = "light"
 export const DARK = "dark"
 
 export const SPEAK_LINK =
-  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple"
+  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple-referral"
 
 export const SPEAK_BANNER_KEY = "speak_banner_closed"
 

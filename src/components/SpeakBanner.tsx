@@ -36,7 +36,7 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
             <Prelude>새해 전 영어공부 시작하자!!!</Prelude>
             <div>
               <Title>
-                이 <Highlight>시크릿 링크</Highlight>를 통해&nbsp;
+                이 <Highlight>링크</Highlight>를 통해&nbsp;
                 <Highlight>60% 할인</Highlight>된 가격으로 영어공부 제대로
                 시작하세요!
               </Title>
@@ -160,7 +160,7 @@ const Button = styled.div`
   padding: 0.5rem 1rem;
   border-radius: 4px;
   font-weight: 500;
-  min-width: fit-content;
+  min-width: max-content;
 
   @media (min-width: ${({ theme }) => theme.device.md}) {
     display: block;

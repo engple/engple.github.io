@@ -20,13 +20,7 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
   // )
 
   return (
-    <BannerButton
-      onClick={e => {
-        e.preventDefault()
-        e.stopPropagation()
-        window.open(link, "_blank")
-      }}
-    >
+    <BannerLink href={link} target="_blank" rel="nofollow">
       <Container>
         <LogoAndSlogan>
           <LogoWrapper>
@@ -67,11 +61,11 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
           />
         </svg>
       </CloseButton>
-    </BannerButton>
+    </BannerLink>
   )
 }
 
-const BannerButton = styled.button`
+const BannerLink = styled.a`
   position: fixed;
   bottom: 0;
   left: 0;
@@ -84,6 +78,7 @@ const BannerButton = styled.button`
   border: none;
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
 
   overflow: hidden;
   line-height: 1.25;

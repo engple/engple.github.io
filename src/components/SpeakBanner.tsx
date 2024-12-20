@@ -27,7 +27,7 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
             <img src={speakLogoWhite} alt="Speak Logo" />
           </LogoWrapper>
           <Slogan>
-            <Prelude>새해 전 영어공부 시작하자!!!</Prelude>
+            <Prelude>(광고)새해 전 영어공부 시작하자!!!</Prelude>
             <div>
               <Title>
                 이 <Highlight>링크</Highlight>를 통해&nbsp;

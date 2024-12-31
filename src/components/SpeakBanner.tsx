@@ -10,14 +10,12 @@ interface BannerProps {
 }
 
 const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
-  // const today = new Date()
-  // const blackFriday = new Date("2024-11-25")
-  // const daysLeft = Math.max(
-  //   0,
-  //   Math.floor(
-  //     (blackFriday.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
-  //   ),
-  // )
+  const today = new Date()
+  const eventDay = new Date("2025-01-06")
+  const daysLeft = Math.max(
+    0,
+    Math.floor((eventDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
+  )
 
   return (
     <BannerLink href={link} target="_blank" rel="nofollow">
@@ -27,12 +25,15 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
             <img src={speakLogoWhite} alt="Speak Logo" />
           </LogoWrapper>
           <Slogan>
-            <Prelude>(광고)새해 전 영어공부 시작하자!!!</Prelude>
+            <Prelude>새해 특별 할인 혜택 - AI와 프리토킹하기&nbsp;</Prelude>
             <div>
               <Title>
-                이 <Highlight>링크</Highlight>를 통해&nbsp;
-                <Highlight>60% 할인</Highlight>된 가격으로 영어공부 제대로
-                시작하세요!
+                이 링크를 클릭하고&nbsp;
+                <Highlight>70% 할인</Highlight>된 가격으로 영어공부 제대로
+                시작하세요!{" "}
+                <Highlight>
+                  ({daysLeft === 0 ? "오늘 마감" : `D-${daysLeft}`})
+                </Highlight>
               </Title>
             </div>
           </Slogan>
@@ -135,7 +136,7 @@ const Prelude = styled.div`
 `
 
 const Title = styled.div`
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
   color: white;
 `

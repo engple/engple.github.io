@@ -82,7 +82,7 @@ faq:
 
 <details>
 <summary>상황을 확인하고 안전한지 알려줄게.</summary>
-<span>I'm gonna check out the situation and let you know if it's safe.</span>
+<span>I'm gonna check out the situation and <a href="/blog/in-english/241.let-someone-know/">let you know</a> if it's safe.</span>
 </details>
 
 <details>

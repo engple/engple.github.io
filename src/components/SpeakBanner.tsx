@@ -11,7 +11,7 @@ interface BannerProps {
 
 const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
   const today = new Date()
-  const eventDay = new Date("2025-01-06")
+  const eventDay = new Date("2025-01-14")
   const daysLeft = Math.max(
     0,
     Math.floor((eventDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
@@ -25,7 +25,9 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
             <img src={speakLogoWhite} alt="Speak Logo" />
           </LogoWrapper>
           <Slogan>
-            <Prelude>새해 특별 할인 혜택 - AI와 프리토킹하기&nbsp;</Prelude>
+            <Prelude>
+              새해 특별 할인 혜택 - 일주일에 1000문장 말하기&nbsp;
+            </Prelude>
             <div>
               <Title>
                 이 링크를 클릭하고&nbsp;

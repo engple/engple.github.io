@@ -25,9 +25,7 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
             <img src={speakLogoWhite} alt="Speak Logo" />
           </LogoWrapper>
           <Slogan>
-            <Prelude>
-              새해 특별 할인 혜택 - 일주일에 1000문장 말하기&nbsp;
-            </Prelude>
+            <Prelude>새해 특별 할인 - 7일에 1000문장 말하기&nbsp;</Prelude>
             <div>
               <Title>
                 이 링크를 클릭하고&nbsp;

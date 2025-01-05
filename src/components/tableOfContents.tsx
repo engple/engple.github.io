@@ -26,7 +26,7 @@ const TableOfContents = ({
     )
 
     for (const heading of headings) {
-      const element = document.querySelector(`#${heading.id}`)
+      const element = document.querySelector(`#${CSS.escape(heading.id)}`)
 
       if (element) {
         observer.observe(element)
@@ -35,7 +35,7 @@ const TableOfContents = ({
 
     return () => {
       for (const heading of headings) {
-        const element = document.querySelector(`#${heading.id}`)
+        const element = document.querySelector(`#${CSS.escape(heading.id)}`)
         if (element) {
           observer.unobserve(element)
         }
@@ -70,7 +70,7 @@ const TocNav = styled.nav`
   width: fit-content;
   min-width: 20rem;
   height: fit-content;
-  max-height: 70rem;
+  max-height: 29rem;
   line-height: 1.8;
   overflow: hidden auto;
   background-color: var(--color-gray-1);

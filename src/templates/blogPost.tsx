@@ -17,6 +17,7 @@ import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
 
+import Pronunciation from "../components/Pronunciation"
 import SpeakBanner from "../components/SpeakBanner"
 import Adsense from "../components/adsense"
 import PostNavigator from "../components/postNavigator"
@@ -216,6 +217,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                     dangerouslySetInnerHTML={{ __html: html ?? "" }}
                     rhythm={rhythm}
                   />
+                  <Pronunciation />
                   <RightWrapper>
                     <TocAd>
                       <Adsense

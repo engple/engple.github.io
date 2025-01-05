@@ -83,28 +83,42 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
 
   ul,
   ol {
-    margin-top: ${({ rhythm }) => rhythm(1)};
-    margin-bottom: ${({ rhythm }) => rhythm(1)};
+    margin-top: ${({ rhythm }) => rhythm(0.8)};
+    margin-bottom: ${({ rhythm }) => rhythm(0.8)};
     margin-left: ${({ rhythm }) => rhythm(1)};
+    padding-left: 0;
   }
 
   li > ul,
   li > ol {
-    margin-top: 0;
+    margin-top: ${({ rhythm }) => rhythm(0.3)};
     margin-bottom: 0;
   }
 
-  li > p {
-    margin-bottom: 0;
+  li {
+    margin-bottom: ${({ rhythm }) => rhythm(0.4)};
+    line-height: 1.6;
+    position: relative;
+
+    &::before {
+      content: "•";
+      position: absolute;
+      left: -${({ rhythm }) => rhythm(0.8)};
+      color: var(--color-gray-6);
+    }
+  }
+
+  ol li::before {
+    content: none;
   }
 
   li > ol,
   li > ul {
-    margin-left: ${({ rhythm }) => rhythm(1.25)};
+    margin-left: ${({ rhythm }) => rhythm(1)};
   }
 
-  li {
-    margin-bottom: ${({ rhythm }) => rhythm(0.3)};
+  li > p {
+    margin-bottom: 0;
   }
 
   p,
@@ -226,6 +240,30 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
 
   iframe {
     max-width: 100%;
+  }
+
+  div[data-pronunciation] {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  button.pronunciation-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-primary);
+    padding: 0 var(--sizing-sm);
+    vertical-align: middle;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
   }
 `
 

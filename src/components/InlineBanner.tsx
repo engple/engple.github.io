@@ -20,7 +20,7 @@ const InlineBanner: React.FC = () => {
           const banner = document.createElement("div")
           banner.className = "inline-banner"
           banner.innerHTML = `
-            <a href="${bannerLink}" target="_blank" rel="noopener noreferrer">
+            <a href="${bannerLink}" target="_blank" rel="noopener noreferrer nofollow">
               <div class="inline-banner-content">
                 <div class="inline-banner-text-wrapper">
                   <div class="inline-banner-header">

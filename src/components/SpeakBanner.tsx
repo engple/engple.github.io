@@ -10,12 +10,12 @@ interface BannerProps {
 }
 
 const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
-  // const today = new Date()
-  // const eventDay = new Date("2025-01-26")
-  // const daysLeft = Math.max(
-  //   0,
-  //   Math.floor((eventDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
-  // )
+  const today = new Date()
+  const eventDay = new Date("2025-01-27")
+  const daysLeft = Math.max(
+    0,
+    Math.floor((eventDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
+  )
 
   return (
     <BannerLink href={link} target="_blank" rel="nofollow">
@@ -26,15 +26,16 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
           </LogoWrapper>
           <Slogan>
             <Prelude>
-              새해 특별 할인 혜택{" "}
-              {/* <Highlight대
-                {daysLeft === 0 ? "오늘 마감" : `D-${daysLeft}`}
-              </Highlight> */}
+              새해 특별 할인{" "}
+              <Highlight>
+                {daysLeft >= 0 &&
+                  (daysLeft === 0 ? "(오늘 마감)" : `(D-${daysLeft})`)}
+              </Highlight>
             </Prelude>
             <div>
               <Title>
-                <Highlight>월 2만원</Highlight>으로 말하면서 확실하게 영어 실력
-                향상하기
+                이 링크를 통해 <Highlight>60% + 6만원 할인</Highlight>된
+                가격으로 영어공부 제대로 시작하세요!
               </Title>
             </div>
           </Slogan>

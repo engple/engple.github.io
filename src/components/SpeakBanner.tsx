@@ -11,7 +11,7 @@ interface BannerProps {
 
 const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
   const today = new Date()
-  const eventDay = new Date("2025-01-27")
+  const eventDay = new Date("2025-02-04")
   const daysLeft = Math.max(
     0,
     Math.floor((eventDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
@@ -34,7 +34,7 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
             </Prelude>
             <div>
               <Title>
-                이 링크를 통해 <Highlight>60% + 6만원 할인</Highlight>된
+                이 링크를 통해 <Highlight>60% + 7만원 할인</Highlight>된
                 가격으로 영어공부 제대로 시작하세요!
               </Title>
             </div>

@@ -1,0 +1,11 @@
+# Ignore everything
+*
+
+# Do not ignore src
+!src/*
+
+# Do not ignore js
+!*.js
+
+# Do not ignore ts
+!*.ts

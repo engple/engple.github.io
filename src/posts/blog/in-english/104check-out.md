@@ -26,10 +26,6 @@ faq:
 
 또 다른 예로, 가게에서 물건을 계산할 때나 호텔에서 퇴실할 때도 'check out' 이라는 표현을 사용할 수 있어요. 이 부분은 다음에 추가적으로 다뤄볼게요!
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1465612013356152"
-     crossorigin="anonymous"></script>
-<!-- engple-horizontal-ad -->
-
 <div 
   data-inline-banner="🎉 새해에는 스픽 AI와 함께 영어 공부하자" 
   data-inline-banner-subtext="설날 특별 할인으로 60%할인 + 추가 7만원 할인! (~2/3)" 

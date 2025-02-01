@@ -34,8 +34,8 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
             </Prelude>
             <div>
               <Title>
-                이 링크를 통해 <Highlight>60% + 7만원 할인</Highlight>된
-                가격으로 영어공부 제대로 시작하세요!
+                이 링크를 통해 <Highlight>70% 할인</Highlight>된 가격으로
+                영어공부 제대로 시작하세요!
               </Title>
             </div>
           </Slogan>

@@ -24,7 +24,7 @@ import Adsense from "../components/adsense"
 import PostNavigator from "../components/postNavigator"
 import TableOfContents from "../components/tableOfContents"
 import {
-  // HORIZONTAL_AD_SLOT,
+  HORIZONTAL_AD_SLOT,
   ONE_DAY_MS,
   RECTANGLE_TOC_AD_SLOT,
   SPEAK_BANNER_KEY as SPEAK_BANNER_EXPIRY_KEY,
@@ -235,19 +235,13 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                     <TableOfContents headings={headings} />
                   </RightWrapper>
                 </ContentWrapper>
-                <div
-                  data-inline-banner="🎉 새해에는 스픽 AI와 함께 영어 공부하자"
-                  data-inline-banner-subtext="설날 특별 할인으로 60%할인 + 추가 7만원 할인! (~2/3)"
-                  data-inline-banner-link="https://app.usespeak.com/kr-ko/sale/kr-affiliate-special/?ref=engple-inline"
-                  data-inline-banner-caption="해당 링크를 통해 구매시 일정액의 수수료를 지급받습니다."
-                ></div>
-                {/* <Adsense
+                <Adsense
                   adClient={site.googleAdsense ?? ""}
                   adSlot={HORIZONTAL_AD_SLOT}
                   adFormat="auto"
                   fullWidthResponsive={true}
                   noContainer={true}
-                /> */}
+                />
               </div>
             </InnerWrapper>
           </OuterWrapper>

@@ -3,7 +3,7 @@ import React, { useLayoutEffect, useState } from "react"
 import { type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
-import SpeakBanner from "~/src/components/SpeakBanner"
+// import SpeakBanner from "~/src/components/SpeakBanner"
 import Adsense from "~/src/components/adsense"
 import PostGrid from "~/src/components/postGrid"
 import SEO from "~/src/components/seo"
@@ -12,24 +12,24 @@ import Layout from "~/src/layouts/layout"
 import type Post from "~/src/types/Post"
 
 import {
-  ONE_DAY_MS,
-  SPEAK_BANNER_KEY,
-  SPEAK_LINK,
+  // ONE_DAY_MS,
+  // SPEAK_BANNER_KEY,
+  // SPEAK_LINK,
   VERTICAL_AD_SLOT,
 } from "../constants"
-import { useExpiryKey } from "../hooks/useExpiryKey"
+// import { useExpiryKey } from "../hooks/useExpiryKey"
 
 const Home = ({
   pageContext,
   data,
 }: PageProps<Queries.Query, Queries.MarkdownRemarkFrontmatter>) => {
   const [posts, setPosts] = useState<Post[]>([])
-  const { isExpired: bannerEnabled, refresh: closeBanner } = useExpiryKey(
-    SPEAK_BANNER_KEY,
-    {
-      ttl: ONE_DAY_MS,
-    },
-  )
+  // const { isExpired: bannerEnabled, refresh: closeBanner } = useExpiryKey(
+  //   SPEAK_BANNER_KEY,
+  //   {
+  //     ttl: ONE_DAY_MS,
+  //   },
+  // )
   const currentCategory = pageContext.category
   const postData = data.allMarkdownRemark.edges
   useLayoutEffect(() => {
@@ -95,7 +95,7 @@ const Home = ({
           />
         </RightAd>
       </Main>
-      {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />}
+      {/* {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />} */}
     </Layout>
   )
 }

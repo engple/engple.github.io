@@ -30,6 +30,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
 
   a {
     text-decoration: underline;
+    font-weight: var(--font-weight-semi-bold);
     &:hover,
     &:active {
       text-decoration: underline;

@@ -35,6 +35,10 @@ const Adsense: React.FC<AdsenseProps> = ({
     }
   }, [isDev])
 
+  const adClassName = extraClassName
+    ? `adsbygoogle ${extraClassName}`
+    : "adsbygoogle"
+
   return noContainer ? (
     <>
       {isDev ? (
@@ -46,7 +50,7 @@ const Adsense: React.FC<AdsenseProps> = ({
           style={{
             display: "block",
           }}
-          className={`adsbygoogle ${extraClassName || ""}`}
+          className={adClassName}
           data-ad-client={adClient}
           data-ad-slot={adSlot}
           data-ad-format={adFormat}
@@ -65,7 +69,7 @@ const Adsense: React.FC<AdsenseProps> = ({
           style={{
             display: "block",
           }}
-          className={`adsbygoogle ${extraClassName || ""}`}
+          className={adClassName}
           data-ad-client={adClient}
           data-ad-slot={adSlot}
           data-ad-format={adFormat}

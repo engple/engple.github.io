@@ -17,6 +17,7 @@ import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
 
+import DetailsToggle from "../components/DetailsToggle"
 import InlineBanner from "../components/InlineBanner"
 import Pronunciation from "../components/Pronunciation"
 // import SpeakBanner from "../components/SpeakBanner"
@@ -220,6 +221,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   />
                   <InlineBanner />
                   <Pronunciation />
+                  <DetailsToggle />
                   <RightWrapper>
                     <TocAd>
                       <Adsense

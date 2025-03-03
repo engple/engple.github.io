@@ -233,6 +233,28 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     display: none;
   }
 
+  button.details-toggle-button {
+    position: absolute;
+    top: calc(-3.4rem);
+    height: 2rem;
+    right: 0;
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    border: 1px solid var(--color-gray-2);
+    border-radius: 4px;
+    background-color: var(--color-gray-1);
+    color: var(--color-gray-8);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px var(--color-gray-2);
+
+    &:hover {
+      background-color: var(--color-gray-2);
+    }
+  }
+
   iframe.youtube {
     width: 100% !important;
     aspect-ratio: 16 / 9 !important;

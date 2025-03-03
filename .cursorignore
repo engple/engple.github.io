@@ -2,10 +2,8 @@
 *
 
 # Do not ignore src
-!src/*
-
-# Do not ignore js
-!*.js
-
-# Do not ignore ts
-!*.ts
+!src
+!src/**
+!src/**/*.js
+!src/**/*.ts
+!.cursorignore

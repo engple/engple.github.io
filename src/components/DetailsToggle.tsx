@@ -44,6 +44,12 @@ const DetailsToggle: React.FC = () => {
         button.classList.toggle("expanded")
         button.textContent = newState ? BtnText.EXPAND : BtnText.COLLAPSE
         toggleAllDetails(detailsElements, newState)
+
+        if (newState) {
+          window?.gtag?.("event", "expand_details")
+        } else {
+          window?.gtag?.("event", "collapse_details")
+        }
       }
 
       button.addEventListener("click", handleClick)
@@ -57,7 +63,7 @@ const DetailsToggle: React.FC = () => {
       wrapper.append(button)
 
       cleanupItems.push({
-        button: wrapper, // Change to remove the wrapper instead
+        button: wrapper,
         cleanup: () => button.removeEventListener("click", handleClick),
       })
     }

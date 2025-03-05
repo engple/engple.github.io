@@ -2,7 +2,7 @@ import React from "react"
 
 const BtnText = {
   EXPAND: "🙈 모두 숨기기",
-  COLLAPSE: "👀 모두 보이기",
+  COLLAPSE: "👀 모두 펼치기",
 }
 
 const DetailsToggle: React.FC = () => {

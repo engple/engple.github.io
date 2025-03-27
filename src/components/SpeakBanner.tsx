@@ -10,12 +10,12 @@ interface BannerProps {
 }
 
 const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
-  // const today = new Date()
-  // const eventDay = new Date("2025-02-04")
-  // const daysLeft = Math.max(
-  //   0,
-  //   Math.floor((eventDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
-  // )
+  const today = new Date()
+  const eventDay = new Date("2025-03-31")
+  const daysLeft = Math.max(
+    0,
+    Math.floor((eventDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
+  )
 
   return (
     <BannerLink href={link} target="_blank" rel="nofollow">
@@ -26,16 +26,16 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
           </LogoWrapper>
           <Slogan>
             <Prelude>
-              스픽은 당신을 말하게 합니다.
-              {/* <Highlight>
+              스픽 100일 영어 챌린지 🚀
+              <Highlight>
                 {daysLeft >= 0 &&
                   (daysLeft === 0 ? "(오늘 마감)" : `(D-${daysLeft})`)}
-              </Highlight> */}
+              </Highlight>
             </Prelude>
             <div>
               <Title>
-                이 링크를 통해 <Highlight>60% 할인</Highlight>된 가격으로
-                영어공부 제대로 시작하세요!
+                이 링크를 통해 <Highlight>66% 할인</Highlight>된 가격으로
+                시작하세요!
               </Title>
             </div>
           </Slogan>

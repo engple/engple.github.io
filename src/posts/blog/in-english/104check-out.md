@@ -26,21 +26,6 @@ faq:
 
 또 다른 예로, 가게에서 물건을 계산할 때나 호텔에서 퇴실할 때도 'check out' 이라는 표현을 사용할 수 있어요. 이 부분은 다음에 추가적으로 다뤄볼게요!
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1465612013356152"
-     crossorigin="anonymous"></script>
-<!-- engple-horizontal-ad -->
-
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-1465612013356152"
-     data-ad-slot="2106896038"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-
 ## 📖 예문
 
 "이 새 책 한번 봐봐."

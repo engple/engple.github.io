@@ -11,6 +11,7 @@ interface AdsenseProps {
   height?: string
   extraClassName?: string
   noContainer?: boolean
+  disabled?: boolean
 }
 
 const Adsense: React.FC<AdsenseProps> = ({
@@ -22,10 +23,12 @@ const Adsense: React.FC<AdsenseProps> = ({
   height = "100%",
   extraClassName,
   noContainer = false,
+  disabled = true,
 }) => {
   const isDev = process.env.NODE_ENV === "development"
 
   React.useEffect(() => {
+    if (disabled) return
     if (!isDev) {
       try {
         ;(window.adsbygoogle = window.adsbygoogle || []).push({})
@@ -33,7 +36,9 @@ const Adsense: React.FC<AdsenseProps> = ({
         console.error("Adsbygoogle error:", error)
       }
     }
-  }, [isDev])
+  }, [isDev, disabled])
+
+  if (disabled) return <></>
 
   const adClassName = extraClassName
     ? `adsbygoogle ${extraClassName}`

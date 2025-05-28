@@ -41,7 +41,7 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
           </Slogan>
         </LogoAndSlogan>
         <ButtonWrapper>
-          <Button>할인 혜택 받기</Button>
+          <Button>지금 최저가로 구매하기</Button>
         </ButtonWrapper>
       </Container>
       <CloseButton

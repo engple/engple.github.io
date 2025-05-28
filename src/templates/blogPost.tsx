@@ -275,6 +275,7 @@ const InnerWrapper = styled.div`
 `
 
 const TocAd = styled.div`
+  display: none;
   width: 300px;
   height: 250px;
   margin-bottom: var(--padding-xl);

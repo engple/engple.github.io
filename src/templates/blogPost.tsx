@@ -16,6 +16,7 @@ import Category from "~/src/styles/category"
 import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
+import { addFirstParagraphBanner } from "~/src/utils/addFirstParagraphBanner"
 
 import DetailsToggle from "../components/DetailsToggle"
 import InlineBanner from "../components/InlineBanner"
@@ -84,6 +85,14 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   } = data.current!
   const { title, desc, thumbnail, date, category, faq = [] } = frontmatter!
   const site = useSiteMetadata()
+
+  // Add banner to first paragraph
+  const processedHtml = addFirstParagraphBanner(html ?? "", {
+    text: "⚡ 스픽 66% 할인 + 100일 챌린지 패키지 (6/2 마감)",
+    subtext: "500일 분량 2,000개 코스 + 매일 카톡 알림 + 굿즈 패키지",
+    link: SPEAK_LINK,
+    caption: "구매시 일정 수수료를 지급받습니다.",
+  })
 
   const nextPost = data.next
     ? {
@@ -216,7 +225,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                     />
                   </LeftAd>
                   <Markdown
-                    dangerouslySetInnerHTML={{ __html: html ?? "" }}
+                    dangerouslySetInnerHTML={{ __html: processedHtml ?? "" }}
                     rhythm={rhythm}
                   />
                   <InlineBanner />

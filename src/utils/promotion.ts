@@ -5,22 +5,23 @@ interface BannerConfig {
   caption?: string
 }
 
-export const addFirstParagraphBanner = (
+export const withInlineBanner = (
   html: string,
   bannerConfig: BannerConfig,
+  { idx = 0 }: { idx?: number } = {},
 ): string => {
   // Find the first <p> tag in the HTML
-  const firstParagraphRegex = /(<p[^>]*>.*?<\/p>)/i
-  const match = html.match(firstParagraphRegex)
+  const paragraphRegex = /(<p[^>]*>.*?<\/p>)/gi
+  const match = html.match(paragraphRegex)
 
   if (!match) {
     return html // No paragraph found, return original HTML
   }
 
-  const firstParagraph = match[1]
+  const paragraph = match.at(idx)
 
   // Check if the paragraph already has banner data attributes
-  if (firstParagraph.includes("data-inline-banner")) {
+  if (!paragraph || paragraph.includes("data-inline-banner")) {
     return html // Already has banner, return original HTML
   }
 
@@ -39,13 +40,12 @@ export const addFirstParagraphBanner = (
     .join(" ")
 
   // Replace the opening <p> tag to include the data attributes
-  const modifiedParagraph = firstParagraph.replace(
+  const modifiedParagraph = paragraph.replace(
     /^<p([^>]*)>/i,
     `<p$1 ${dataAttributes}>`,
   )
 
-  // Replace the first paragraph in the original HTML
-  return html.replace(firstParagraphRegex, modifiedParagraph)
+  return html.replace(paragraph, modifiedParagraph)
 }
 
-export default addFirstParagraphBanner
+export default withInlineBanner

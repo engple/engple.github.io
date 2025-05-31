@@ -335,6 +335,7 @@ const Title = styled.h1`
   }
 `
 const LeftAd = styled.div`
+  min-width: 300px;
   width: 300px;
   height: 600px;
   position: sticky;

@@ -16,7 +16,7 @@ import Category from "~/src/styles/category"
 import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
-import { addFirstParagraphBanner } from "~/src/utils/addFirstParagraphBanner"
+import { addFirstParagraphBanner } from "~/src/utils/promotion"
 
 import DetailsToggle from "../components/DetailsToggle"
 import InlineBanner from "../components/InlineBanner"

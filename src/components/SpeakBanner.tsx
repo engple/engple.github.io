@@ -2,6 +2,8 @@ import React from "react"
 
 import styled, { keyframes } from "styled-components"
 
+import { SPEAK_EVENT_END_DATE } from "~/src/constants"
+
 import speakLogoWhite from "../images/speak-logo-white.png"
 
 interface BannerProps {
@@ -11,7 +13,7 @@ interface BannerProps {
 
 const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
   const today = new Date()
-  const eventDay = new Date("2025-06-03")
+  const eventDay = SPEAK_EVENT_END_DATE
   const daysLeft = Math.max(
     0,
     Math.floor((eventDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),

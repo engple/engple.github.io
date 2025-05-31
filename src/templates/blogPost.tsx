@@ -20,6 +20,7 @@ import { withInlineBanner } from "~/src/utils/promotion"
 
 import DetailsToggle from "../components/DetailsToggle"
 import InlineBanner from "../components/InlineBanner"
+import PopupBanner from "../components/PopupBanner"
 import Pronunciation from "../components/Pronunciation"
 import SpeakBanner from "../components/SpeakBanner"
 import Adsense from "../components/adsense"
@@ -28,12 +29,14 @@ import TableOfContents from "../components/tableOfContents"
 import {
   HORIZONTAL_AD_SLOT,
   ONE_DAY_MS,
+  POPUP_BANNER_KEY as POPUP_BANNER_EXPIRY_KEY,
   RECTANGLE_TOC_AD_SLOT,
   SPEAK_BANNER_KEY as SPEAK_BANNER_EXPIRY_KEY,
   SPEAK_LINK,
   VERTICAL_AD_SLOT,
 } from "../constants"
 import { useExpiryKey } from "../hooks/useExpiryKey"
+import { usePopupBanner } from "../hooks/usePopupBanner"
 
 interface DataProps {
   current: {
@@ -76,6 +79,13 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
       ttl: ONE_DAY_MS,
     },
   )
+
+  const { shouldShowPopup, handleCloseButtonClick, handleOverlayClick } =
+    usePopupBanner({
+      storageKey: POPUP_BANNER_EXPIRY_KEY,
+      ttl: ONE_DAY_MS,
+    })
+
   const {
     frontmatter,
     html,
@@ -264,6 +274,13 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         <PostNavigator prevPost={prevPost} nextPost={nextPost} />
       </main>
       {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />}
+      {shouldShowPopup && (
+        <PopupBanner
+          link={SPEAK_LINK}
+          onCloseButtonClick={handleCloseButtonClick}
+          onOverlayClick={handleOverlayClick}
+        />
+      )}
     </Layout>
   )
 }

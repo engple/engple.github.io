@@ -3,6 +3,7 @@ import React, { useLayoutEffect, useState } from "react"
 import { type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
+import PopupBanner from "~/src/components/PopupBanner"
 import SpeakBanner from "~/src/components/SpeakBanner"
 import Adsense from "~/src/components/adsense"
 import PostGrid from "~/src/components/postGrid"
@@ -13,11 +14,13 @@ import type Post from "~/src/types/Post"
 
 import {
   ONE_DAY_MS,
+  POPUP_BANNER_KEY,
   SPEAK_BANNER_KEY,
   SPEAK_LINK,
   VERTICAL_AD_SLOT,
 } from "../constants"
 import { useExpiryKey } from "../hooks/useExpiryKey"
+import { usePopupBanner } from "../hooks/usePopupBanner"
 
 const Home = ({
   pageContext,
@@ -30,6 +33,13 @@ const Home = ({
       ttl: ONE_DAY_MS,
     },
   )
+
+  const { shouldShowPopup, handleCloseButtonClick, handleOverlayClick } =
+    usePopupBanner({
+      storageKey: POPUP_BANNER_KEY,
+      ttl: ONE_DAY_MS,
+    })
+
   const currentCategory = pageContext.category
   const postData = data.allMarkdownRemark.edges
   useLayoutEffect(() => {
@@ -96,6 +106,13 @@ const Home = ({
         </RightAd>
       </Main>
       {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />}
+      {shouldShowPopup && (
+        <PopupBanner
+          link={SPEAK_LINK}
+          onCloseButtonClick={handleCloseButtonClick}
+          onOverlayClick={handleOverlayClick}
+        />
+      )}
     </Layout>
   )
 }

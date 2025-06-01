@@ -338,7 +338,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     display: none;
     padding: 12px 15px;
     margin-top: 0;
-    background-color: var(--color-white);
+    background-color: var(--color-post-background);
     font-size: 0.95rem;
     line-height: 1.6;
 

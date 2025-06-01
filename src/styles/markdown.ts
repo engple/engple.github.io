@@ -233,7 +233,8 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     display: none;
   }
 
-  button.details-toggle-button {
+  button.details-toggle-button,
+  button.interactive-list-toggle-all-button {
     position: absolute;
     top: calc(-3.4rem);
     height: 2rem;
@@ -291,6 +292,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
 
   /* Interactive list (연습해보기) */
   [data-interactive-list] {
+    position: relative;
     margin: 0;
     padding-left: 0;
     list-style-type: none;

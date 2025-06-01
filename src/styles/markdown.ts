@@ -233,7 +233,8 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     display: none;
   }
 
-  button.details-toggle-button {
+  button.details-toggle-button,
+  button.interactive-list-toggle-all-button {
     position: absolute;
     top: calc(-3.4rem);
     height: 2rem;
@@ -287,6 +288,69 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
       width: 16px;
       height: 16px;
     }
+  }
+
+  /* Interactive list (연습해보기) */
+  [data-interactive-list] {
+    position: relative;
+    margin: 0;
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  [data-interactive-item] {
+    background-color: var(--color-gray-1);
+    border: 1px solid var(--color-gray-2);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: none;
+    }
+  }
+
+  [data-toggler] {
+    cursor: pointer;
+    font-weight: var(--font-weight-semi-bold);
+    color: var(--color-gray-8);
+    font-size: 1rem;
+    padding: 12px 15px;
+    background-color: transparent;
+    transition: background-color 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: "▶";
+      font-size: 0.8em;
+      color: var(--color-gray-6);
+      margin-right: 8px;
+    }
+  }
+
+  [data-interactive-item][data-open="true"] [data-toggler]::before {
+    content: "▼";
+  }
+
+  [data-answer] {
+    display: none;
+    padding: 12px 15px;
+    margin-top: 0;
+    background-color: var(--color-post-background);
+    font-size: 0.95rem;
+    line-height: 1.6;
+
+    a {
+      color: var(--color-primary);
+      text-decoration: underline;
+      font-weight: var(--font-weight-semi-bold);
+    }
+  }
+
+  [data-interactive-item][data-open="true"] [data-answer] {
+    display: block;
   }
 `
 

@@ -87,6 +87,15 @@ module.exports = {
         "@typescript-eslint/restrict-template-expressions": 0,
         "@typescript-eslint/explicit-module-boundary-types": 0,
         "@typescript-eslint/no-non-null-asserted-optional-chain": 0,
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
+          {
+            vars: "all",
+            args: "after-used",
+            ignoreRestSiblings: true,
+            varsIgnorePattern: "^_",
+          },
+        ],
       },
     },
     {

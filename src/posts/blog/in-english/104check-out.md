@@ -40,50 +40,44 @@ faq:
 
 ## 💬 연습해보기
 
-<details>
-<summary>우리 언젠간 시내에 새로 생긴 식당에 가봐야돼.</summary>
-<span>We should check out that new restaurant downtown sometime.</span>
-</details>
-
-<details>
-<summary>그 드라마 최신 에피소드 벌써 봤어?</summary>
-<span>Have you checked out the latest episode of that show yet?</span>
-</details>
-
-<details>
-<summary>오늘 밤 그 새로운 클럽에 가보자. 꽤 핫하다던데.</summary>
-<span>Let's check out that new club tonight. I heard it's pretty wild.</span>
-</details>
-
-<details>
-<summary>그 소리가 뭐였는지 좀 확인해 줄래?</summary>
-<span>Can you check out what that noise was?</span>
-</details>
-
-<details>
-<summary>내가 발견한 이 밴드 꼭 들어봐.</summary>
-<span>You've gotta check out this band I discovered.</span>
-</details>
-
-<details>
-<summary>상황을 확인하고 안전한지 알려줄게.</summary>
-<span>I'm gonna check out the situation and <a href="/blog/in-english/241.let-someone-know/">let you know</a> if it's safe.</span>
-</details>
-
-<details>
-<summary>할인 코너 확인하는 거 잊지 마.</summary>
-<span>Don't forget to check out the sales rack.</span>
-</details>
-
-<details>
-<summary>헬스장에 가서 새로운 운동기구를 살펴볼 거야.</summary>
-<span>I'm heading to the gym to check out their new equipment.</span>
-</details>
-
-<details>
-<summary>야, 내가 찾은 이 밈 봐봐. 완전 웃겨.</summary>
-<span>Hey, check out this meme I found. It's hilarious!</span>
-</details>
+<ul data-interactive-list>
+  <li data-interactive-item>
+    <span data-toggler>우리 언젠간 시내에 새로 생긴 식당에 가봐야돼.</span>
+    <span data-answer>We should check out that new restaurant downtown sometime.</span>
+  </li>
+  <li data-interactive-item>
+    <span data-toggler>그 드라마 최신 에피소드 벌써 봤어?</span>
+    <span data-answer>Have you checked out the latest episode of that show yet?</span>
+  </li>
+  <li data-interactive-item>
+    <span data-toggler>오늘 밤 그 새로운 클럽에 가보자. 꽤 핫하다던데.</span>
+    <span data-answer>Let's check out that new club tonight. I heard it's pretty wild.</span>
+  </li>
+  <li data-interactive-item>
+    <span data-toggler>그 소리가 뭐였는지 좀 확인해 줄래?</span>
+    <span data-answer>Can you check out what that noise was?</span>
+  </li>
+  <li data-interactive-item>
+    <span data-toggler>내가 발견한 이 밴드 꼭 들어봐.</span>
+    <span data-answer>You've gotta check out this band I discovered.</span>
+  </li>
+  <li data-interactive-item>
+    <span data-toggler>상황을 확인하고 안전한지 알려줄게.</span>
+    <span data-answer>I'm gonna check out the situation and <a href="/blog/in-english/241.let-someone-know/">let you know</a> if it's safe.</span>
+  </li>
+  <li data-interactive-item>
+    <span data-toggler>할인 코너 확인하는 거 잊지 마.</span>
+    <span data-answer>Don't forget to check out the sales rack.</span>
+  </li>
+  <li data-interactive-item>
+    <span data-toggler>헬스장에 가서 새로운 운동기구를 살펴볼 거야.</span>
+    <span data-answer>I'm heading to the gym to check out their new equipment.</span>
+  </li>
+  <li data-interactive-item>
+    <span data-toggler>야, 내가 찾은 이 밈 봐봐. 완전 웃겨.</span>
+    <span data-answer>Hey, check out this meme I found. It's hilarious!</span>
+  </li>
+</ul>
 
 ## 🤝 함께 알아두면 좋은 표현들
 

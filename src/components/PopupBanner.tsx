@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 
-import styled, { keyframes } from "styled-components"
+import styled from "styled-components"
 
 import { SPEAK_EVENT_END_DATE, SPEAK_POPUP_LINK } from "~/src/constants"
 
@@ -17,9 +17,6 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
   onOverlayClick,
   isVisible = true,
 }) => {
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [shouldRender, setShouldRender] = useState(isVisible)
-
   const today = new Date()
   const eventDay = SPEAK_EVENT_END_DATE
   const daysLeft = Math.max(
@@ -27,43 +24,25 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
     Math.floor((eventDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
   )
 
-  useEffect(() => {
-    if (isVisible) {
-      setShouldRender(true)
-      // Small delay to trigger animation
-      setTimeout(() => setIsAnimating(true), 50)
-    } else {
-      setIsAnimating(false)
-      // Wait for animation to complete before unmounting
-      setTimeout(() => setShouldRender(false), 300)
-    }
-  }, [isVisible])
-
   const handleCloseButtonClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    setIsAnimating(false)
-    setTimeout(() => {
-      onCloseButtonClick()
-    }, 300)
+    onCloseButtonClick()
   }
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       e.preventDefault()
       e.stopPropagation()
-      setIsAnimating(false)
-      setTimeout(() => {
-        onOverlayClick()
-      }, 300)
+      onOverlayClick()
     }
   }
 
-  if (!shouldRender) return
+  if (!isVisible) return
 
   return (
-    <PopupOverlay isAnimating={isAnimating} onClick={handleOverlayClick}>
-      <PopupContainer isAnimating={isAnimating}>
+    <PopupOverlay onClick={handleOverlayClick}>
+      <PopupContainer>
         <CloseButton onClick={handleCloseButtonClick}>
           <svg
             width="24"
@@ -119,29 +98,7 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
   )
 }
 
-const slideUp = keyframes`
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-`
-
-const slideDown = keyframes`
-  from {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-`
-
-const PopupOverlay = styled.div<{ isAnimating: boolean }>`
+const PopupOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -155,16 +112,25 @@ const PopupOverlay = styled.div<{ isAnimating: boolean }>`
   justify-content: center;
   padding: var(--padding-lg);
 
-  opacity: ${({ isAnimating }) => (isAnimating ? 1 : 0)};
-  transition: opacity 0.3s ease;
+  /* Simple fade-in animation */
+  animation: fadeIn 0.2s ease-out;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     padding: 0;
     align-items: flex-end;
   }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 `
 
-const PopupContainer = styled.div<{ isAnimating: boolean }>`
+const PopupContainer = styled.div`
   background: linear-gradient(135deg, #0b0c15 0%, #1a1b2e 50%, #0b0c15 100%);
   border-radius: var(--border-radius-lg);
   max-width: 500px;
@@ -175,24 +141,38 @@ const PopupContainer = styled.div<{ isAnimating: boolean }>`
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
 
-  transform: ${({ isAnimating }) => (isAnimating ? "scale(1)" : "scale(0.8)")};
-  opacity: ${({ isAnimating }) => (isAnimating ? 1 : 0)};
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Simple scale-in animation */
+  animation: scaleIn 0.2s ease-out;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     max-width: 100%;
     border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
     max-height: 80vh;
 
-    transform: ${({ isAnimating }) =>
-      isAnimating ? "translateY(0)" : "translateY(100%)"};
-    animation: ${({ isAnimating }) => (isAnimating ? slideUp : "none")} 0.3s
-      cubic-bezier(0.4, 0, 0.2, 1);
+    /* Slide up animation for mobile */
+    animation: slideUp 0.2s ease-out;
   }
 
-  @media (min-width: ${({ theme }) => theme.device.sm}) {
-    animation: ${({ isAnimating }) => (isAnimating ? slideDown : "none")} 0.3s
-      cubic-bezier(0.4, 0, 0.2, 1);
+  @keyframes scaleIn {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 `
 
@@ -272,10 +252,6 @@ const Badge = styled.div`
   font-size: 0.9rem;
   font-weight: var(--font-weight-bold);
   box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-  animation: ${keyframes`
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-  `} 2s ease-in-out infinite;
 `
 
 const MainContent = styled.div`

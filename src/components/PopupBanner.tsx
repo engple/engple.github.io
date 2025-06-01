@@ -2,19 +2,17 @@ import React, { useEffect, useState } from "react"
 
 import styled, { keyframes } from "styled-components"
 
-import { SPEAK_EVENT_END_DATE } from "~/src/constants"
+import { SPEAK_EVENT_END_DATE, SPEAK_POPUP_LINK } from "~/src/constants"
 
 import speakLogoWhite from "../images/speak-logo-white.png"
 
 interface PopupBannerProps {
-  link: string
   onCloseButtonClick: () => void
   onOverlayClick: () => void
   isVisible?: boolean
 }
 
 const PopupBanner: React.FC<PopupBannerProps> = ({
-  link,
   onCloseButtonClick,
   onOverlayClick,
   isVisible = true,
@@ -110,7 +108,7 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
           </MainContent>
 
           <ActionSection>
-            <CTAButton href={link} target="_blank" rel="nofollow">
+            <CTAButton href={SPEAK_POPUP_LINK} target="_blank" rel="nofollow">
               지금 최저가로 구매하기
               <ButtonArrow>→</ButtonArrow>
             </CTAButton>

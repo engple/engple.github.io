@@ -108,7 +108,6 @@ const Home = ({
       {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />}
       {shouldShowPopup && (
         <PopupBanner
-          link={SPEAK_LINK}
           onCloseButtonClick={handleCloseButtonClick}
           onOverlayClick={handleOverlayClick}
         />

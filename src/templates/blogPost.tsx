@@ -36,6 +36,7 @@ import {
   VERTICAL_AD_SLOT,
 } from "../constants"
 import { useExpiryKey } from "../hooks/useExpiryKey"
+import { useInteractiveList } from "../hooks/useInteractiveList"
 import { usePopupBanner } from "../hooks/usePopupBanner"
 
 interface DataProps {
@@ -107,6 +108,8 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     bannerConfig,
     { idx: -1 },
   )
+
+  useInteractiveList([processedHtml])
 
   const nextPost = data.next
     ? {

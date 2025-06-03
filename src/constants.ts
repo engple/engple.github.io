@@ -9,13 +9,13 @@ export const LIGHT = "light"
 export const DARK = "dark"
 
 export const SPEAK_LINK =
-  "https://www.speak.com/ko/event/25may-challenge/home?utm_source=speakpartners&utm_campaign=KR_2505_25may-challenge_n/a_link_performance&utm_medium=n/a&utm_content=n/a&ref=engple"
+  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple"
 
 export const SPEAK_INLINE_LINK =
-  "https://www.speak.com/ko/event/25may-challenge/home?utm_source=speakpartners&utm_campaign=KR_2505_25may-challenge_n/a_link_performance&utm_medium=n/a&utm_content=n/a&ref=engple-inline"
+  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple-inline"
 
 export const SPEAK_POPUP_LINK =
-  "https://www.speak.com/ko/event/25may-challenge/home?utm_source=speakpartners&utm_campaign=KR_2505_25may-challenge_n/a_link_performance&utm_medium=n/a&utm_content=n/a&ref=engple-modal"
+  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple-modal"
 
 export const SPEAK_BANNER_KEY = "speak_banner_closed"
 

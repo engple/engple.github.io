@@ -2,22 +2,26 @@ import React from "react"
 
 import styled, { keyframes } from "styled-components"
 
-import { SPEAK_EVENT_END_DATE } from "~/src/constants"
-
 import speakLogoWhite from "../images/speak-logo-white.png"
 
 interface BannerProps {
   link: string
   onClose?: () => void
+  eventDay?: Date // Optional prop for future events
 }
 
-const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
-  const today = new Date()
-  const eventDay = SPEAK_EVENT_END_DATE
-  const daysLeft = Math.max(
-    0,
-    Math.floor((eventDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
-  )
+const Banner: React.FC<BannerProps> = ({
+  link,
+  onClose = () => {},
+  eventDay,
+}) => {
+  // Calculate days left only if eventDay is provided
+  const daysLeft = eventDay
+    ? Math.max(
+        0,
+        Math.floor((eventDay.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+      )
+    : undefined
 
   return (
     <BannerLink href={link} target="_blank" rel="nofollow">
@@ -28,22 +32,23 @@ const Banner: React.FC<BannerProps> = ({ link, onClose = () => {} }) => {
           </LogoWrapper>
           <Slogan>
             <Prelude>
-              스픽 100일 갓생 챌린지
-              <Highlight>
-                {daysLeft >= 0 &&
-                  (daysLeft === 0 ? "(오늘 마감)" : `(D-${daysLeft})`)}
-              </Highlight>
+              <Highlight>AI 영어회화 1위</Highlight> 스픽으로
+              {daysLeft !== undefined && daysLeft >= 0 && (
+                <EventBadge>
+                  {daysLeft === 0 ? "(오늘 마감)" : `(D-${daysLeft})`}
+                </EventBadge>
+              )}
             </Prelude>
             <div>
               <Title>
-                <Highlight>66% 할인</Highlight>된 가격으로 영어공부도 하고 스픽
-                굿즈도 받아가자!
+                <Highlight>20분에 100문장</Highlight> 말하며 영어{" "}
+                <Highlight>자신감</Highlight> 폭발시키자!
               </Title>
             </div>
           </Slogan>
         </LogoAndSlogan>
         <ButtonWrapper>
-          <Button>지금 최저가로 구매하기</Button>
+          <Button>바로 할인받기</Button>
         </ButtonWrapper>
       </Container>
       <CloseButton
@@ -131,12 +136,17 @@ const Prelude = styled.div`
   width: max-content;
   animation: ${keyframes`
     0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-2deg); }
-    75% { transform: rotate(2deg); } 
-  `} 0.25s ease-in-out infinite;
-  span {
-    color: #ffd700;
-  }
+    25% { transform: rotate(-1deg); }
+    75% { transform: rotate(1deg); } 
+  `} 0.3s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+`
+
+const EventBadge = styled.span`
+  color: #ffd700;
+  font-weight: 600;
 `
 
 const Title = styled.div`
@@ -147,20 +157,26 @@ const Title = styled.div`
 
 const Highlight = styled.span`
   color: #ffd700;
+  font-weight: 600;
 `
 
 const ButtonWrapper = styled.div``
 
 const Button = styled.div`
   display: none;
-  background: #ffd700;
-  background: #1c49ff;
-  color: #000;
+  background: linear-gradient(135deg, #1c49ff, #0066cc);
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
   min-width: max-content;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(28, 73, 255, 0.3);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(28, 73, 255, 0.4);
+  }
 
   @media (min-width: ${({ theme }) => theme.device.md}) {
     display: block;

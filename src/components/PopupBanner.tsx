@@ -2,7 +2,7 @@ import React from "react"
 
 import styled from "styled-components"
 
-import { SPEAK_EVENT_END_DATE, SPEAK_POPUP_LINK } from "~/src/constants"
+import { SPEAK_POPUP_LINK } from "~/src/constants"
 
 import speakLogoWhite from "../images/speak-logo-white.png"
 
@@ -10,19 +10,22 @@ interface PopupBannerProps {
   onCloseButtonClick: () => void
   onOverlayClick: () => void
   isVisible?: boolean
+  eventDay?: Date // Optional prop for future events
 }
 
 const PopupBanner: React.FC<PopupBannerProps> = ({
   onCloseButtonClick,
   onOverlayClick,
   isVisible = true,
+  eventDay,
 }) => {
-  const today = new Date()
-  const eventDay = SPEAK_EVENT_END_DATE
-  const daysLeft = Math.max(
-    0,
-    Math.floor((eventDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
-  )
+  // Calculate days left only if eventDay is provided
+  const daysLeft = eventDay
+    ? Math.max(
+        0,
+        Math.floor((eventDay.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+      )
+    : undefined
 
   const handleCloseButtonClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -63,32 +66,32 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
             <LogoWrapper>
               <img src={speakLogoWhite} alt="Speak Logo" />
             </LogoWrapper>
-            <BadgeWrapper>
-              <Badge>
-                {daysLeft >= 0 &&
-                  (daysLeft === 0 ? "오늘 마감!" : `D-${daysLeft}`)}
-              </Badge>
-            </BadgeWrapper>
+            {daysLeft !== undefined && daysLeft >= 0 && (
+              <BadgeWrapper>
+                <Badge>{daysLeft === 0 ? "오늘 마감!" : `D-${daysLeft}`}</Badge>
+              </BadgeWrapper>
+            )}
           </LogoSection>
 
           <MainContent>
             <Title>
-              <Highlight>스픽 100일 갓생 챌린지</Highlight>
+              <Highlight>AI 영어회화 1위</Highlight> 스픽
             </Title>
             <Subtitle>
-              <Highlight>66% 할인</Highlight>된 가격으로 영어공부하고 굿즈도
-              받자!
+              <Highlight>실제 대화</Highlight>처럼 연습하고 영어{" "}
+              <Highlight>자신감</Highlight>을 키워보세요!
             </Subtitle>
             <Features>
-              <Feature>✨ 500일 분량 2,000개 코스</Feature>
-              <Feature>📱 매일 카톡 알림</Feature>
-              <Feature>🎁 스픽 굿즈 패키지</Feature>
+              <Feature>🎯 AI와 실시간 영어 대화 연습</Feature>
+              <Feature>📈 개인 맞춤형 학습 커리큘럼</Feature>
+              <Feature>🏆 전 세계 1,000만 명이 선택한 앱</Feature>
+              <Feature>⚡ 20분에 100문장 말하기 가능</Feature>
             </Features>
           </MainContent>
 
           <ActionSection>
             <CTAButton href={SPEAK_POPUP_LINK} target="_blank" rel="nofollow">
-              지금 최저가로 구매하기
+              바로 할인받기
               <ButtonArrow>→</ButtonArrow>
             </CTAButton>
           </ActionSection>
@@ -265,6 +268,7 @@ const Title = styled.h2`
   font-weight: var(--font-weight-bold);
   line-height: 1.2;
   margin: 0;
+  color: white;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     font-size: 1.5rem;

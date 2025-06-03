@@ -32,6 +32,7 @@ import {
   POPUP_BANNER_KEY as POPUP_BANNER_EXPIRY_KEY,
   RECTANGLE_TOC_AD_SLOT,
   SPEAK_BANNER_KEY as SPEAK_BANNER_EXPIRY_KEY,
+  SPEAK_INLINE_LINK,
   SPEAK_LINK,
   VERTICAL_AD_SLOT,
 } from "../constants"
@@ -98,9 +99,10 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const site = useSiteMetadata()
 
   const bannerConfig = {
-    text: "⚡ 스픽 66% 할인 + 100일 챌린지 패키지 (6/2 마감)",
-    subtext: "500일 분량 2,000개 코스 + 매일 카톡 알림 + 굿즈 패키지",
-    link: SPEAK_LINK,
+    text: "AI 영어회화 1위 스픽으로 실제 대화처럼 연습하고 자신감 키우자!",
+    subtext:
+      "AI와 실시간 영어 대화 연습 + 개인 맞춤형 학습 + 전 세계 1,000만 명 선택",
+    link: SPEAK_INLINE_LINK,
     caption: "구매시 일정 수수료를 지급받습니다.",
   }
   const processedHtml = withInlineBanner(

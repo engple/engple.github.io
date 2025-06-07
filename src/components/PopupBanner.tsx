@@ -75,25 +75,25 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
 
           <MainContent>
             <Title>
-              <Highlight>AI 영어회화 1위</Highlight> 스픽
+              영어 말하기가 <Highlight>어려우세요?</Highlight>
             </Title>
             <Subtitle>
-              <Highlight>실제 대화</Highlight>처럼 연습하고 영어{" "}
-              <Highlight>자신감</Highlight>을 키워보세요!
+              AI와 <Highlight>실제 대화</Highlight>하며 30일 만에
+              <br />
+              자신있게 영어로 말해보세요
             </Subtitle>
             <Features>
               <Feature>🎯 AI와 실시간 영어 대화 연습</Feature>
-              <Feature>📈 개인 맞춤형 학습 커리큘럼</Feature>
-              <Feature>🏆 전 세계 1,000만 명이 선택한 앱</Feature>
-              <Feature>⚡ 20분에 100문장 말하기 가능</Feature>
+              <Feature>🔥 지금 60% 할인 특가 진행중</Feature>
             </Features>
           </MainContent>
 
           <ActionSection>
             <CTAButton href={SPEAK_POPUP_LINK} target="_blank" rel="nofollow">
-              바로 할인받기
+              60% 할인받고 시작하기
               <ButtonArrow>→</ButtonArrow>
             </CTAButton>
+            <TrustSignal>전 세계 1,000만 명이 선택한 1위 앱</TrustSignal>
           </ActionSection>
         </ContentWrapper>
       </PopupContainer>
@@ -264,27 +264,27 @@ const MainContent = styled.div`
 `
 
 const Title = styled.h2`
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: var(--font-weight-bold);
   line-height: 1.2;
   margin: 0;
   color: white;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
   }
 `
 
 const Subtitle = styled.p`
-  font-size: 1.1rem;
-  line-height: 1.5;
+  font-size: 1.3rem;
+  line-height: 1.4;
   margin: 0;
   opacity: 1;
   color: white;
   word-break: keep-all;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: 1rem;
+    font-size: 1.1rem;
     word-break: break-word;
   }
 `
@@ -297,7 +297,7 @@ const Features = styled.div`
 `
 
 const Feature = styled.div`
-  font-size: 1rem;
+  font-size: 1.1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -306,7 +306,7 @@ const Feature = styled.div`
   color: white;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 `
 
@@ -322,7 +322,7 @@ const CTAButton = styled.a`
   color: white;
   padding: var(--sizing-md) var(--sizing-xl);
   border-radius: var(--border-radius-lg);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: var(--font-weight-bold);
   text-decoration: none;
   display: flex;
@@ -347,7 +347,7 @@ const CTAButton = styled.a`
   }
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: 1rem;
+    font-size: 1.1rem;
     padding: var(--sizing-md) var(--sizing-lg);
     min-width: 250px;
   }
@@ -363,6 +363,14 @@ const ButtonArrow = styled.span`
 
 const Highlight = styled.span`
   color: #ffd700;
+`
+
+const TrustSignal = styled.div`
+  font-size: 1rem;
+  opacity: 0.7;
+  margin-top: var(--sizing-sm);
+  color: #ffffff;
+  font-weight: 400;
 `
 
 export default PopupBanner

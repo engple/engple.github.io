@@ -99,9 +99,8 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const site = useSiteMetadata()
 
   const bannerConfig = {
-    text: "AI 영어회화 1위 스픽으로 실제 대화처럼 연습하고 자신감 키우자!",
-    subtext:
-      "AI와 실시간 영어 대화 연습 + 개인 맞춤형 학습 + 전 세계 1,000만 명 선택",
+    text: "영어 말하기 두려우신가요?",
+    subtext: "AI와 20분 연습으로 자신감 UP! 지금 60% 할인",
     link: SPEAK_INLINE_LINK,
     caption: "구매시 일정 수수료를 지급받습니다.",
   }

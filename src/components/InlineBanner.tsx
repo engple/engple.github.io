@@ -24,11 +24,14 @@ const InlineBanner: React.FC = () => {
               <div class="inline-banner-content">
                 <div class="inline-banner-text-wrapper">
                   <div class="inline-banner-header">
+                    <span class="inline-banner-icon">✨</span>
                     <span class="inline-banner-title">${bannerText}</span>
                   </div>
                   ${bannerSubtext ? `<span class="inline-banner-subtext">${bannerSubtext}</span>` : ""}
                 </div>
-                <span class="inline-banner-arrow">→</span>
+                <div class="inline-banner-cta">
+                  <span class="inline-banner-button">60% 할인받기 →</span>
+                </div>
               </div>
             </a>
             ${bannerCaption ? `<div class="inline-banner-caption">${bannerCaption}</div>` : ""}

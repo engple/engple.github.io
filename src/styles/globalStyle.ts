@@ -24,6 +24,7 @@ const GlobalStyle = createGlobalStyle`
 
     --border-radius-sm: 6px;
     --border-radius-base: 8px;
+    --border-radius-md: 12px;
     --border-radius-lg: 28px;
 
     --sizing-xs: 4px;

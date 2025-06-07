@@ -23,16 +23,21 @@ const Banner: React.FC<BannerProps> = ({
       )
     : undefined
 
+  const handleBannerClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    window.open(link, "_blank", "nofollow")
+  }
+
   return (
-    <BannerLink href={link} target="_blank" rel="nofollow">
-      <Container>
+    <BannerContainer>
+      <Container onClick={handleBannerClick}>
         <LogoAndSlogan>
           <LogoWrapper>
             <img src={speakLogoWhite} alt="Speak Logo" />
           </LogoWrapper>
           <Slogan>
             <Prelude>
-              <Highlight>AI 영어회화 1위</Highlight> 스픽으로
+              영어 말하기 어려우세요?
               {daysLeft !== undefined && daysLeft >= 0 && (
                 <EventBadge>
                   {daysLeft === 0 ? "(오늘 마감)" : `(D-${daysLeft})`}
@@ -41,14 +46,13 @@ const Banner: React.FC<BannerProps> = ({
             </Prelude>
             <div>
               <Title>
-                <Highlight>20분에 100문장</Highlight> 말하며 영어{" "}
-                <Highlight>자신감</Highlight> 폭발시키자!
+                <Highlight>60% 할인</Highlight>으로 AI와 영어 대화 연습하기
               </Title>
             </div>
           </Slogan>
         </LogoAndSlogan>
         <ButtonWrapper>
-          <Button>바로 할인받기</Button>
+          <Button>할인받기</Button>
         </ButtonWrapper>
       </Container>
       <CloseButton
@@ -71,39 +75,52 @@ const Banner: React.FC<BannerProps> = ({
           />
         </svg>
       </CloseButton>
-    </BannerLink>
+    </BannerContainer>
   )
 }
 
-const BannerLink = styled.a`
+const BannerContainer = styled.div`
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background: #0b0c15;
   border: none;
-  cursor: pointer;
   text-align: left;
   text-decoration: none;
-
-  overflow: hidden;
-  line-height: 1.25;
+  line-height: 1.2;
   z-index: 300;
-  padding: var(--padding-sm);
+  padding: 0.75rem var(--padding-sm);
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    padding: 0.5rem var(--padding-sm);
+  }
 `
 
 const Container = styled.div`
   display: flex;
-  width: var(--max-width);
+  max-width: var(--max-width);
+  margin: 0 auto;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 1rem;
   z-index: 1;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  position: relative;
+  padding-right: 2.5rem;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    align-items: center;
+    gap: 0.75rem;
+    padding-right: 2rem;
+  }
 `
 
 const LogoAndSlogan = styled.div`
@@ -111,6 +128,12 @@ const LogoAndSlogan = styled.div`
   align-items: center;
   flex-wrap: wrap;
   gap: var(--padding-sm);
+  flex: 1;
+  min-width: 0;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    width: 100%;
+  }
 `
 
 const LogoWrapper = styled.div`
@@ -126,7 +149,7 @@ const LogoWrapper = styled.div`
 const Slogan = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 `
 
 const Prelude = styled.div`
@@ -134,14 +157,13 @@ const Prelude = styled.div`
   color: white;
   transform-origin: center center;
   width: max-content;
-  animation: ${keyframes`
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-1deg); }
-    75% { transform: rotate(1deg); } 
-  `} 0.3s ease-in-out infinite;
   display: flex;
   align-items: center;
   gap: 0.25rem;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    font-size: 0.85rem;
+  }
 `
 
 const EventBadge = styled.span`
@@ -153,6 +175,10 @@ const Title = styled.div`
   font-size: 1rem;
   font-weight: 500;
   color: white;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    font-size: 0.95rem;
+  }
 `
 
 const Highlight = styled.span`
@@ -163,23 +189,25 @@ const Highlight = styled.span`
 const ButtonWrapper = styled.div``
 
 const Button = styled.div`
-  display: none;
   background: linear-gradient(135deg, #1c49ff, #0066cc);
   color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
   font-weight: 600;
-  min-width: max-content;
+  white-space: nowrap;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(28, 73, 255, 0.3);
+  flex-shrink: 0;
+  font-size: 0.95rem;
 
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(28, 73, 255, 0.4);
   }
 
-  @media (min-width: ${({ theme }) => theme.device.md}) {
-    display: block;
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.9rem;
   }
 `
 
@@ -188,12 +216,23 @@ const CloseButton = styled.button`
   padding: var(--padding-xs);
   background: none;
   border: none;
+  position: absolute;
+  right: var(--padding-sm);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  color: white;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
 
-  @media (min-width: ${({ theme }) => theme.device.sm}) {
-    position: absolute;
-    right: var(--padding-xl);
-    top: 50%;
-    transform: translateY(-50%);
+  &:hover {
+    opacity: 1;
+  }
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    right: var(--padding-xs);
+    top: var(--padding-xs);
+    transform: none;
   }
 `
 

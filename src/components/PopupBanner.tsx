@@ -75,7 +75,7 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
 
           <MainContent>
             <Title>
-              영어 말하기가 <Highlight>어려우세요?</Highlight>
+              영어 말하기 <Highlight>어려우세요?</Highlight>
             </Title>
             <Subtitle>
               AI와 <Highlight>실제 대화</Highlight>하며 30일 만에

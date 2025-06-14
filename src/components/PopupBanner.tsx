@@ -1,10 +1,14 @@
-import React from "react"
+import React, { useRef, useState } from "react"
 
 import styled from "styled-components"
 
-import { SPEAK_POPUP_LINK } from "~/src/constants"
+import { SPEAK_POPUP_LINK, SPEAK_POPUP_VIDEO_URL } from "~/src/constants"
 
 import speakLogoWhite from "../images/speak-logo-white.png"
+
+import CloseIcon from "./icons/CloseIcon"
+import MutedIcon from "./icons/MutedIcon"
+import UnmutedIcon from "./icons/UnmutedIcon"
 
 interface PopupBannerProps {
   onCloseButtonClick: () => void
@@ -19,6 +23,9 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
   isVisible = true,
   eventDay,
 }) => {
+  const [isMuted, setIsMuted] = useState(true)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
   // Calculate days left only if eventDay is provided
   const daysLeft = eventDay
     ? Math.max(
@@ -41,26 +48,40 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
     }
   }
 
+  const handleToggleMute = () => {
+    if (videoRef.current) {
+      const currentMuted = !videoRef.current.muted
+      videoRef.current.muted = currentMuted
+      setIsMuted(currentMuted)
+    }
+  }
+
   if (!isVisible) return
 
   return (
     <PopupOverlay onClick={handleOverlayClick}>
       <PopupContainer>
         <CloseButton onClick={handleCloseButtonClick}>
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 14 14"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M13.6894 0.321198C13.2753 -0.0929086 12.6064 -0.0929086 12.1923 0.321198L7 5.50284L1.80774 0.31058C1.39363 -0.103527 0.724687 -0.103527 0.31058 0.31058C-0.103527 0.724687 -0.103527 1.39363 0.31058 1.80774L5.50284 7L0.31058 12.1923C-0.103527 12.6064 -0.103527 13.2753 0.31058 13.6894C0.724687 14.1035 1.39363 14.1035 1.80774 13.6894L7 8.49716L12.1923 13.6894C12.6064 14.1035 13.2753 14.1035 13.6894 13.6894C14.1035 13.2753 14.1035 12.6064 13.6894 12.1923L8.49716 7L13.6894 1.80774C14.0929 1.40425 14.0929 0.724687 13.6894 0.321198Z"
-              fill="currentColor"
-            />
-          </svg>
+          <CloseIcon width={12} height={12} />
         </CloseButton>
 
+        <VideoWrapper>
+          <video
+            ref={videoRef}
+            src={SPEAK_POPUP_VIDEO_URL}
+            autoPlay
+            loop
+            playsInline
+            muted
+          />
+          <MuteButton onClick={handleToggleMute}>
+            {isMuted ? (
+              <MutedIcon width={16} height={16} />
+            ) : (
+              <UnmutedIcon width={16} height={16} />
+            )}
+          </MuteButton>
+        </VideoWrapper>
         <ContentWrapper>
           <LogoSection>
             <LogoWrapper>
@@ -72,26 +93,14 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
               </BadgeWrapper>
             )}
           </LogoSection>
-
           <MainContent>
             <Title>
-              영어 말하기 <Highlight>어려우세요?</Highlight>
+              <Highlight>영어 말하기</Highlight>, 아직 어려우신가요?
             </Title>
-            <Subtitle>
-              AI와 <Highlight>실제 대화</Highlight>하며 30일 만에
-              <br />
-              자신있게 영어로 말해보세요
-            </Subtitle>
-            <Features>
-              <Feature>🎯 AI와 실시간 영어 대화 연습</Feature>
-              <Feature>🔥 지금 60% 할인 특가 진행중</Feature>
-            </Features>
           </MainContent>
-
           <ActionSection>
             <CTAButton href={SPEAK_POPUP_LINK} target="_blank" rel="nofollow">
-              60% 할인받고 시작하기
-              <ButtonArrow>→</ButtonArrow>
+              더 알아보기
             </CTAButton>
             <TrustSignal>전 세계 1,000만 명이 선택한 1위 앱</TrustSignal>
           </ActionSection>
@@ -150,7 +159,7 @@ const PopupContainer = styled.div`
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     max-width: 100%;
     border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
-    max-height: 80vh;
+    max-height: 100vh;
 
     /* Slide up animation for mobile */
     animation: slideUp 0.2s ease-out;
@@ -181,37 +190,52 @@ const PopupContainer = styled.div`
 
 const CloseButton = styled.button`
   position: absolute;
-  top: var(--padding-lg);
-  right: var(--padding-lg);
-  background: rgba(255, 255, 255, 0.1);
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.4);
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: white;
   transition: all 0.2s ease;
   z-index: 10;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.8);
     transform: scale(1.1);
   }
 
   svg {
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
+    fill: var(--color-gray-4);
+  }
+`
+
+const VideoWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  overflow: hidden;
+  background-color: #000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+  video {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 `
 
 const ContentWrapper = styled.div`
-  padding: var(--padding-xl);
+  padding: 0 var(--padding-xl) var(--padding-xl);
   display: flex;
   flex-direction: column;
-  gap: var(--sizing-lg);
+  gap: var(--sizing-md);
   text-align: center;
   color: white;
 
@@ -225,19 +249,19 @@ const LogoSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--sizing-md);
+  margin-top: var(--sizing-md);
 `
 
 const LogoWrapper = styled.div`
   img {
-    height: 40px;
+    height: 32px;
     width: auto;
     object-fit: contain;
   }
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     img {
-      height: 32px;
+      height: 24px;
     }
   }
 `
@@ -260,7 +284,6 @@ const Badge = styled.div`
 const MainContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--sizing-md);
 `
 
 const Title = styled.h2`
@@ -272,41 +295,6 @@ const Title = styled.h2`
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     font-size: 1.8rem;
-  }
-`
-
-const Subtitle = styled.p`
-  font-size: 1.3rem;
-  line-height: 1.4;
-  margin: 0;
-  opacity: 1;
-  color: white;
-  word-break: keep-all;
-
-  @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: 1.1rem;
-    word-break: break-word;
-  }
-`
-
-const Features = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--sizing-sm);
-  margin: var(--sizing-md) 0;
-`
-
-const Feature = styled.div`
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sizing-sm);
-  opacity: 0.9;
-  color: white;
-
-  @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: 1rem;
   }
 `
 
@@ -353,14 +341,6 @@ const CTAButton = styled.a`
   }
 `
 
-const ButtonArrow = styled.span`
-  transition: transform 0.3s ease;
-
-  ${CTAButton}:hover & {
-    transform: translateX(4px);
-  }
-`
-
 const Highlight = styled.span`
   color: #ffd700;
 `
@@ -371,6 +351,36 @@ const TrustSignal = styled.div`
   margin-top: var(--sizing-sm);
   color: #ffffff;
   font-weight: 400;
+`
+
+const MuteButton = styled.button`
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.2s ease;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  &:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 `
 
 export default PopupBanner

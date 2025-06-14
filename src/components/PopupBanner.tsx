@@ -212,7 +212,7 @@ const CloseButton = styled.button`
   svg {
     width: 12px;
     height: 12px;
-    fill: var(--color-gray-4);
+    fill: var(--color-gray-7);
   }
 `
 
@@ -366,7 +366,6 @@ const MuteButton = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #333;
   transition: all 0.2s ease;
   z-index: 20;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -380,6 +379,7 @@ const MuteButton = styled.button`
   svg {
     width: 16px;
     height: 16px;
+    stroke: black;
   }
 `
 

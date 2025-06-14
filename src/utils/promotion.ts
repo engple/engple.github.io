@@ -3,6 +3,7 @@ interface BannerConfig {
   subtext?: string
   link: string
   caption?: string
+  cta?: string
 }
 
 export const withInlineBanner = (
@@ -35,6 +36,7 @@ export const withInlineBanner = (
     bannerConfig.caption
       ? `data-inline-banner-caption="${bannerConfig.caption}"`
       : "",
+    `data-inline-banner-cta="${bannerConfig.cta}"`,
   ]
     .filter(Boolean)
     .join(" ")

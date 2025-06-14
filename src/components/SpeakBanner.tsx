@@ -37,6 +37,7 @@ const Banner: React.FC<BannerProps> = ({
           </LogoWrapper>
           <Slogan>
             <Prelude>
+              <FireIcon>🔥</FireIcon>
               영어 말하기 어려우세요?
               {daysLeft !== undefined && daysLeft >= 0 && (
                 <EventBadge>
@@ -52,7 +53,7 @@ const Banner: React.FC<BannerProps> = ({
           </Slogan>
         </LogoAndSlogan>
         <ButtonWrapper>
-          <Button>할인받기</Button>
+          <Button>더 알아보기</Button>
         </ButtonWrapper>
       </Container>
       <CloseButton
@@ -234,6 +235,27 @@ const CloseButton = styled.button`
     top: var(--padding-xs);
     transform: none;
   }
+`
+
+const fireAnimation = keyframes`
+  0%, 100% {
+    transform: scale(1) rotate(-3deg);
+  }
+  25% {
+    transform: scale(1.1) rotate(3deg);
+  }
+  50% {
+    transform: scale(1.05) rotate(-1deg);
+  }
+  75% {
+    transform: scale(1.08) rotate(1deg);
+  }
+`
+
+const FireIcon = styled.span`
+  display: inline-block;
+  animation: ${fireAnimation} 1s ease-in-out infinite;
+  margin-right: 0.25rem;
 `
 
 export default Banner

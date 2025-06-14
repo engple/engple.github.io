@@ -14,6 +14,7 @@ const InlineBanner: React.FC = () => {
         const bannerLink = (element as HTMLElement).dataset.inlineBannerLink
         const bannerCaption = (element as HTMLElement).dataset
           .inlineBannerCaption
+        const bannerCTA = (element as HTMLElement).dataset.inlineBannerCta
         if (!bannerText || !bannerLink) continue
 
         if (!element.querySelector(".inline-banner")) {
@@ -24,13 +25,13 @@ const InlineBanner: React.FC = () => {
               <div class="inline-banner-content">
                 <div class="inline-banner-text-wrapper">
                   <div class="inline-banner-header">
-                    <span class="inline-banner-icon">✨</span>
+                    <span class="inline-banner-icon">🔥</span>
                     <span class="inline-banner-title">${bannerText}</span>
                   </div>
                   ${bannerSubtext ? `<span class="inline-banner-subtext">${bannerSubtext}</span>` : ""}
                 </div>
                 <div class="inline-banner-cta">
-                  <span class="inline-banner-button">60% 할인받기 →</span>
+                  <span class="inline-banner-button">${bannerCTA}</span>
                 </div>
               </div>
             </a>

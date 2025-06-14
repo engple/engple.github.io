@@ -34,11 +34,11 @@ const Home = ({
     },
   )
 
-  const { shouldShowPopup, handleCloseButtonClick, handleOverlayClick } =
-    usePopupBanner({
-      storageKey: POPUP_BANNER_KEY,
-      ttl: ONE_DAY_MS,
-    })
+  const {
+    showing: popupShowing,
+    show: showPopup,
+    hide: hidePopup,
+  } = usePopupBanner()
 
   const currentCategory = pageContext.category
   const postData = data.allMarkdownRemark.edges
@@ -106,10 +106,10 @@ const Home = ({
         </RightAd>
       </Main>
       {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />}
-      {shouldShowPopup && (
+      {popupShowing && (
         <PopupBanner
-          onCloseButtonClick={handleCloseButtonClick}
-          onOverlayClick={handleOverlayClick}
+          onCloseButtonClick={hidePopup}
+          onOverlayClick={hidePopup}
         />
       )}
     </Layout>

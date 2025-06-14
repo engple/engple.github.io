@@ -29,7 +29,6 @@ import TableOfContents from "../components/tableOfContents"
 import {
   HORIZONTAL_AD_SLOT,
   ONE_DAY_MS,
-  POPUP_BANNER_KEY as POPUP_BANNER_EXPIRY_KEY,
   RECTANGLE_TOC_AD_SLOT,
   SPEAK_BANNER_KEY as SPEAK_BANNER_EXPIRY_KEY,
   SPEAK_INLINE_LINK,
@@ -82,11 +81,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     },
   )
 
-  const { shouldShowPopup, handleCloseButtonClick, handleOverlayClick } =
-    usePopupBanner({
-      storageKey: POPUP_BANNER_EXPIRY_KEY,
-      ttl: ONE_DAY_MS,
-    })
+  const { showing: popupShowing, hide: hidePopup } = usePopupBanner({})
 
   const {
     frontmatter,
@@ -278,10 +273,10 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         <PostNavigator prevPost={prevPost} nextPost={nextPost} />
       </main>
       {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />}
-      {shouldShowPopup && (
+      {popupShowing && (
         <PopupBanner
-          onCloseButtonClick={handleCloseButtonClick}
-          onOverlayClick={handleOverlayClick}
+          onCloseButtonClick={hidePopup}
+          onOverlayClick={hidePopup}
         />
       )}
     </Layout>

@@ -17,6 +17,9 @@ export const SPEAK_INLINE_LINK =
 export const SPEAK_POPUP_LINK =
   "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple-modal"
 
+export const SPEAK_INLINE_VIDEO_LINK =
+  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple-inline-video"
+
 export const SPEAK_BANNER_KEY = "speak_banner_closed"
 
 export const SPEAK_EVENT_END_DATE = new Date("2025-06-03")

@@ -2,9 +2,7 @@ import React, { useRef, useState } from "react"
 
 import styled from "styled-components"
 
-import { SPEAK_POPUP_LINK, SPEAK_POPUP_VIDEO_URL } from "~/src/constants"
-
-import speakLogoWhite from "../images/speak-logo-white.png"
+import { SPEAK_INLINE_VIDEO_LINK, SPEAK_POPUP_VIDEO_URL } from "~/src/constants"
 
 import MutedIcon from "./icons/MutedIcon"
 import UnmutedIcon from "./icons/UnmutedIcon"
@@ -44,7 +42,11 @@ const InlineVideoBanner: React.FC = () => {
         <Title>
           <Highlight>영어 말하기</Highlight> 어려우신가요?
         </Title>
-        <CTAButton href={SPEAK_POPUP_LINK} target="_blank" rel="nofollow">
+        <CTAButton
+          href={SPEAK_INLINE_VIDEO_LINK}
+          target="_blank"
+          rel="nofollow"
+        >
           더 알아보기
         </CTAButton>
       </ContentWrapper>

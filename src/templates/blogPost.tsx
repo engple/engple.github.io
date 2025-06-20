@@ -20,6 +20,7 @@ import { withInlineBanner } from "~/src/utils/promotion"
 
 import DetailsToggle from "../components/DetailsToggle"
 import InlineBanner from "../components/InlineBanner"
+import InlineVideoBanner from "../components/InlineVideoBanner"
 import PopupBanner from "../components/PopupBanner"
 import Pronunciation from "../components/Pronunciation"
 import SpeakBanner from "../components/SpeakBanner"
@@ -257,6 +258,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                         extraClassName="lg-only-ads"
                       />
                     </TocAd>
+                    <InlineVideoBanner />
                     <TableOfContents headings={headings} />
                   </RightWrapper>
                 </ContentWrapper>
@@ -366,6 +368,10 @@ const LeftAd = styled.div`
 `
 
 const RightWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--sizing-lg);
+  align-items: center;
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
   }

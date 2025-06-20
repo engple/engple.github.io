@@ -26,4 +26,4 @@ export const POPUP_BANNER_KEY = "popup_banner_closed"
 export const ONE_DAY_MS = 24 * 60 * 60 * 1000
 
 export const SPEAK_POPUP_VIDEO_URL =
-  "https://s3.usespeak.com/web-landing/official/UserInterview_Basic_YubinHwang_1920*1080.mp4"
+  "https://s3.usespeak.com/web-landing/official/1004_User_Interview_Basic_EunbiCha_1920*1080.mp4"

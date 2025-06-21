@@ -19,7 +19,6 @@ import { rhythm } from "~/src/styles/typography"
 import { withInlineBanner } from "~/src/utils/promotion"
 
 import DetailsToggle from "../components/DetailsToggle"
-import InlineBanner from "../components/InlineBanner"
 import InlineVideoBanner from "../components/InlineVideoBanner"
 import PopupBanner from "../components/PopupBanner"
 import Pronunciation from "../components/Pronunciation"
@@ -37,6 +36,7 @@ import {
   VERTICAL_AD_SLOT,
 } from "../constants"
 import { useExpiryKey } from "../hooks/useExpiryKey"
+import { useInlineBanner } from "../hooks/useInlineBanner"
 import { useInteractiveList } from "../hooks/useInteractiveList"
 import { usePopupBanner } from "../hooks/usePopupBanner"
 
@@ -106,6 +106,8 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     bannerConfig,
     { idx: -1 },
   )
+
+  useInlineBanner()
 
   useInteractiveList([processedHtml])
 
@@ -243,7 +245,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                     dangerouslySetInnerHTML={{ __html: processedHtml ?? "" }}
                     rhythm={rhythm}
                   />
-                  <InlineBanner />
+
                   <Pronunciation />
                   <DetailsToggle />
                   <RightWrapper>

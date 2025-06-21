@@ -1,6 +1,6 @@
 import React from "react"
 
-const InlineBanner: React.FC = () => {
+export const useInlineBanner = () => {
   React.useEffect(() => {
     const cleanupItems: HTMLElement[] = []
 
@@ -52,8 +52,4 @@ const InlineBanner: React.FC = () => {
       }
     }
   }, [])
-
-  return <></>
 }
-
-export default InlineBanner

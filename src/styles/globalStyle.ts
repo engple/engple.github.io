@@ -136,6 +136,10 @@ const GlobalStyle = createGlobalStyle`
     @media (min-width: ${({ theme }) => theme.device.xl}) {
       --max-width: 1096px;
     }
+
+    @media (max-width: ${({ theme }) => theme.device.sm}) {
+      --post-width: 100%;
+    }
   }
 
   html, body, #___gatsby, #gatsby-focus-wrapper {

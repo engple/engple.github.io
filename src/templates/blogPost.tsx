@@ -101,11 +101,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     caption: "구매시 일정 수수료를 지급받습니다.",
     cta: "더 알아보기",
   }
-  const processedHtml = withInlineBanner(
-    withInlineBanner(html ?? "", bannerConfig, { idx: 0 }),
-    bannerConfig,
-    { idx: -1 },
-  )
+  const processedHtml = withInlineBanner(html ?? "", bannerConfig, { idx: 0 })
 
   useInlineBanner()
 
@@ -220,58 +216,60 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         <article>
           <OuterWrapper>
             <InnerWrapper>
-              <div>
-                <header>
-                  <Info>
-                    <PostCategory>{category}</PostCategory>
-                    <Time dateTime={date!}>{date?.split("T")[0]}</Time>
-                  </Info>
-                  <Title>{title}</Title>
-                </header>
-                <Divider />
-                <ContentWrapper>
-                  <LeftAd>
-                    <Adsense
-                      adClient={site.googleAdsense ?? ""}
-                      adSlot={VERTICAL_AD_SLOT}
-                      adFormat="auto"
-                      fullWidthResponsive={true}
-                      width={"300px"}
-                      height={"600px"}
-                      extraClassName="lg-only-ads"
-                    />
-                  </LeftAd>
+              <ContentHeader>
+                <Info>
+                  <PostCategory>{category}</PostCategory>
+                  <Time dateTime={date!}>{date?.split("T")[0]}</Time>
+                </Info>
+                <Title>{title}</Title>
+              </ContentHeader>
+              <Divider />
+              <ContentWrapper>
+                <LeftAd>
+                  <Adsense
+                    adClient={site.googleAdsense ?? ""}
+                    adSlot={VERTICAL_AD_SLOT}
+                    adFormat="auto"
+                    fullWidthResponsive={true}
+                    width={"300px"}
+                    height={"600px"}
+                    extraClassName="lg-only-ads"
+                  />
+                </LeftAd>
+                <CenterWrapper>
                   <Markdown
                     dangerouslySetInnerHTML={{ __html: processedHtml ?? "" }}
                     rhythm={rhythm}
                   />
-
-                  <Pronunciation />
-                  <DetailsToggle />
-                  <RightWrapper>
-                    <TocAd>
-                      <Adsense
-                        adClient={site.googleAdsense ?? ""}
-                        adSlot={RECTANGLE_TOC_AD_SLOT}
-                        adFormat="auto"
-                        fullWidthResponsive={true}
-                        width={"320px"}
-                        height={"250px"}
-                        extraClassName="lg-only-ads"
-                      />
-                    </TocAd>
+                  <InlineVideoBannerWrapper>
                     <InlineVideoBanner />
-                    <TableOfContents headings={headings} />
-                  </RightWrapper>
-                </ContentWrapper>
-                <Adsense
-                  adClient={site.googleAdsense ?? ""}
-                  adSlot={HORIZONTAL_AD_SLOT}
-                  adFormat="auto"
-                  fullWidthResponsive={true}
-                  noContainer={true}
-                />
-              </div>
+                  </InlineVideoBannerWrapper>
+                </CenterWrapper>
+                <Pronunciation />
+                <DetailsToggle />
+                <RightWrapper>
+                  <TocAd>
+                    <Adsense
+                      adClient={site.googleAdsense ?? ""}
+                      adSlot={RECTANGLE_TOC_AD_SLOT}
+                      adFormat="auto"
+                      fullWidthResponsive={true}
+                      width={"320px"}
+                      height={"250px"}
+                      extraClassName="lg-only-ads"
+                    />
+                  </TocAd>
+                  <InlineVideoBanner />
+                  <TableOfContents headings={headings} />
+                </RightWrapper>
+              </ContentWrapper>
+              <Adsense
+                adClient={site.googleAdsense ?? ""}
+                adSlot={HORIZONTAL_AD_SLOT}
+                adFormat="auto"
+                fullWidthResponsive={true}
+                noContainer={true}
+              />
             </InnerWrapper>
           </OuterWrapper>
         </article>
@@ -289,7 +287,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
 }
 
 const OuterWrapper = styled.div`
-  margin-top: var(--sizing-xl);
+  margin-top: var(--sizing-lg);
   position: relative;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
@@ -298,7 +296,6 @@ const OuterWrapper = styled.div`
 `
 
 const InnerWrapper = styled.div`
-  width: var(--post-width);
   margin: 0 auto;
   padding-bottom: var(--sizing-lg);
 
@@ -312,6 +309,14 @@ const TocAd = styled.div`
   width: 300px;
   height: 250px;
   margin-bottom: var(--padding-xl);
+`
+
+const ContentHeader = styled.div`
+  width: var(--post-width);
+
+  @media (min-width: ${({ theme }) => theme.device.sm}) {
+    margin: 0 auto;
+  }
 `
 
 const ContentWrapper = styled.div`
@@ -336,7 +341,8 @@ const Time = styled(DateTime)`
 `
 
 const Divider = styled.div`
-  width: 100%;
+  width: var(--post-width);
+  margin: 0 auto;
   height: 1px;
   background-color: var(--color-gray-3);
   margin-top: var(--sizing-lg);
@@ -370,6 +376,8 @@ const LeftAd = styled.div`
 `
 
 const RightWrapper = styled.div`
+  min-width: 300px;
+  width: 300px;
   display: flex;
   flex-direction: column;
   gap: var(--sizing-lg);
@@ -377,6 +385,19 @@ const RightWrapper = styled.div`
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
   }
+`
+
+const CenterWrapper = styled.div`
+  width: var(--post-width);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sizing-md);
+  align-items: center;
+`
+
+const InlineVideoBannerWrapper = styled.div`
+  width: 320px;
+  max-width: 100%;
 `
 
 export const query = graphql`

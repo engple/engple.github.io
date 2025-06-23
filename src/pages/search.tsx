@@ -14,6 +14,7 @@ import type Post from "~/src/types/Post"
 import {
   ONE_DAY_MS,
   SPEAK_BANNER_KEY,
+  SPEAK_EVENT_END_DATE,
   SPEAK_LINK,
   VERTICAL_AD_SLOT,
 } from "../constants"
@@ -102,7 +103,13 @@ const SearchPage: React.FC<PageProps<Queries.Query>> = ({ location, data }) => {
           />
         </RightAd>
       </Main>
-      {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />}
+      {bannerEnabled && (
+        <SpeakBanner
+          link={SPEAK_LINK}
+          onClose={closeBanner}
+          eventDay={SPEAK_EVENT_END_DATE}
+        />
+      )}
     </Layout>
   )
 }

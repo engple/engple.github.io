@@ -5,6 +5,7 @@ import styled from "styled-components"
 import { SPEAK_POPUP_LINK, SPEAK_POPUP_VIDEO_URL } from "~/src/constants"
 
 import speakLogoWhite from "../images/speak-logo-white.png"
+import { getDaysLeft, getSpeakCTA } from "../utils/promotion"
 
 import CloseIcon from "./icons/CloseIcon"
 import MutedIcon from "./icons/MutedIcon"
@@ -14,25 +15,15 @@ interface PopupBannerProps {
   onCloseButtonClick: () => void
   onOverlayClick: () => void
   isVisible?: boolean
-  eventDay?: Date // Optional prop for future events
 }
 
 const PopupBanner: React.FC<PopupBannerProps> = ({
   onCloseButtonClick,
   onOverlayClick,
   isVisible = true,
-  eventDay,
 }) => {
   const [isMuted, setIsMuted] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
-
-  // Calculate days left only if eventDay is provided
-  const daysLeft = eventDay
-    ? Math.max(
-        0,
-        Math.floor((eventDay.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
-      )
-    : undefined
 
   const handleCloseButtonClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -57,6 +48,8 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
   }
 
   if (!isVisible) return
+
+  const ctaText = getSpeakCTA()
 
   return (
     <PopupOverlay onClick={handleOverlayClick}>
@@ -87,11 +80,6 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
             <LogoWrapper>
               <img src={speakLogoWhite} alt="Speak Logo" />
             </LogoWrapper>
-            {daysLeft !== undefined && daysLeft >= 0 && (
-              <BadgeWrapper>
-                <Badge>{daysLeft === 0 ? "오늘 마감!" : `D-${daysLeft}`}</Badge>
-              </BadgeWrapper>
-            )}
           </LogoSection>
           <MainContent>
             <Title>
@@ -100,7 +88,7 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
           </MainContent>
           <ActionSection>
             <CTAButton href={SPEAK_POPUP_LINK} target="_blank" rel="nofollow">
-              더 알아보기
+              {ctaText}
             </CTAButton>
             <TrustSignal>전 세계 1,000만 명이 선택한 1위 앱</TrustSignal>
           </ActionSection>

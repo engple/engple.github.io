@@ -16,7 +16,7 @@ import Category from "~/src/styles/category"
 import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
-import { withInlineBanner } from "~/src/utils/promotion"
+import { getSpeakCTA, withInlineBanner } from "~/src/utils/promotion"
 
 import DetailsToggle from "../components/DetailsToggle"
 import InlineVideoBanner from "../components/InlineVideoBanner"
@@ -31,6 +31,7 @@ import {
   ONE_DAY_MS,
   RECTANGLE_TOC_AD_SLOT,
   SPEAK_BANNER_KEY as SPEAK_BANNER_EXPIRY_KEY,
+  SPEAK_EVENT_END_DATE,
   SPEAK_INLINE_LINK,
   SPEAK_LINK,
   VERTICAL_AD_SLOT,
@@ -96,10 +97,10 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
 
   const bannerConfig = {
     text: "영어 말하기 어려우신가요?",
-    subtext: "AI와 20분 연습으로 자신감 UP! 지금 60% 할인",
+    subtext: "AI와 20분 연습으로 자신감 UP! 지금 70% 할인",
     link: SPEAK_INLINE_LINK,
     caption: "구매시 일정 수수료를 지급받습니다.",
-    cta: "더 알아보기",
+    cta: getSpeakCTA(),
   }
   const processedHtml = withInlineBanner(html ?? "", bannerConfig, { idx: 0 })
 
@@ -275,7 +276,13 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         </article>
         <PostNavigator prevPost={prevPost} nextPost={nextPost} />
       </main>
-      {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />}
+      {bannerEnabled && (
+        <SpeakBanner
+          link={SPEAK_LINK}
+          onClose={closeBanner}
+          eventDay={SPEAK_EVENT_END_DATE}
+        />
+      )}
       {popupShowing && (
         <PopupBanner
           onCloseButtonClick={hidePopup}

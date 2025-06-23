@@ -4,6 +4,8 @@ import styled from "styled-components"
 
 import { SPEAK_INLINE_VIDEO_LINK, SPEAK_POPUP_VIDEO_URL } from "~/src/constants"
 
+import { getSpeakCTA } from "../utils/promotion"
+
 import MutedIcon from "./icons/MutedIcon"
 import UnmutedIcon from "./icons/UnmutedIcon"
 
@@ -18,6 +20,8 @@ const InlineVideoBanner: React.FC = () => {
       setIsMuted(currentMuted)
     }
   }
+
+  const ctaText = getSpeakCTA()
 
   return (
     <BannerContainer>
@@ -47,7 +51,7 @@ const InlineVideoBanner: React.FC = () => {
           target="_blank"
           rel="nofollow"
         >
-          더 알아보기
+          {ctaText}
         </CTAButton>
       </ContentWrapper>
     </BannerContainer>

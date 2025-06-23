@@ -1,3 +1,5 @@
+import { SPEAK_EVENT_END_DATE } from "~/src/constants"
+
 interface BannerConfig {
   text: string
   subtext?: string
@@ -50,4 +52,31 @@ export const withInlineBanner = (
   return html.replace(paragraph, modifiedParagraph)
 }
 
-export default withInlineBanner
+export const getDaysLeft = (
+  endDate: Date | undefined | null,
+): number | undefined => {
+  if (!endDate) return undefined
+
+  const now = new Date()
+  const diff = Math.ceil(
+    (endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+  )
+  return diff >= 0 ? diff : undefined
+}
+
+export const getSpeakCTA = ({
+  useDaysLeft = true,
+}: {
+  useDaysLeft?: boolean
+} = {}) => {
+  const daysLeft = useDaysLeft ? getDaysLeft(SPEAK_EVENT_END_DATE) : undefined
+  if (daysLeft === undefined || daysLeft < 0) {
+    return "더 알아보기"
+  } else if (!useDaysLeft) {
+    return "70% 할인받기"
+  } else if (daysLeft === 0) {
+    return "70% 할인받기 (오늘마감)"
+  } else {
+    return `70% 할인받기 (D-${daysLeft})`
+  }
+}

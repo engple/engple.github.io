@@ -22,7 +22,7 @@ export const SPEAK_INLINE_VIDEO_LINK =
 
 export const SPEAK_BANNER_KEY = "speak_banner_closed"
 
-export const SPEAK_EVENT_END_DATE = new Date("2025-06-03")
+export const SPEAK_EVENT_END_DATE = new Date("2025-07-01")
 
 export const POPUP_BANNER_KEY = "popup_banner_closed"
 

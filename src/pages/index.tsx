@@ -16,6 +16,7 @@ import {
   ONE_DAY_MS,
   POPUP_BANNER_KEY,
   SPEAK_BANNER_KEY,
+  SPEAK_EVENT_END_DATE,
   SPEAK_LINK,
   VERTICAL_AD_SLOT,
 } from "../constants"
@@ -105,7 +106,13 @@ const Home = ({
           />
         </RightAd>
       </Main>
-      {bannerEnabled && <SpeakBanner link={SPEAK_LINK} onClose={closeBanner} />}
+      {bannerEnabled && (
+        <SpeakBanner
+          link={SPEAK_LINK}
+          onClose={closeBanner}
+          eventDay={SPEAK_EVENT_END_DATE}
+        />
+      )}
       {popupShowing && (
         <PopupBanner
           onCloseButtonClick={hidePopup}

@@ -3,6 +3,7 @@ import React from "react"
 import styled, { keyframes } from "styled-components"
 
 import speakLogoWhite from "../images/speak-logo-white.png"
+import { getDaysLeft } from "../utils/promotion"
 
 interface BannerProps {
   link: string
@@ -15,14 +16,7 @@ const Banner: React.FC<BannerProps> = ({
   onClose = () => {},
   eventDay,
 }) => {
-  // Calculate days left only if eventDay is provided
-  const daysLeft = eventDay
-    ? Math.max(
-        0,
-        Math.floor((eventDay.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
-      )
-    : undefined
-
+  const daysLeft = getDaysLeft(eventDay)
   const handleBannerClick = (e: React.MouseEvent) => {
     e.preventDefault()
     window.open(link, "_blank", "nofollow")
@@ -47,7 +41,7 @@ const Banner: React.FC<BannerProps> = ({
             </Prelude>
             <div>
               <Title>
-                <Highlight>60% 할인</Highlight>으로 AI와 영어 대화 연습하기
+                <Highlight>70% 할인</Highlight>으로 AI와 영어 대화 연습하기
               </Title>
             </div>
           </Slogan>

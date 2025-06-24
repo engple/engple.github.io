@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { SPEAK_POPUP_LINK, SPEAK_POPUP_VIDEO_URL } from "~/src/constants"
 
 import speakLogoWhite from "../images/speak-logo-white.png"
-import { getDaysLeft, getSpeakCTA } from "../utils/promotion"
+import { getSpeakCTA } from "../utils/promotion"
 
 import CloseIcon from "./icons/CloseIcon"
 import MutedIcon from "./icons/MutedIcon"

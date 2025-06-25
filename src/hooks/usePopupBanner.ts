@@ -22,7 +22,7 @@ const LAST_POPUP_SHOWN_KEY = "popup_last_shown"
 export const usePopupBanner = ({
   minTimeOnPage = 2000,
   cooldownMinutes = 1,
-  scrollPercentage = 70,
+  scrollPercentage = 60,
 }: UsePopupBannerOptions = {}) => {
   const [showing, setShowing] = useState(false)
   const [timeRequirementMet, setTimeRequirementMet] = useState(false)

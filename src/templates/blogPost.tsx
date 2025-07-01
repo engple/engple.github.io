@@ -97,7 +97,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
 
   const bannerConfig = {
     text: "영어 말하기 어려우신가요?",
-    subtext: "AI와 20분 연습으로 자신감 UP! 지금 60% 할인",
+    subtext: "AI와 20분 연습으로 자신감 UP! 지금 64% 할인",
     link: SPEAK_INLINE_LINK,
     caption: "구매시 일정 수수료를 지급받습니다.",
     cta: getSpeakCTA(),

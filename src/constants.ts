@@ -9,20 +9,20 @@ export const LIGHT = "light"
 export const DARK = "dark"
 
 export const SPEAK_LINK =
-  "https://app.usespeak.com/kr-ko/sale/kr-affiliate-special/?ref=engple"
+  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple"
 
 export const SPEAK_INLINE_LINK =
-  "https://app.usespeak.com/kr-ko/sale/kr-affiliate-special/?ref=engple-inline"
+  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple-inline"
 
 export const SPEAK_POPUP_LINK =
-  "https://app.usespeak.com/kr-ko/sale/kr-affiliate-special/?ref=engple-modal"
+  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple-modal"
 
 export const SPEAK_INLINE_VIDEO_LINK =
-  "https://app.usespeak.com/kr-ko/sale/kr-affiliate-special/?ref=engple-inline-video"
+  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple-inline-video"
 
 export const SPEAK_BANNER_KEY = "speak_banner_closed"
 
-export const SPEAK_EVENT_END_DATE = new Date("2025-07-01")
+export const SPEAK_EVENT_END_DATE = new Date("2025-06-30")
 
 export const POPUP_BANNER_KEY = "popup_banner_closed"
 

@@ -41,7 +41,7 @@ const Banner: React.FC<BannerProps> = ({
             </Prelude>
             <div>
               <Title>
-                <Highlight>70% 할인</Highlight>으로 AI와 영어 대화 연습하기
+                <Highlight>60% 할인</Highlight>으로 AI와 영어 대화 연습하기
               </Title>
             </div>
           </Slogan>

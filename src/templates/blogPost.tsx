@@ -16,30 +16,18 @@ import Category from "~/src/styles/category"
 import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
-import { getSpeakCTA, withInlineBanner } from "~/src/utils/promotion"
 
 import DetailsToggle from "../components/DetailsToggle"
-import InlineVideoBanner from "../components/InlineVideoBanner"
-import PopupBanner from "../components/PopupBanner"
 import Pronunciation from "../components/Pronunciation"
-import SpeakBanner from "../components/SpeakBanner"
 import Adsense from "../components/adsense"
 import PostNavigator from "../components/postNavigator"
 import TableOfContents from "../components/tableOfContents"
 import {
   HORIZONTAL_AD_SLOT,
-  ONE_DAY_MS,
   RECTANGLE_TOC_AD_SLOT,
-  SPEAK_BANNER_KEY as SPEAK_BANNER_EXPIRY_KEY,
-  SPEAK_EVENT_END_DATE,
-  SPEAK_INLINE_LINK,
-  SPEAK_LINK,
   VERTICAL_AD_SLOT,
 } from "../constants"
-import { useExpiryKey } from "../hooks/useExpiryKey"
-import { useInlineBanner } from "../hooks/useInlineBanner"
 import { useInteractiveList } from "../hooks/useInteractiveList"
-import { usePopupBanner } from "../hooks/usePopupBanner"
 
 interface DataProps {
   current: {
@@ -76,15 +64,6 @@ interface DataProps {
 }
 
 const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
-  const { isExpired: bannerEnabled, refresh: closeBanner } = useExpiryKey(
-    SPEAK_BANNER_EXPIRY_KEY,
-    {
-      ttl: ONE_DAY_MS,
-    },
-  )
-
-  const { showing: popupShowing, hide: hidePopup } = usePopupBanner({})
-
   const {
     frontmatter,
     html,
@@ -95,18 +74,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const { title, desc, thumbnail, date, category, faq = [] } = frontmatter!
   const site = useSiteMetadata()
 
-  const bannerConfig = {
-    text: "영어 말하기 어려우신가요?",
-    subtext: "AI와 20분 연습으로 자신감 UP! 지금 64% 할인",
-    link: SPEAK_INLINE_LINK,
-    caption: "구매시 일정 수수료를 지급받습니다.",
-    cta: getSpeakCTA(),
-  }
-  const processedHtml = withInlineBanner(html ?? "", bannerConfig, { idx: 0 })
-
-  useInlineBanner()
-
-  useInteractiveList([processedHtml])
+  useInteractiveList([html])
 
   const nextPost = data.next
     ? {
@@ -239,12 +207,9 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 </LeftAd>
                 <CenterWrapper>
                   <Markdown
-                    dangerouslySetInnerHTML={{ __html: processedHtml ?? "" }}
+                    dangerouslySetInnerHTML={{ __html: html ?? "" }}
                     rhythm={rhythm}
                   />
-                  <InlineVideoBannerWrapper>
-                    <InlineVideoBanner />
-                  </InlineVideoBannerWrapper>
                 </CenterWrapper>
                 <Pronunciation />
                 <DetailsToggle />
@@ -260,7 +225,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                       extraClassName="lg-only-ads"
                     />
                   </TocAd>
-                  <InlineVideoBanner />
                   <TableOfContents headings={headings} />
                 </RightWrapper>
               </ContentWrapper>
@@ -276,19 +240,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         </article>
         <PostNavigator prevPost={prevPost} nextPost={nextPost} />
       </main>
-      {bannerEnabled && (
-        <SpeakBanner
-          link={SPEAK_LINK}
-          onClose={closeBanner}
-          eventDay={SPEAK_EVENT_END_DATE}
-        />
-      )}
-      {popupShowing && (
-        <PopupBanner
-          onCloseButtonClick={hidePopup}
-          onOverlayClick={hidePopup}
-        />
-      )}
     </Layout>
   )
 }
@@ -400,11 +351,6 @@ const CenterWrapper = styled.div`
   flex-direction: column;
   gap: var(--sizing-md);
   align-items: center;
-`
-
-const InlineVideoBannerWrapper = styled.div`
-  width: 320px;
-  max-width: 100%;
 `
 
 export const query = graphql`

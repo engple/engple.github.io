@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useState } from "react"
 import { type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
-import SpeakBanner from "~/src/components/SpeakBanner"
 import Adsense from "~/src/components/adsense"
 import PostGrid from "~/src/components/postGrid"
 import SEO from "~/src/components/seo"
@@ -11,26 +10,12 @@ import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
 import type Post from "~/src/types/Post"
 
-import {
-  ONE_DAY_MS,
-  SPEAK_BANNER_KEY,
-  SPEAK_EVENT_END_DATE,
-  SPEAK_LINK,
-  VERTICAL_AD_SLOT,
-} from "../constants"
-import { useExpiryKey } from "../hooks/useExpiryKey"
+import { VERTICAL_AD_SLOT } from "../constants"
 
 const SearchPage: React.FC<PageProps<Queries.Query>> = ({ location, data }) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<Post[]>([])
   const site = useSiteMetadata()
-
-  const { isExpired: bannerEnabled, refresh: closeBanner } = useExpiryKey(
-    SPEAK_BANNER_KEY,
-    {
-      ttl: ONE_DAY_MS,
-    },
-  )
 
   const performSearch = useCallback(
     (query: string) => {
@@ -103,13 +88,6 @@ const SearchPage: React.FC<PageProps<Queries.Query>> = ({ location, data }) => {
           />
         </RightAd>
       </Main>
-      {bannerEnabled && (
-        <SpeakBanner
-          link={SPEAK_LINK}
-          onClose={closeBanner}
-          eventDay={SPEAK_EVENT_END_DATE}
-        />
-      )}
     </Layout>
   )
 }

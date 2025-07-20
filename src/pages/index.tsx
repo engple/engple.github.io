@@ -3,8 +3,6 @@ import React, { useLayoutEffect, useState } from "react"
 import { type PageProps, graphql } from "gatsby"
 import styled from "styled-components"
 
-import PopupBanner from "~/src/components/PopupBanner"
-import SpeakBanner from "~/src/components/SpeakBanner"
 import Adsense from "~/src/components/adsense"
 import PostGrid from "~/src/components/postGrid"
 import SEO from "~/src/components/seo"
@@ -12,34 +10,13 @@ import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
 import type Post from "~/src/types/Post"
 
-import {
-  ONE_DAY_MS,
-  POPUP_BANNER_KEY,
-  SPEAK_BANNER_KEY,
-  SPEAK_EVENT_END_DATE,
-  SPEAK_LINK,
-  VERTICAL_AD_SLOT,
-} from "../constants"
-import { useExpiryKey } from "../hooks/useExpiryKey"
-import { usePopupBanner } from "../hooks/usePopupBanner"
+import { VERTICAL_AD_SLOT } from "../constants"
 
 const Home = ({
   pageContext,
   data,
 }: PageProps<Queries.Query, Queries.MarkdownRemarkFrontmatter>) => {
   const [posts, setPosts] = useState<Post[]>([])
-  const { isExpired: bannerEnabled, refresh: closeBanner } = useExpiryKey(
-    SPEAK_BANNER_KEY,
-    {
-      ttl: ONE_DAY_MS,
-    },
-  )
-
-  const {
-    showing: popupShowing,
-    show: showPopup,
-    hide: hidePopup,
-  } = usePopupBanner()
 
   const currentCategory = pageContext.category
   const postData = data.allMarkdownRemark.edges
@@ -106,19 +83,6 @@ const Home = ({
           />
         </RightAd>
       </Main>
-      {bannerEnabled && (
-        <SpeakBanner
-          link={SPEAK_LINK}
-          onClose={closeBanner}
-          eventDay={SPEAK_EVENT_END_DATE}
-        />
-      )}
-      {popupShowing && (
-        <PopupBanner
-          onCloseButtonClick={hidePopup}
-          onOverlayClick={hidePopup}
-        />
-      )}
     </Layout>
   )
 }

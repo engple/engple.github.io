@@ -3,7 +3,9 @@ import styled from "styled-components"
 import type typography from "./typography"
 
 const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
+  width: 100%;
   min-width: 100%;
+
   h1,
   h2,
   h3,
@@ -499,6 +501,11 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     .inline-banner-caption {
       color: var(--color-gray-5);
     }
+  }
+
+  .inline-adsense {
+    width: 100%;
+    margin-bottom: var(--sizing-md);
   }
 `
 

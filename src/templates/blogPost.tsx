@@ -27,6 +27,7 @@ import {
   RECTANGLE_TOC_AD_SLOT,
   VERTICAL_AD_SLOT,
 } from "../constants"
+import { useInlineAdsense } from "../hooks/useInlineAdsense"
 import { useInteractiveList } from "../hooks/useInteractiveList"
 
 interface DataProps {
@@ -75,6 +76,16 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const site = useSiteMetadata()
 
   useInteractiveList([html])
+  useInlineAdsense({
+    idx: 1,
+    adClient: site.googleAdsense ?? "",
+    adSlot: HORIZONTAL_AD_SLOT,
+  })
+  useInlineAdsense({
+    idx: -2,
+    adClient: site.googleAdsense ?? "",
+    adSlot: HORIZONTAL_AD_SLOT,
+  })
 
   const nextPost = data.next
     ? {
@@ -228,13 +239,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   <TableOfContents headings={headings} />
                 </RightWrapper>
               </ContentWrapper>
-              <Adsense
-                adClient={site.googleAdsense ?? ""}
-                adSlot={HORIZONTAL_AD_SLOT}
-                adFormat="auto"
-                fullWidthResponsive={true}
-                noContainer={true}
-              />
             </InnerWrapper>
           </OuterWrapper>
         </article>
@@ -263,7 +267,6 @@ const InnerWrapper = styled.div`
 `
 
 const TocAd = styled.div`
-  display: none;
   width: 300px;
   height: 250px;
   margin-bottom: var(--padding-xl);

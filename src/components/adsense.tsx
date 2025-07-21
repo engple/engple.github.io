@@ -23,7 +23,7 @@ const Adsense: React.FC<AdsenseProps> = ({
   height = "100%",
   extraClassName,
   noContainer = false,
-  disabled = true,
+  disabled = false,
 }) => {
   const isDev = process.env.NODE_ENV === "development"
 

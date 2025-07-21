@@ -7,6 +7,7 @@ declare global {
         [key: string]: string | number | boolean
       },
     ) => void
+    adsbygoogle?: Record<string, unknown>[]
   }
 }
 

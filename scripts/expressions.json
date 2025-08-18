@@ -1,0 +1,62 @@
+{
+  "get rid of": {
+    "path": "/blog/vocab-1/get-rid-of/",
+    "variations": ["get rid of", "gets rid of", "getting rid of", "got rid of"]
+  },
+  "hold on to": {
+    "path": "/blog/vocab-1/hold-on-to/",
+    "variations": ["held on to", "hold on to", "holding on to", "holds on to"]
+  },
+  "choice": {
+    "path": "/blog/in-english/choice/",
+    "variations": ["choice", "choiced", "choices", "choicing"]
+  },
+  "turn into": {
+    "path": "/blog/in-english/turn-into/",
+    "variations": ["turn into", "turned into", "turning into", "turns into"]
+  },
+  "attractive": {
+    "path": "/blog/in-english/attractive/",
+    "variations": ["attractive", "attractives"]
+  },
+  "honestly": {
+    "path": "/blog/in-english/honestly/",
+    "variations": ["honestly"]
+  },
+  "try to": {
+    "path": "/blog/in-english/try-to/",
+    "variations": ["tried to", "tries to", "try to", "trying to"]
+  },
+  "decide to": {
+    "path": "/blog/in-english/decide-to/",
+    "variations": ["decide to", "decided to", "decides to", "deciding to"]
+  },
+  "accidentally": {
+    "path": "/blog/in-english/accidentally/",
+    "variations": ["accidentally"]
+  },
+  "used to": {
+    "path": "/blog/in-english/used-to/",
+    "variations": ["used to", "usedded to", "usedding to", "useds to"]
+  },
+  "sometimes": {
+    "path": "/blog/in-english/sometimes/",
+    "variations": ["sometimes", "sometimeses"]
+  },
+  "go with": {
+    "path": "/blog/vocab-1/go-with/",
+    "variations": ["go with", "goes with", "going with", "went with"]
+  },
+  "available": {
+    "path": "/blog/in-english/available/",
+    "variations": ["available", "availables"]
+  },
+  "collect": {
+    "path": "/blog/in-english/collect/",
+    "variations": ["collect", "collected", "collecting", "collects"]
+  },
+  "overnight": {
+    "path": "/blog/in-english/overnight/",
+    "variations": ["overnight", "overnights"]
+  }
+}

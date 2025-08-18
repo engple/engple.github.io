@@ -7,3 +7,11 @@
 !src/**/*.js
 !src/**/*.ts
 !.cursorignore
+
+!scripts
+!scripts/**
+!scripts/**/*.py
+
+!works
+!works/**
+!works/**/*.md

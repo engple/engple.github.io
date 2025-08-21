@@ -1,6 +1,4 @@
-"""Utility modules for expression linking."""
+from .variation_generator import generate_variations
+from .expr_path import get_expr_path
 
-from .context_detector import ContextDetector
-from .backup import BackupManager
-
-__all__ = ["ContextDetector", "BackupManager"]
+__all__ = ["generate_variations", "get_expr_path"]

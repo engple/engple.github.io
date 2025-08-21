@@ -24,7 +24,7 @@ def generate_variations(expression: str) -> list[str]:
 
 
 def _is_reasonable_word(
-    inflection: str, original: str, allow_plurals: bool = False
+    inflection: str, original: str
 ) -> bool:
     """Basic validation to filter out obvious nonsense inflections."""
     if not inflection:
@@ -79,7 +79,7 @@ def _handle_single_word(word: str) -> list[str]:
         inflections = lemminflect.getInflection(word, tag="NNS")
         if inflections:
             for inf in inflections:
-                if _is_reasonable_word(inf, word, allow_plurals=True):
+                if _is_reasonable_word(inf, word):
                     variations.add(inf)
         return list(variations)
 
@@ -110,7 +110,7 @@ def _handle_single_word(word: str) -> list[str]:
         inflections = lemminflect.getInflection(word, tag="NNS")
         if inflections:
             for inf in inflections:
-                if _is_reasonable_word(inf, word, allow_plurals=True):
+                if _is_reasonable_word(inf, word):
                     variations.add(inf)
 
     return list(variations)
@@ -122,32 +122,40 @@ def _handle_multiple_words(phrase: str) -> list[str]:
     if not words:
         return []
 
-    # Try spaCy to find a main verb token inside the phrase.
-    main_verb = words[0]
-    main_index = 0
-
     doc = _spacy_nlp(phrase)
+    verb_token = None
+    verb_index = None
+    # Find the leftmost AUX/VERB token and map it to the original word index
+    candidates: list[tuple[int, str]] = []
     for token in doc:
-        if token.pos_ == "VERB":
-            # Find a matching word index in the original split words
-            ttext = token.text.lower()
-            for i, w in enumerate(words):
-                if w.lower().startswith(ttext):
-                    main_verb = words[i]
-                    main_index = i
+        if token.pos_ in ("AUX", "VERB"):
+            tok_lower = token.text.lower()
+            for i, word in enumerate(words):
+                if word.lower() == tok_lower:
+                    candidates.append((i, words[i]))
                     break
-            if main_index != 0:
-                break
+    if candidates:
+        candidates.sort(key=lambda x: x[0])
+        verb_index, verb_token = candidates[0]
 
-    rest = " ".join(words[main_index + 1 :])
+    # If no verb found, default to first word
+    if verb_index is None:
+        verb_index = 0
+        verb_token = words[0]
+
+    before = words[:verb_index]
+    after = words[verb_index+1:]
 
     variations = {phrase}
-
-    verb_forms = _handle_single_word(main_verb)
+    verb_str = verb_token if verb_token is not None else words[0]
+    verb_forms = _handle_single_word(verb_str)
     for vf in verb_forms:
-        if rest:
-            variations.add(f"{vf} {rest}")
-        else:
-            variations.add(vf)
+        # Only add if the inflected verb is different from the original verb
+        if vf != verb_str:
+            new_words = before + [vf] + after
+            phrase_variant = " ".join(new_words)
+            variations.add(phrase_variant)
+    # Always include the original phrase
+    variations.add(phrase)
 
     return list(variations)

@@ -15,14 +15,15 @@ class TestVariationGenerator:
         ("child", {"child", "children"}),
         ("quickly", {"quickly"}),  # adverbs should not be inflected
         ("give up", {"give up", "gives up", "gave up", "given up", "giving up"}),
+        ("get rid of", {"gets rid of", "got rid of", "getting rid of", "gotten rid of", "get rid of"}),
         ("", set()),  # empty input
         ("   ", set()),  # whitespace only
     ])
     def test_generate_variations(self, word, expected_variations):
         """Test variation generation for various word types."""
-        variations = generate_variations(word)
+        actual_variations = generate_variations(word)
 
-        assert set(variations) == expected_variations
+        assert set(actual_variations) == expected_variations
 
 
 class TestExprPath:

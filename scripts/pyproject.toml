@@ -5,9 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "lemminflect>=0.2.3",
-    "loguru>=0.7.3",
-    "typer>=0.16.0",
+    "lemminflect>=0.2.3,<1.0.0",
+    "loguru>=0.7.3,<1.0.0",
+    "pip>=25.2",
+    "spacy>=3.8.7,<4.0.0",
+    "typer>=0.16.0,<1.0.0",
 ]
 
 [dependency-groups]

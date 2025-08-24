@@ -1,6 +1,6 @@
+from pathlib import Path
 import pytest
-from engple.utils.variation_generator import generate_variations
-from engple.utils.expr_path import get_expr_path
+from engple.utils import generate_variations, get_expr_path
 
 
 class TestVariationGenerator:
@@ -26,14 +26,30 @@ class TestVariationGenerator:
         assert set(actual_variations) == expected_variations
 
 
+
 class TestExprPath:
     """Test cases for expr_path functions."""
 
     def test_get_expr_path(self):
-        """Test get_expr_path with various expressions."""
-        assert get_expr_path("get rid of") == "/blog/in-english/398.get-rid-of/"
-        assert get_expr_path("on time") == "/blog/vocab-1/043.on-time/"
-        assert get_expr_path("There's a good chance") == "/blog/가능성이-높아-영어표현/"
+        """Test get_expr_path with various expressions.""" 
+        result1 = get_expr_path("get rid of")
+        assert result1 is not None
+        assert result1.expr == "get rid of"
+        assert result1.url_path == "/blog/in-english/398.get-rid-of/"
+        assert result1.file_path.resolve() == Path("../src/posts/blog/in-english/398.get-rid-of.md").resolve()
+
+
+        result2 = get_expr_path("on time")
+        assert result2 is not None
+        assert result2.expr == "on time"
+        assert result2.url_path == "/blog/vocab-1/043.on-time/"
+        assert result2.file_path.resolve() == Path("../src/posts/blog/vocab-1/043.on-time.md").resolve()
+        
+        result3 = get_expr_path("There's a good chance")
+        assert result3 is not None
+        assert result3.expr == "There's a good chance"
+        assert result3.url_path == "/blog/가능성이-높아-영어표현/"
+        assert result3.file_path.resolve() == Path("../src/posts/blog/season-1/가능성이-높아-영어표현.md").resolve()
 
     def test_get_expr_path_not_found(self):
         """Test get_expr_path with expressions not found."""

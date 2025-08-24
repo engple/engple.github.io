@@ -1,6 +1,7 @@
 """Data models for expressions and linking results."""
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List, Dict
 
 
@@ -9,7 +10,8 @@ class Expression:
     """Represents an English expression with its variations and target path."""
 
     base_form: str
-    path: str
+    url_path: str
+    file_path: Path
     variations: List[str]
 
 
@@ -32,8 +34,7 @@ class LinkingResult:
     files_modified: int
     links_added: int
     expressions_linked: Dict[str, int]
-    backup_created: bool = False
-    errors: List[str] = None
+    errors: list[Exception] | None = None
 
     def __post_init__(self):
         if self.errors is None:

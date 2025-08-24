@@ -1,9 +1,12 @@
 """CLI for automated expression linking system."""
 
+import sys
 import typer
 from loguru import logger
 
-from engple.core import VariationGenerator, ExpressionLinker
+from engple.core import ExpressionLinker
+from engple.models import Expression
+from engple.utils import generate_variations, get_expr_path
 
 app = typer.Typer(help="Automated English Expression Linking System")
 
@@ -36,7 +39,6 @@ def link_expression(
         python main.py link_expression "honestly" --target-dir ./test --verbose
     """
 
-    # Setup logging
     if verbose:
         logger.remove()
         logger.add(lambda msg: print(msg, end=""), level="DEBUG")
@@ -46,38 +48,28 @@ def link_expression(
 
     logger.info(f"🔗 Linking expression: '{expr}'")
 
-    try:
-        # 1. Generate variations and create Expression object
-        generator = VariationGenerator()
-        expression = generator.create_expression(expr)
+    variations = generate_variations(expr)
+    expr_path = get_expr_path(expr)
 
-        logger.info(
-            f"📝 Generated {len(expression.variations)} variations: {', '.join(expression.variations)}"
-        )
-        logger.info(f"🎯 Target path: {expression.path}")
+    if not expr_path:
+        logger.warning(f"❌ Expression path not found for: '{expr}'")
+        sys.exit(1)
 
-        # 2. Link expression across all files
-        linker = ExpressionLinker(target_dir=target_dir, dry_run=dry_run)
-        result = linker.link_expression(expression)
+    expression = Expression(base_form=expr, url_path=expr_path.url_path, file_path=expr_path.file_path, variations=variations)
+    linker = ExpressionLinker(target_dir=target_dir, dry_run=dry_run)
+    result = linker.link_expression(expression)
 
-        # 3. Report results
-        logger.info("")
-        logger.info("📊 Results:")
-        logger.info(f"   Files processed: {result.files_processed}")
-        logger.info(f"   Files modified: {result.files_modified}")
-        logger.info(f"   Links added: {result.links_added}")
+    logger.info("")
+    logger.info("📊 Results:")
+    logger.info(f"   Files processed: {result.files_processed}")
+    logger.info(f"   Files modified: {result.files_modified}")
+    logger.info(f"   Links added: {result.links_added}")
 
-        if result.backup_created:
-            logger.info("💾 Backup created successfully")
 
-        if dry_run:
-            logger.info("🔍 Dry run completed - no files were modified")
-        else:
-            logger.success("✅ Expression linking completed successfully!")
-
-    except Exception as e:
-        logger.error(f"❌ Error: {e}")
-        raise typer.Exit(1)
+    if dry_run:
+        logger.info("🔍 Dry run completed - no files were modified")
+    else:
+        logger.success("✅ Expression linking completed successfully!")
 
 
 if __name__ == "__main__":

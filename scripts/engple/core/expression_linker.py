@@ -4,8 +4,7 @@ import re
 from typing import List
 from pathlib import Path
 from ..models import Expression, LinkingResult, LinkMatch
-from ..utils import ContextDetector, BackupManager
-from .file_processor import FileProcessor
+from .context_detector import ContextDetector
 from loguru import logger
 
 
@@ -16,36 +15,27 @@ class ExpressionLinker:
         self.target_dir = Path(target_dir)
         self.dry_run = dry_run
         self.context_detector = ContextDetector()
-        self.backup_manager = BackupManager()
-        self.file_processor = FileProcessor()
 
     def link_expression(self, expression: Expression) -> LinkingResult:
         """Link a single expression across all markdown files."""
-        # TODO: Implement the main linking logic
-
         logger.info(f"Linking expression: {expression.base_form}")
         logger.info(f"Variations: {expression.variations}")
-        logger.info(f"Target path: {expression.path}")
+        logger.info(f"Target path: {expression.url_path}")
 
-        # 1. Find all markdown files
-        markdown_files = self.file_processor.find_markdown_files(self.target_dir)
+        markdown_files = self._find_markdown_files(self.target_dir)
         logger.info(f"Found {len(markdown_files)} markdown files")
 
-        # 2. Create backup if not dry run
-        backup_created = False
-        if not self.dry_run and markdown_files:
-            backup_created = self.backup_manager.create_backup(self.target_dir)
-
-        # 3. Process each file
         result = LinkingResult(
             files_processed=0,
             files_modified=0,
             links_added=0,
             expressions_linked={},
-            backup_created=backup_created,
         )
 
         for file_path in markdown_files:
+            if file_path.resolve() == expression.file_path.resolve():
+                continue
+
             file_result = self._process_file(file_path, expression)
             result.files_processed += 1
 
@@ -65,13 +55,19 @@ class ExpressionLinker:
 
         return result
 
+    def _find_markdown_files(self, directory: Path) -> List[Path]:
+        if not directory.exists():
+            logger.error(f"Directory {directory} not found")
+            return []
+
+        return list(directory.rglob("*.md"))
+
     def _process_file(self, file_path: Path, expression: Expression) -> LinkingResult:
         """Process a single markdown file."""
-        # TODO: Implement single file processing
+        with file_path.open("r", encoding="utf-8") as f:
+            content = f.read()
 
-        # Read file
-        content = self.file_processor.read_file(file_path)
-        if content is None:
+        if not content:
             return LinkingResult(
                 files_processed=1,
                 files_modified=0,
@@ -79,12 +75,10 @@ class ExpressionLinker:
                 expressions_linked={},
             )
 
-        # Find and apply links
         modified_content, links_added = self._apply_links(content, expression)
 
-        # Write back if modified
         if links_added > 0 and modified_content != content:
-            if self.file_processor.write_file(
+            if self._write_file(
                 file_path, modified_content, self.dry_run
             ):
                 return LinkingResult(
@@ -97,22 +91,30 @@ class ExpressionLinker:
         return LinkingResult(
             files_processed=1, files_modified=0, links_added=0, expressions_linked={}
         )
+    
+    def _write_file(self, file_path: Path, content: str, dry_run: bool) -> bool:
+        """Write content to a file."""
+        if dry_run:
+            logger.info(f"[DRY RUN] Would write to {file_path}")
+            return True
+
+        try:
+            file_path.write_text(content, encoding="utf-8")
+            return True
+        except Exception as e:
+            logger.error(f"Error writing {file_path}: {e}")
+            return False
 
     def _apply_links(self, content: str, expression: Expression) -> tuple[str, int]:
         """Apply links for an expression in content. Returns (modified_content, links_added)."""
-        # TODO: Implement link application logic
 
-        # Find all potential matches
         matches = self._find_matches(content, expression)
-
-        # Apply first valid match only
         for match in matches:
             if self._is_valid_match(content, match):
-                # Create appropriate link format
                 if match.is_html_context:
-                    link = f'<a href="{expression.path}">{match.text}</a>'
+                    link = f'<a href="{expression.url_path}">{match.text}</a>'
                 else:
-                    link = f"[{match.text}]({expression.path})"
+                    link = f"[{match.text}]({expression.url_path})"
 
                 # Apply the link
                 modified_content = content[: match.start] + link + content[match.end :]
@@ -128,7 +130,6 @@ class ExpressionLinker:
 
     def _find_matches(self, content: str, expression: Expression) -> List[LinkMatch]:
         """Find all potential matches for expression variations."""
-        # TODO: Implement match finding
         matches = []
 
         for variation in expression.variations:
@@ -147,13 +148,10 @@ class ExpressionLinker:
                     )
                 )
 
-        # Sort by position (earliest first)
         return sorted(matches, key=lambda m: m.start)
 
     def _is_valid_match(self, content: str, match: LinkMatch) -> bool:
         """Check if a match is valid for linking."""
-        # TODO: Implement match validation
-
         # Skip if inside existing link
         if self.context_detector.is_inside_existing_link(content, match.start):
             return False

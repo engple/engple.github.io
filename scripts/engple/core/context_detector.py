@@ -56,6 +56,10 @@ class ContextDetector:
         if self._is_in_yaml_frontmatter(text, start):
             return True
 
+        # Skip HTML comments
+        if self._is_in_html_comment(text, start):
+            return True
+
         return False
 
     def _is_in_code_block(self, text: str, position: int) -> bool:
@@ -110,3 +114,11 @@ class ContextDetector:
         
         # Position is in frontmatter if it's before the closing marker
         return position < absolute_closing_pos
+
+    def _is_in_html_comment(self, text: str, position: int) -> bool:
+        """Check if position is inside an HTML comment (<!-- ... -->)."""
+        before_text = text[:position]
+        last_open = before_text.rfind("<!--")
+        last_close = before_text.rfind("-->")
+        # Inside comment if the last open marker is after the last close marker
+        return last_open != -1 and last_open > last_close

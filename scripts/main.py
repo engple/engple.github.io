@@ -6,11 +6,11 @@ from loguru import logger
 
 from engple.core import (
     ExpressionLinker,
-    ExpressionDiscovery,
     BatchLinker,
 )
 from engple.models import Expression
 from engple.utils import generate_variations, get_expr_path
+from engple.utils.expr_path import iter_expr_path
 
 app = typer.Typer(help="Automated English Expression Linking System")
 
@@ -69,8 +69,15 @@ def link_expression(
         logger.warning(f"❌ Expression path not found for: '{expr}'")
         sys.exit(1)
 
-    expression = Expression(base_form=expr, url_path=expr_path.url_path, file_path=expr_path.file_path, variations=variations)
-    linker = ExpressionLinker(target_dir=target_dir, dry_run=dry_run, max_links=max_links)
+    expression = Expression(
+        base_form=expr,
+        url_path=expr_path.url_path,
+        file_path=expr_path.file_path,
+        variations=variations,
+    )
+    linker = ExpressionLinker(
+        target_dir=target_dir, dry_run=dry_run, max_links=max_links
+    )
     result = linker.link_expression(expression)
 
     logger.info("")
@@ -78,7 +85,6 @@ def link_expression(
     logger.info(f"   Files processed: {result.files_processed}")
     logger.info(f"   Files modified: {result.files_modified}")
     logger.info(f"   Links added: {result.links_added}")
-
 
     if dry_run:
         logger.info("🔍 Dry run completed - no files were modified")
@@ -129,12 +135,23 @@ def link_all_expressions(
         sys.exit(2)
 
     logger.info("🔎 Discovering expressions...")
-    discovery = ExpressionDiscovery(target_dir=target_dir)
-    discovered = discovery.discover()
-    expressions = discovery.to_expressions(discovered)
+    expressions = [
+        Expression(
+            base_form=expr_path.expr,
+            url_path=expr_path.url_path,
+            file_path=expr_path.file_path,
+            variations=generate_variations(expr_path.expr),
+        )
+        for expr_path in iter_expr_path()
+    ]
     logger.info(f"Found {len(expressions)} expressions to process")
 
-    batch = BatchLinker(target_dir=target_dir, dry_run=dry_run, max_links=max_links, count_all_links=count_all_links)
+    batch = BatchLinker(
+        target_dir=target_dir,
+        dry_run=dry_run,
+        max_links=max_links,
+        count_all_links=count_all_links,
+    )
     agg = batch.run(expressions)
 
     logger.info("")

@@ -101,17 +101,19 @@ class ContextDetector:
         first_line_end = text.find("\n")
         if first_line_end == -1:
             return False
-            
-        remaining_text = text[first_line_end + 1:]
+
+        remaining_text = text[first_line_end + 1 :]
         closing_marker_pos = remaining_text.find("\n---")
-        
+
         if closing_marker_pos == -1:
             # No closing marker found, assume entire file is frontmatter (shouldn't happen)
             return True
-            
+
         # Calculate absolute position of closing marker
-        absolute_closing_pos = first_line_end + 1 + closing_marker_pos + 4  # +4 for "\n---"
-        
+        absolute_closing_pos = (
+            first_line_end + 1 + closing_marker_pos + 4
+        )  # +4 for "\n---"
+
         # Position is in frontmatter if it's before the closing marker
         return position < absolute_closing_pos
 

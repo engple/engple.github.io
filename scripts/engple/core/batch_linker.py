@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional
 
 from loguru import logger
 
@@ -20,20 +19,28 @@ class BatchResult:
 
 
 class BatchLinker:
-    def __init__(self, target_dir: str, dry_run: bool = False, max_links: Optional[int] = None, count_all_links: bool = False) -> None:
+    def __init__(
+        self,
+        target_dir: str,
+        dry_run: bool = False,
+        max_links: int | None = None,
+        count_all_links: bool = False,
+    ) -> None:
         self.target_dir = target_dir
         self.dry_run = dry_run
         self.max_links = max_links
         self.count_all_links = count_all_links
 
-    def run(self, expressions: List[Expression]) -> BatchResult:
+    def run(self, expressions: list[Expression]) -> BatchResult:
         per_expression: dict[str, LinkingResult] = {}
         total_files_processed = 0
         total_files_modified = 0
         total_links_added = 0
 
         for i, expr in enumerate(expressions, start=1):
-            logger.info(f"[{i}/{len(expressions)}] Linking expression: {expr.base_form}")
+            logger.info(
+                f"[{i}/{len(expressions)}] Linking expression: {expr.base_form}"
+            )
             linker = ExpressionLinker(
                 target_dir=self.target_dir,
                 dry_run=self.dry_run,

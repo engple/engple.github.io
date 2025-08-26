@@ -60,6 +60,26 @@ class ContextDetector:
         if self._is_in_html_comment(text, start):
             return True
 
+        # Skip inside HTML tags
+        if self._is_in_html_tag(text, start):
+            return True
+
+        return False
+
+    def _is_in_html_tag(self, text: str, position: int) -> bool:
+        """Check if position is inside an HTML tag."""
+        before_text = text[:position]
+        after_text = text[position:]
+
+        last_open_bracket = before_text.rfind("<")
+        last_close_bracket = before_text.rfind(">")
+
+        # If the last '<' is after the last '>', we are potentially inside a tag
+        if last_open_bracket > last_close_bracket:
+            # Check if there is a closing '>' after the position
+            if ">" in after_text:
+                return True
+
         return False
 
     def _is_in_code_block(self, text: str, position: int) -> bool:

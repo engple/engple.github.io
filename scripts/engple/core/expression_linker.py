@@ -3,6 +3,8 @@
 import re
 from typing import List, Optional
 from pathlib import Path
+
+from ..constants import BLOG_DIR
 from ..models import Expression, LinkingResult, LinkMatch
 from .context_detector import ContextDetector
 from loguru import logger
@@ -13,11 +15,9 @@ class ExpressionLinker:
 
     def __init__(
         self,
-        target_dir: str = "../src/posts/blog",
         dry_run: bool = False,
         max_links: Optional[int] = None,
     ):
-        self.target_dir = Path(target_dir)
         self.dry_run = dry_run
         # Maximum links allowed per target file for THIS expression.
         # When None, unlimited.
@@ -30,7 +30,7 @@ class ExpressionLinker:
         logger.info(f"Linking expression: {expression.base_form}")
         logger.info(f"Variations: {expression.variations}")
         logger.info(f"Target path: {expression.url_path}")
-        markdown_files = self._find_markdown_files(self.target_dir)
+        markdown_files = list(BLOG_DIR.rglob("*.md"))
         logger.info(f"Found {len(markdown_files)} markdown files")
 
         result = LinkingResult(
@@ -74,12 +74,6 @@ class ExpressionLinker:
 
         return result
 
-    def _find_markdown_files(self, directory: Path) -> List[Path]:
-        if not directory.exists():
-            logger.error(f"Directory {directory} not found")
-            return []
-
-        return list(directory.rglob("*.md"))
 
     def _process_file(self, file_path: Path, expression: Expression) -> LinkingResult:
         """Process a single markdown file."""
@@ -94,7 +88,7 @@ class ExpressionLinker:
                 expressions_linked={},
             )
 
-        modified_content, links_added = self._apply_links(content, expression)
+        modified_content, links_added = self.apply_link(content, expression)
 
         if links_added > 0 and modified_content != content:
             if self._write_file(
@@ -124,8 +118,8 @@ class ExpressionLinker:
             logger.error(f"Error writing {file_path}: {e}")
             return False
 
-    def _apply_links(self, content: str, expression: Expression) -> tuple[str, int]:
-        """Apply links for an expression in content. Returns (modified_content, links_added)."""
+    def apply_link(self, content: str, expression: Expression) -> tuple[str, int]:
+        """Apply link for an expression in content. Returns (modified_content, links_added)."""
 
         matches = self._find_matches(content, expression)
         for match in matches:

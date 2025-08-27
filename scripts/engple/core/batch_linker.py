@@ -1,60 +1,74 @@
-"""Batch processing for linking all discovered expressions."""
+"""Batch processing for linking expressions within a single target post."""
 
 from __future__ import annotations
 
+import pathlib
 from dataclasses import dataclass
 
 from loguru import logger
 
-from ..models import LinkingResult, Expression
+
+from ..models import  Expression
 from .expression_linker import ExpressionLinker
 
 
 @dataclass
 class BatchResult:
-    total_files_processed: int
-    total_files_modified: int
-    total_links_added: int
-    per_expression: dict[str, LinkingResult]
+    """Stores the aggregated result of a batch linking operation."""
+
+    total_links_added: int = 0
 
 
 class BatchLinker:
+    """Orchestrates linking multiple expressions within a single target file."""
+
     def __init__(
         self,
-        target_dir: str,
         dry_run: bool = False,
         max_links: int | None = None,
-        count_all_links: bool = False,
     ) -> None:
-        self.target_dir = target_dir
+        """Initializes the BatchLinker."""
         self.dry_run = dry_run
         self.max_links = max_links
-        self.count_all_links = count_all_links
-
-    def run(self, expressions: list[Expression]) -> BatchResult:
-        per_expression: dict[str, LinkingResult] = {}
-        total_files_processed = 0
-        total_files_modified = 0
-        total_links_added = 0
-
-        for i, expr in enumerate(expressions, start=1):
-            logger.info(
-                f"[{i}/{len(expressions)}] Linking expression: {expr.base_form}"
-            )
-            linker = ExpressionLinker(
-                target_dir=self.target_dir,
-                dry_run=self.dry_run,
-                max_links=self.max_links,
-            )
-            res = linker.link_expression(expr)
-            per_expression[expr.base_form] = res
-            total_files_processed += res.files_processed
-            total_files_modified += res.files_modified
-            total_links_added += res.links_added
-
-        return BatchResult(
-            total_files_processed=total_files_processed,
-            total_files_modified=total_files_modified,
-            total_links_added=total_links_added,
-            per_expression=per_expression,
+        self.linker = ExpressionLinker(
+            dry_run=dry_run, max_links=max_links
         )
+
+    def run(
+        self, target_post_path: str | pathlib.Path, expressions: list[Expression]
+    ) -> BatchResult:
+        """
+        Links all provided expressions within the single target post.
+
+        Args:
+            target_post_path: The file path of the post to add links to.
+            expressions: A list of expressions to find and link within the post.
+
+        Returns:
+            A BatchResult summarizing the operation.
+        """
+        result = BatchResult()
+
+
+        target_path = pathlib.Path(target_post_path)
+        if not target_path.exists():
+            logger.error(f"Target file not found: {target_path}")
+            return result
+
+        content =  target_path.read_text(encoding="utf-8")
+
+        for expr in expressions:
+            content, link_added = self.linker.apply_link(content, expr)
+            result.total_links_added += link_added
+
+        self._write_file(target_path, content)
+
+        return result
+
+    def _write_file(self, path: pathlib.Path, content: str) -> None:
+        if self.dry_run:
+            logger.info(f"[DRY RUN] Would write to {path}")
+            return
+
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(content)

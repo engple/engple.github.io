@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-import os
 import re
 from typing import Iterable
 
 from pathlib import Path
+
+from engple.constants import BLOG_DIR
 
 
 EXPR_HEADER_RE = re.compile(r"^##\s*🌟\s*영어 표현\s*-\s*(.+)$", re.MULTILINE)
@@ -27,8 +28,7 @@ def get_expr_path(expr: str) -> ExprPath | None:
 
 
 def iter_expr_path() -> Iterable[ExprPath]:
-    blog_dir = os.path.join(os.path.dirname(__file__), "../../../src/posts/blog")
-    for md in Path(blog_dir).rglob("*.md"):
+    for md in BLOG_DIR.rglob("*.md"):
         try:
             content = md.read_text(encoding="utf-8")
         except Exception:
@@ -39,7 +39,7 @@ def iter_expr_path() -> Iterable[ExprPath]:
             continue
 
         expr = m.group(1).strip()
-        url = _compute_url_path(blog_dir, md)
+        url = _compute_url_path(BLOG_DIR, md)
 
         yield ExprPath(expr=expr, url_path=url, file_path=md.resolve())
 

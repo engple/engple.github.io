@@ -18,9 +18,6 @@ app = typer.Typer(help="Automated English Expression Linking System")
 @app.command()
 def link_expression(
     expr: str = typer.Argument(..., help="The expression to link"),
-    target_dir: str = typer.Option(
-        "../src/posts/blog", help="Target directory containing markdown files"
-    ),
     max_links: int | None = typer.Option(
         None,
         "--max-links",
@@ -76,7 +73,7 @@ def link_expression(
         variations=variations,
     )
     linker = ExpressionLinker(
-        target_dir=target_dir, dry_run=dry_run, max_links=max_links
+        dry_run=dry_run, max_links=max_links
     )
     result = linker.link_expression(expression)
 
@@ -94,8 +91,8 @@ def link_expression(
 
 @app.command()
 def link_all_expressions(
-    target_dir: str = typer.Option(
-        "../src/posts/blog", help="Target directory containing markdown files"
+    target_expr: str = typer.Argument(
+        ..., help="The target expression to link other expressions to"
     ),
     max_links: int | None = typer.Option(
         None,
@@ -108,18 +105,13 @@ def link_all_expressions(
     verbose: bool = typer.Option(
         False, "--verbose", "-v", help="Enable verbose logging"
     ),
-    count_all_links: bool = typer.Option(
-        False,
-        "--count-all-links",
-        help="If set, count all links in a file toward max-links (instead of only expression links)",
-    ),
 ) -> None:
-    """Discover all expressions and link each across all posts.
+    """Discover all expressions and link them within a single target post.
 
-    - Discovers expressions using '## 🌟 영어 표현 - {{expr}}' headers
-    - Links occurrences in other posts to their dedicated post
-    - Respects --max-links per target file
-    - Skips self-references
+    - Finds the file for the `target-expr`.
+    - Scans that file for occurrences of all other expressions.
+    - Links those occurrences to their dedicated posts.
+    - Respects --max-links for the target file.
     """
 
     if verbose:
@@ -134,8 +126,15 @@ def link_all_expressions(
         logger.error("--max-links must be a positive integer or omitted for unlimited")
         sys.exit(2)
 
-    logger.info("🔎 Discovering expressions...")
-    expressions = [
+    logger.info(f"🎯 Targeting expression: '{target_expr}'")
+
+    target_expr_path = get_expr_path(target_expr)
+    if not target_expr_path:
+        logger.error(f"Could not find file for target expression: '{target_expr}'")
+        sys.exit(1)
+
+    logger.info("🔎 Discovering all other expressions...")
+    other_expressions = [
         Expression(
             base_form=expr_path.expr,
             url_path=expr_path.url_path,
@@ -143,21 +142,21 @@ def link_all_expressions(
             variations=generate_variations(expr_path.expr),
         )
         for expr_path in iter_expr_path()
+        if expr_path.expr != target_expr
     ]
-    logger.info(f"Found {len(expressions)} expressions to process")
+    logger.info(f"Found {len(other_expressions)} other expressions to link.")
 
     batch = BatchLinker(
-        target_dir=target_dir,
         dry_run=dry_run,
         max_links=max_links,
-        count_all_links=count_all_links,
     )
-    agg = batch.run(expressions)
+    agg = batch.run(
+        target_post_path=target_expr_path.file_path, expressions=other_expressions
+    )
 
     logger.info("")
     logger.info("📊 Batch Results:")
-    logger.info(f"   Files processed: {agg.total_files_processed}")
-    logger.info(f"   Files modified: {agg.total_files_modified}")
+    logger.info(f"   File processed: {target_expr_path.file_path}")
     logger.info(f"   Links added: {agg.total_links_added}")
 
     if dry_run:

@@ -5,7 +5,6 @@
   "python.analysis.typeCheckingMode": "standard",
   "search.exclude": {
     "**/node_modules": true,
-    "**/bower_components": true,
     "**/env": true,
     "**/venv": true
   },

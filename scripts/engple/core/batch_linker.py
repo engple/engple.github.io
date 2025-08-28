@@ -10,6 +10,7 @@ from loguru import logger
 
 from ..models import  Expression
 from .expression_linker import ExpressionLinker
+from .context_detector import ContextDetector
 
 
 @dataclass
@@ -30,8 +31,9 @@ class BatchLinker:
         """Initializes the BatchLinker."""
         self.dry_run = dry_run
         self.max_links = max_links
+        self.context_detector = ContextDetector()
         self.linker = ExpressionLinker(
-            dry_run=dry_run, max_links=max_links
+            dry_run=dry_run
         )
 
     def run(
@@ -49,13 +51,20 @@ class BatchLinker:
         """
         result = BatchResult()
 
-
         target_path = pathlib.Path(target_post_path)
         if not target_path.exists():
             logger.error(f"Target file not found: {target_path}")
             return result
 
-        content =  target_path.read_text(encoding="utf-8")
+        content = target_path.read_text(encoding="utf-8")
+
+        if self.max_links is not None:
+            existing_links = self.context_detector.count_existing_links(content)
+            if existing_links >= self.max_links:
+                logger.warning(
+                    f"Skipping {target_path.name}: existing links {existing_links} >= max {self.max_links}"
+                )
+                return result
 
         for expr in expressions:
             content, link_added = self.linker.apply_link(content, expr)

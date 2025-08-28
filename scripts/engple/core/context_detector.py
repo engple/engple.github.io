@@ -144,3 +144,29 @@ class ContextDetector:
         last_close = before_text.rfind("-->")
         # Inside comment if the last open marker is after the last close marker
         return last_open != -1 and last_open > last_close
+
+    def count_existing_links(self, content: str) -> int:
+        """Count existing links in the content.
+
+        Counts both markdown and HTML links. Excludes code blocks, headers,
+        and YAML front matter regions using context detection.
+        """
+        import re
+        
+        count = 0
+
+        # Markdown links: [text](url)
+        for m in re.finditer(r"\[([^\]]+)\]\(([^)]+)\)", content):
+            start, end = m.span()
+            if self.should_skip_context(content, start, end):
+                continue
+            count += 1
+
+        # HTML links: <a href="url">text</a>
+        for m in re.finditer(r"<a\s+[^>]*href=[\"\']([^\"\']+)[\"\'][^>]*>.*?</a>", content, re.IGNORECASE | re.DOTALL):
+            start, end = m.span()
+            if self.should_skip_context(content, start, end):
+                continue
+            count += 1
+        
+        return count

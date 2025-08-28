@@ -21,6 +21,12 @@ def test_fixtures_dir():
 
 
 @pytest.fixture
+def mock_blog_fixtures_dir(test_fixtures_dir):
+    """Get the path to mock blog fixtures directory."""
+    return test_fixtures_dir / "mock_blog"
+
+
+@pytest.fixture
 def comprehensive_md(test_fixtures_dir):
     """Load comprehensive test markdown file."""
     with open(test_fixtures_dir / "comprehensive.md", "r", encoding="utf-8") as f:

@@ -8,6 +8,8 @@ dependencies = [
     "lemminflect>=0.2.3,<1.0.0",
     "loguru>=0.7.3,<1.0.0",
     "pip>=25.2",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
     "spacy>=3.8.7,<4.0.0",
     "typer>=0.16.0,<1.0.0",
 ]

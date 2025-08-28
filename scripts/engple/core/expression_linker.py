@@ -1,10 +1,9 @@
 """Link expressions in markdown files."""
 
 import re
-from typing import List, Optional
 from pathlib import Path
 
-from ..constants import BLOG_DIR
+from engple.config import config
 from ..models import Expression, LinkingResult, LinkMatch
 from .context_detector import ContextDetector
 from loguru import logger
@@ -16,21 +15,16 @@ class ExpressionLinker:
     def __init__(
         self,
         dry_run: bool = False,
-        max_links: Optional[int] = None,
     ):
         self.dry_run = dry_run
-        # Maximum links allowed per target file for THIS expression.
-        # When None, unlimited.
-        self.max_links: Optional[int] = max_links
-        # When True, count all links in the file toward max-links; when False, count only links to this expression
         self.context_detector = ContextDetector()
 
-    def link_expression(self, expression: Expression) -> LinkingResult:
+    def link_expression(self, expression: Expression, max_links: int | None = None) -> LinkingResult:
         """Link a single expression across all markdown files."""
         logger.info(f"Linking expression: {expression.base_form}")
         logger.info(f"Variations: {expression.variations}")
         logger.info(f"Target path: {expression.url_path}")
-        markdown_files = list(BLOG_DIR.rglob("*.md"))
+        markdown_files = list(config.blog_dir.rglob("*.md"))
         logger.info(f"Found {len(markdown_files)} markdown files")
 
         result = LinkingResult(
@@ -44,13 +38,13 @@ class ExpressionLinker:
             if file_path.resolve() == expression.file_path.resolve():
                 continue
 
-            if self.max_links is not None:
+            if max_links is not None:
                 content = file_path.read_text(encoding="utf-8")
-                existing_links = self._count_existing_links(content, expression)
+                existing_links = self.context_detector.count_existing_links(content)
 
-                if existing_links >= self.max_links:
+                if existing_links >= max_links:
                     logger.warning(
-                        f"Skipping {file_path.name}: existing links {existing_links} >= max {self.max_links}"
+                        f"Skipping {file_path.name}: existing links {existing_links} >= max {max_links}"
                     )
                     result.files_processed += 1
                     continue
@@ -141,7 +135,7 @@ class ExpressionLinker:
 
         return content, 0
 
-    def _find_matches(self, content: str, expression: Expression) -> List[LinkMatch]:
+    def _find_matches(self, content: str, expression: Expression) -> list[LinkMatch]:
         """Find all potential matches for expression variations."""
         matches = []
 
@@ -174,42 +168,3 @@ class ExpressionLinker:
             return False
 
         return True
-
-    def _count_existing_links(self, content: str, expression: Expression) -> int:
-        """Count existing links pointing to the expression's url in this content.
-
-        Counts both markdown and HTML links. Excludes code blocks, headers,
-        and YAML front matter regions using ContextDetector.
-        """
-        count = 0
-
-        # Markdown links: [text](url)
-        for m in re.finditer(r"\[([^\]]+)\]\(([^)]+)\)", content):
-            start, end = m.span()
-            if self.context_detector.should_skip_context(content, start, end):
-                continue
-            count += 1
-
-        # HTML links: <a href="url">text</a>
-        for m in re.finditer(r"<a\s+[^>]*href=[\"\']([^\"\']+)[\"\'][^>]*>.*?</a>", content, re.IGNORECASE | re.DOTALL):
-            start, end = m.span()
-            if self.context_detector.should_skip_context(content, start, end):
-                continue
-            count += 1
-        
-        return count
-
-    def _should_skip_file(self, file_path: Path, expression: Expression) -> bool:
-        """Determine whether to skip linking in this file based on max_links."""
-        if self.max_links is None:
-            return False
-
-        try:
-            content = file_path.read_text(encoding="utf-8")
-        except Exception as e:
-            logger.error(f"Error reading {file_path}: {e}")
-            return False
-
-        existing = self._count_existing_links(content, expression)
-        return existing >= self.max_links
-       

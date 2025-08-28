@@ -62,6 +62,8 @@ def link_expression(
     variations = generate_variations(expr)
     expr_path = get_expr_path(expr)
 
+    print(expr_path)
+
     if not expr_path:
         logger.warning(f"❌ Expression path not found for: '{expr}'")
         sys.exit(1)
@@ -73,9 +75,9 @@ def link_expression(
         variations=variations,
     )
     linker = ExpressionLinker(
-        dry_run=dry_run, max_links=max_links
+        dry_run=dry_run
     )
-    result = linker.link_expression(expression)
+    result = linker.link_expression(expression, max_links)
 
     logger.info("")
     logger.info("📊 Results:")

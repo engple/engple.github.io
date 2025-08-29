@@ -128,6 +128,42 @@ class TestApplyLinkIntegration:
         assert result_content == expected
         assert links_added == 1
 
+    def test_skip_expression_in_link_url(self, linker):
+        """Test that expressions inside markdown link URLs are not modified."""
+        # Given: Expression appearing in existing markdown link URL
+        test_expression = Expression(
+            base_form="test",
+            url_path="/expressions/test/",
+            file_path=Path("/test/test.md"),
+            variations=["test", "tests", "testing", "tested"]
+        )
+        content = "Check out this [example](/blog/test/sample.html) for more info."
+        
+        # When: Applying link to the content
+        result_content, links_added = linker.apply_link(content, test_expression)
+        
+        # Then: Content should remain unchanged as expression is inside existing link URL
+        assert result_content == content
+        assert links_added == 0
+
+    def test_skip_expression_in_html_link_text(self, linker):
+        """Test that expressions inside HTML link text are not modified."""
+        # Given: Expression appearing in existing HTML link text
+        click_expression = Expression(
+            base_form="click",
+            url_path="/expressions/click/",
+            file_path=Path("/test/click.md"),
+            variations=["click", "clicks", "clicking", "clicked"]
+        )
+        content = 'Please <a href="/help">click here</a> for assistance.'
+        
+        # When: Applying link to the content
+        result_content, links_added = linker.apply_link(content, click_expression)
+        
+        # Then: Content should remain unchanged as expression is inside existing HTML link
+        assert result_content == content
+        assert links_added == 0
+
     def test_skip_code_blocks(self, linker, basic_expression):
         """Test that code blocks are skipped."""
         # Given: Content with expression inside code block and outside

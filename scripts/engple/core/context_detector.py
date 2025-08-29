@@ -6,20 +6,27 @@ class ContextDetector:
 
     def is_inside_existing_link(self, text: str, position: int) -> bool:
         """Check if position is inside an existing markdown or HTML link."""
-        before_text = text[:position]
-        after_text = text[position:]
-
+        import re
+        
         # Check for markdown links [text](url)
-        open_brackets = before_text.count("[") - before_text.count("]")
-        if open_brackets > 0:
-            if "](" in after_text:
+        # Find all markdown links in the text
+        for match in re.finditer(r'\[([^\]]+)\]\(([^)]+)\)', text):
+            link_start, link_end = match.span()
+            bracket_end = match.start(2) - 2  # End of ']' before '('
+            
+            # Check if position is within the link text [text] part
+            if match.start(1) <= position <= bracket_end:
+                return True
+                
+            # Check if position is within the URL part (url)
+            if match.start(2) <= position <= match.end(2):
                 return True
 
         # Check for HTML links <a href="">text</a>
-        last_open_tag = before_text.rfind("<a ")
-        last_close_tag = before_text.rfind("</a>")
-        if last_open_tag > last_close_tag:
-            if "</a>" in after_text:
+        for match in re.finditer(r'<a\s+[^>]*href=[\"\']([^\"\']+)[\"\'][^>]*>(.*?)</a>', text, re.IGNORECASE | re.DOTALL):
+            link_start, link_end = match.span()
+            # Check if position is anywhere within the HTML link
+            if link_start <= position <= link_end:
                 return True
 
         return False

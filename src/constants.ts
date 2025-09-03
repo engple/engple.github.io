@@ -9,20 +9,20 @@ export const LIGHT = "light"
 export const DARK = "dark"
 
 export const SPEAK_LINK =
-  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple"
+  "https://www.speak.com/ko/event/25sep-t1promo/home?utm_source=speakpartners&utm_campaign=KR_2505_25may-challenge_n/a_link_performance&utm_medium=n/a&utm_content=n/a&ref=engple"
 
 export const SPEAK_INLINE_LINK =
-  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple-inline"
+  "https://www.speak.com/ko/event/25sep-t1promo/home?utm_source=speakpartners&utm_campaign=KR_2505_25may-challenge_n/a_link_performance&utm_medium=n/a&utm_content=n/a&ref=engple-inline"
 
 export const SPEAK_POPUP_LINK =
-  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple-modal"
+  "https://www.speak.com/ko/event/25sep-t1promo/home?utm_source=speakpartners&utm_campaign=KR_2505_25may-challenge_n/a_link_performance&utm_medium=n/a&utm_content=n/a&ref=engple-modal"
 
 export const SPEAK_INLINE_VIDEO_LINK =
-  "https://app.usespeak.com/kr-ko/sale/kr-affiliate/?ref=engple-inline-video"
+  "https://www.speak.com/ko/event/25sep-t1promo/home?utm_source=speakpartners&utm_campaign=KR_2505_25may-challenge_n/a_link_performance&utm_medium=n/a&utm_content=n/a&ref=engple-video-inline"
 
 export const SPEAK_BANNER_KEY = "speak_banner_closed"
 
-export const SPEAK_EVENT_END_DATE = new Date("2025-06-30")
+export const SPEAK_EVENT_END_DATE = new Date("2025-09-30")
 
 export const POPUP_BANNER_KEY = "popup_banner_closed"
 

@@ -32,7 +32,7 @@ const Banner: React.FC<BannerProps> = ({
           <Slogan>
             <Prelude>
               <FireIcon>🔥</FireIcon>
-              영어 말하기 어려우세요?
+              틀려라, 트일것이다.
               {daysLeft !== undefined && daysLeft >= 0 && (
                 <EventBadge>
                   {daysLeft === 0 ? "(오늘 마감)" : `(D-${daysLeft})`}
@@ -41,7 +41,7 @@ const Banner: React.FC<BannerProps> = ({
             </Prelude>
             <div>
               <Title>
-                <Highlight>64% 할인</Highlight>으로 AI와 영어 대화 연습하기
+                [9월 특별 할인] SPEAK 영어 공부 <Highlight>70% 할인</Highlight>
               </Title>
             </div>
           </Slogan>
@@ -233,16 +233,16 @@ const CloseButton = styled.button`
 
 const fireAnimation = keyframes`
   0%, 100% {
-    transform: scale(1) rotate(-3deg);
+    transform: scale(1) rotate(-10deg);
   }
   25% {
-    transform: scale(1.1) rotate(3deg);
+    transform: scale(1.1) rotate(10deg);
   }
   50% {
-    transform: scale(1.05) rotate(-1deg);
+    transform: scale(1.05) rotate(-5deg);
   }
   75% {
-    transform: scale(1.08) rotate(1deg);
+    transform: scale(1.08) rotate(5deg);
   }
 `
 

@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react"
 
 import styled from "styled-components"
 
-import { SPEAK_POPUP_LINK, SPEAK_POPUP_VIDEO_URL } from "~/src/constants"
+import { SPEAK_POPUP_LINK } from "~/src/constants"
 
 import speakLogoWhite from "../images/speak-logo-white.png"
 import { getSpeakCTA } from "../utils/promotion"
@@ -17,13 +17,15 @@ interface PopupBannerProps {
   isVisible?: boolean
 }
 
+const YOUTUBE_VIDEO_ID = "AaQ0UriBGuA"
+
 const PopupBanner: React.FC<PopupBannerProps> = ({
   onCloseButtonClick,
   onOverlayClick,
   isVisible = true,
 }) => {
   const [isMuted, setIsMuted] = useState(true)
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
 
   const handleCloseButtonClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -40,10 +42,13 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
   }
 
   const handleToggleMute = () => {
-    if (videoRef.current) {
-      const currentMuted = !videoRef.current.muted
-      videoRef.current.muted = currentMuted
-      setIsMuted(currentMuted)
+    if (iframeRef.current) {
+      const newMuted = !isMuted
+      iframeRef.current.contentWindow?.postMessage(
+        `{"event":"command","func":"${newMuted ? "mute" : "unMute"}","args":""}`,
+        "*",
+      )
+      setIsMuted(newMuted)
     }
   }
 
@@ -59,14 +64,13 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
         </CloseButton>
 
         <VideoWrapper>
-          <video
-            ref={videoRef}
-            src={SPEAK_POPUP_VIDEO_URL}
-            autoPlay
-            loop
-            playsInline
-            muted
-          />
+          <iframe
+            ref={iframeRef}
+            src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&loop=1&playlist=${YOUTUBE_VIDEO_ID}&mute=1&controls=0&playsinline=1&enablejsapi=1`}
+            allow="autoplay; encrypted-media"
+            allowFullScreen
+            title="[스픽xT1] 틀려라, 트일것이다."
+          ></iframe>
           <MuteButton onClick={handleToggleMute}>
             {isMuted ? (
               <MutedIcon width={16} height={16} />
@@ -83,7 +87,9 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
           </LogoSection>
           <MainContent>
             <Title>
-              <Highlight>영어 말하기</Highlight>, 아직 어려우신가요?
+              <Highlight>틀려라</Highlight>
+              <br />
+              트일것이다.
             </Title>
           </MainContent>
           <ActionSection>
@@ -207,15 +213,18 @@ const CloseButton = styled.button`
 const VideoWrapper = styled.div`
   position: relative;
   width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
   border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
   overflow: hidden;
   background-color: #000;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 
-  video {
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: auto;
-    display: block;
+    height: 100%;
   }
 `
 
@@ -252,21 +261,6 @@ const LogoWrapper = styled.div`
       height: 24px;
     }
   }
-`
-
-const BadgeWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`
-
-const Badge = styled.div`
-  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
-  color: white;
-  padding: var(--sizing-xs) var(--sizing-md);
-  border-radius: var(--border-radius-lg);
-  font-size: 0.9rem;
-  font-weight: var(--font-weight-bold);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
 `
 
 const MainContent = styled.div`

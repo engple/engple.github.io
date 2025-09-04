@@ -1,7 +1,12 @@
 import lemminflect  # type:ignore[import-untyped]
 import spacy
+from loguru import logger
 
-_spacy_nlp = spacy.load("en_core_web_sm")
+try:
+    _spacy_nlp = spacy.load("en_core_web_sm")
+except Exception as e:
+    logger.error(f"Error loading spaCy model: {e}")
+    _spacy_nlp = None
 
 
 def generate_variations(expression: str) -> list[str]:
@@ -23,9 +28,7 @@ def generate_variations(expression: str) -> list[str]:
         return _handle_single_word(expression)
 
 
-def _is_reasonable_word(
-    inflection: str, original: str
-) -> bool:
+def _is_reasonable_word(inflection: str, original: str) -> bool:
     """Basic validation to filter out obvious nonsense inflections."""
     if not inflection:
         return False
@@ -144,7 +147,7 @@ def _handle_multiple_words(phrase: str) -> list[str]:
         verb_token = words[0]
 
     before = words[:verb_index]
-    after = words[verb_index+1:]
+    after = words[verb_index + 1 :]
 
     variations = {phrase}
     verb_str = verb_token if verb_token is not None else words[0]

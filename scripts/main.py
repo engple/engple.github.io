@@ -7,6 +7,7 @@ from loguru import logger
 from engple.core import (
     ExpressionLinker,
     BatchLinker,
+    BlogWriter,
 )
 from engple.models import Expression
 from engple.utils import generate_variations, get_expr_path
@@ -62,8 +63,6 @@ def link_expression(
     variations = generate_variations(expr)
     expr_path = get_expr_path(expr)
 
-    print(expr_path)
-
     if not expr_path:
         logger.warning(f"❌ Expression path not found for: '{expr}'")
         sys.exit(1)
@@ -74,9 +73,7 @@ def link_expression(
         file_path=expr_path.file_path,
         variations=variations,
     )
-    linker = ExpressionLinker(
-        dry_run=dry_run
-    )
+    linker = ExpressionLinker(dry_run=dry_run)
     result = linker.link_expression(expression, max_links)
 
     logger.info("")
@@ -165,6 +162,15 @@ def link_all_expressions(
         logger.info("🔍 Dry run completed - no files were modified")
     else:
         logger.success("✅ Batch expression linking completed successfully!")
+
+
+@app.command()
+def write_blog(expression: str, count: int = 5):
+    """Generate a blog post draft with a specified number of expressions."""
+
+    writer = BlogWriter()
+    data = writer.generate(expression)
+    print(data)
 
 
 if __name__ == "__main__":

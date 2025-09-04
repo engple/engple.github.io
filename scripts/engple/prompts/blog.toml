@@ -1,0 +1,127 @@
+[example]
+prompt = """Create English examples using the given <expression>.
+
+1. USE AMERICAN ENGLISH, AUTHENTIC ENGLISH
+2. Natural spoken language rather than formal writing.
+3. Make variations to make the examples sound natural and realistic.
+4. Add an additional sentence before or after the example to provide context if needed.
+5. no explanations, just answer.
+
+<example>
+For example, for the expression "keep up with",
+
+1. I've been so busy lately, it's hard to keep up with all my emails.
+2. Can you slow down a bit? I can't keep up with you.
+3. I was running late this morning, so I couldn't keep up with my usual routine.
+...
+</example>
+
+<expression>
+{expression}
+</expression>
+
+<count>
+The number of examples to generate: {count}
+</count>
+"""
+
+[translation]
+prompt =  """<input>으로 주어지는 예문들을 한국어로 번역
+
+<Instruction>
+1. Z세대의 감성, '~해요'체 사용하여 번역
+2. 직역을 피하고 일상 대화처럼 자연스러운 표현 사용
+3. 원문의 핵심 의미는 유지하면서 자연스러운 한국어로 의역
+4. 설명은 생략, 답만 제시
+</instruction>
+
+<input>
+{input}
+</input>"""
+
+
+[blog_content]
+prompt = """Write a blog post that explains the given expression in English.
+The content should follow the tone and mood of the examples.
+
+## Examples:
+```
+{examples}
+```
+"""
+
+[blogmeta]
+prompt = """주어진 <input>을 기반으로 메타내용을 작성
+
+<expression>
+{expression}
+</expression>
+
+<input>
+{input}
+</input>"""
+
+[blogmeta.description]
+description = """- <input>에서 사용한 표현과 예문을 활용하여 약 100자의 설명 작성
+- 영어를 사용하지 않고, 한국어 뜻과 예문만 사용
+- 예제를 참고하여 '...를 영어로 어떻게 표현하면 좋을까요? ...등을 영어로 표현하는 법을 배워봅시다' 형식으로 작성할것
+</instruction>
+"""
+examples = [
+    "'솔선수범하다', '모범이 되다', '행동으로 보여주다'를 영어로 어떻게 표현하면 좋을까요? '선생님은 항상 솔선수범하셔요.', 우리 팀장님은 늘 직접 모범을 보여줘요.' 등을 영어로 표현하는 법을 배워봅시다.",
+    "'여분의', '여유있는', '남는'을 영어로 어떻게 표현하면 좋을까요? '펜 남는 거 있나요?', '오늘은 여유 시간이 없어요' 등을 영어로 표현하는 법을 배워봅시다.",
+    "'N일 내내', 'N시간 연속으로'를 영어로 어떻게 표현하면 좋을까요? '3시간 내내 공부했어', '일주일 연속으로 비가 왔어' 등을 영어로 표현하는 법을 배워봅시다."
+]
+
+
+[blogmeta.faq]
+description = """<expression>을 활용하여 4~5개의 문답을 작성
+- 첫번째는 '<expression>'에 대한 한국어 의미를 2~3개를 작성
+- 두번째부터는 각 한국어 의미에 대한 표현과 그 예시를 작성해줘
+- Z세대 감성, '~해요'체로 작성
+- "examples"와 같은 출력 형식을 지킬 것."""
+example = [
+    [
+        "'It's a shame'은 한국어로 어떤 의미인가요?",
+        "'It's a shame'은 한국어로 '아쉽다', '안타깝다', '유감이다' 등으로 번역될 수 있습니다. 어떤 일이 일어나지 않았거나 예상과 다르게 진행되어 실망감이나 아쉬움을 표현할 때 사용합니다."
+    ],
+    [
+        "'아쉽다'를 영어로 어떻게 표현할 수 있나요?",
+        "'아쉽다'는 상황에 따라 'It's a shame'으로 표현할 수 있습니다. 예를 들어, '네가 파티에 못 온 게 아쉽네'는 'It's a shame you missed the party'로 말할 수 있습니다."
+    ],
+    [
+        "'안타깝다'를 영어로 어떻게 표현할 수 있나요?",
+        "'안타깝다'는 상황에 따라 'It's a shame'으로 표현할 수 있습니다. 예를 들어, '그들이 헤어졌다니 정말 안타까워'는 'It's such a shame they broke up'으로 말할 수 있습니다."
+    ],
+    [
+        "'유감이다'를 영어로 어떻게 표현하나요?",
+        "'유감이다'는 'It's a shame'으로 표현할 수 있습니다. 예를 들어, '저녁 식사에 갈 수 없어 유감이야'는 'It's a shame we can't make it to dinner'로 표현할 수 있습니다."
+    ]
+]
+
+[recommendation]
+prompt = """<expression>과 관련있는 표현 **{recommendation_count}개** 제시
+
+<expression>
+{expression}
+</expression>"""
+examples = [
+    [
+        "make a decision", "'make a decision'은 \"**결정을 내리다**\" 또는 \"**선택을 하다**\" 라는 뜻이에요. 이 표현은 **결정 과정 자체를 더 강조하고 좀 더 공식적인 느낌**을 줘요. 보통 여러 선택지 중에서 하나를 고르거나 중요한 일에 대한 결론을 내릴 때 많이 써요.", "After considering all the options, we need to make a decision by the end of the week.", "모든 선택지를 고려한 이후에, 이번 주말까지 결정을 내려야 해요."
+    ],
+    [
+        "weigh one's options", "'weigh one's options'은 \"**여러 선택지를 신중히 고려하다**\" 라는 의미예요. 결정을 내리기 전에 **각 선택지의 장단점을 꼼꼼히 따져보는 과정**을 나타내요. 신중하고 합리적으로 결정을 내리는 것을 강조할 때 많이 사용해요.", "Before accepting the job offer, Tom spent a week weighing his options to ensure it was the right move for his career.", "일자리 제안을 수락하기 전에 톰은 본인 커리어를 위한 선택인지 꼼꼼히 따져가며 일주일을 보냈어요."
+    ],
+    [
+        "hesitant to", "'hesitant to'는 \"**~하기를 주저하다**\" 또는 \"**~하기를 망설이다**\" 라는 뜻이에요. 결정을 내리는 데 있어 불안하거나 걱정되거나 두려워서 망설이는 상태를 나타내요. 주로 안 좋은 결과가 나올까 봐 걱정되거나 위험해 보여서 행동을 주저할 때 써요.", "He was hesitant to invest all his money in the new venture.", "그는 본인의 모든 돈을 새로운 사업에 투자하는 것을 망설였어요."
+    ]
+]
+
+
+[related_expression]
+expression_description = """- Expression similar to or opposite of <expression>
+- Natural expression commonly used in everyday conversations
+"""
+explanation_description = "'expression'필드와 관련된 한국어 설명"
+example_description = "A natural example sentence using the expression"
+translation_description = "- 'example' 필드에 대한 한국어 번역\n- Z세대의 감성, '~해요'체로 작성"

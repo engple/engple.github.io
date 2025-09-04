@@ -1,7 +1,8 @@
 import lemminflect  # type:ignore[import-untyped]
-import spacy
+from engple.utils.spacy import load_spacy_model
 
-_spacy_nlp = spacy.load("en_core_web_sm")
+
+_spacy_nlp = load_spacy_model()
 
 
 def generate_variations(expression: str) -> list[str]:
@@ -23,9 +24,7 @@ def generate_variations(expression: str) -> list[str]:
         return _handle_single_word(expression)
 
 
-def _is_reasonable_word(
-    inflection: str, original: str
-) -> bool:
+def _is_reasonable_word(inflection: str, original: str) -> bool:
     """Basic validation to filter out obvious nonsense inflections."""
     if not inflection:
         return False
@@ -70,9 +69,10 @@ def _handle_single_word(word: str) -> list[str]:
         return [word]
 
     pos = None
-    doc = _spacy_nlp(word)
-    if len(doc) > 0:
-        pos = doc[0].pos_
+    if _spacy_nlp is not None:
+        doc = _spacy_nlp(word)
+        if len(doc) > 0:
+            pos = doc[0].pos_
 
     # If spaCy clearly identifies it as a noun, only generate noun forms
     if pos == "NOUN":
@@ -122,21 +122,23 @@ def _handle_multiple_words(phrase: str) -> list[str]:
     if not words:
         return []
 
-    doc = _spacy_nlp(phrase)
     verb_token = None
     verb_index = None
-    # Find the leftmost AUX/VERB token and map it to the original word index
-    candidates: list[tuple[int, str]] = []
-    for token in doc:
-        if token.pos_ in ("AUX", "VERB"):
-            tok_lower = token.text.lower()
-            for i, word in enumerate(words):
-                if word.lower() == tok_lower:
-                    candidates.append((i, words[i]))
-                    break
-    if candidates:
-        candidates.sort(key=lambda x: x[0])
-        verb_index, verb_token = candidates[0]
+
+    if _spacy_nlp is not None:
+        doc = _spacy_nlp(phrase)
+        # Find the leftmost AUX/VERB token and map it to the original word index
+        candidates: list[tuple[int, str]] = []
+        for token in doc:
+            if token.pos_ in ("AUX", "VERB"):
+                tok_lower = token.text.lower()
+                for i, word in enumerate(words):
+                    if word.lower() == tok_lower:
+                        candidates.append((i, words[i]))
+                        break
+        if candidates:
+            candidates.sort(key=lambda x: x[0])
+            verb_index, verb_token = candidates[0]
 
     # If no verb found, default to first word
     if verb_index is None:
@@ -144,7 +146,7 @@ def _handle_multiple_words(phrase: str) -> list[str]:
         verb_token = words[0]
 
     before = words[:verb_index]
-    after = words[verb_index+1:]
+    after = words[verb_index + 1 :]
 
     variations = {phrase}
     verb_str = verb_token if verb_token is not None else words[0]

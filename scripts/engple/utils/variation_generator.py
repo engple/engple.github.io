@@ -1,8 +1,11 @@
+from functools import cache
 import lemminflect  # type:ignore[import-untyped]
 from engple.utils.spacy import load_spacy_model
 
 
-_spacy_nlp = load_spacy_model()
+@cache
+def _get_spacy_nlp():
+    return load_spacy_model()
 
 
 def generate_variations(expression: str) -> list[str]:
@@ -69,10 +72,10 @@ def _handle_single_word(word: str) -> list[str]:
         return [word]
 
     pos = None
-    if _spacy_nlp is not None:
-        doc = _spacy_nlp(word)
-        if len(doc) > 0:
-            pos = doc[0].pos_
+    spacy_nlp = _get_spacy_nlp()
+    doc = spacy_nlp(word)
+    if len(doc) > 0:
+        pos = doc[0].pos_
 
     # If spaCy clearly identifies it as a noun, only generate noun forms
     if pos == "NOUN":
@@ -125,20 +128,20 @@ def _handle_multiple_words(phrase: str) -> list[str]:
     verb_token = None
     verb_index = None
 
-    if _spacy_nlp is not None:
-        doc = _spacy_nlp(phrase)
-        # Find the leftmost AUX/VERB token and map it to the original word index
-        candidates: list[tuple[int, str]] = []
-        for token in doc:
-            if token.pos_ in ("AUX", "VERB"):
-                tok_lower = token.text.lower()
-                for i, word in enumerate(words):
-                    if word.lower() == tok_lower:
-                        candidates.append((i, words[i]))
-                        break
-        if candidates:
-            candidates.sort(key=lambda x: x[0])
-            verb_index, verb_token = candidates[0]
+    spacy_nlp = _get_spacy_nlp()
+    doc = spacy_nlp(phrase)
+    # Find the leftmost AUX/VERB token and map it to the original word index
+    candidates: list[tuple[int, str]] = []
+    for token in doc:
+        if token.pos_ in ("AUX", "VERB"):
+            tok_lower = token.text.lower()
+            for i, word in enumerate(words):
+                if word.lower() == tok_lower:
+                    candidates.append((i, words[i]))
+                    break
+    if candidates:
+        candidates.sort(key=lambda x: x[0])
+        verb_index, verb_token = candidates[0]
 
     # If no verb found, default to first word
     if verb_index is None:

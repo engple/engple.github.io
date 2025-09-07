@@ -26,45 +26,29 @@ class BlogContent(BaseModel):
             """),
     )
     body: str = Field(
-        description="Main content of the blog written in Korean '~해요'체",
+        description="Content of the blog written in Korean (ending with '~해요').",
     )
 
 
 class FAQ(BaseModel):
-    question: str = Field(description="질문")
-    answer: str = Field(description="답변")
+    question: str
+    answer: str
 
 
 class RelatedExpression(BaseModel):
     expression: str = Field(
-        description=BLOG_PROMPT["related_expression"]["expression_description"]
+        description="Expression similar to or opposite of <expression> used in everyday conversations"
     )
-    explanation: str = Field(
-        description=BLOG_PROMPT["related_expression"]["explanation_description"]
-    )
-    example: str = Field(
-        description=BLOG_PROMPT["related_expression"]["example_description"]
-    )
+    explanation: str = Field(description="Explanation of the expression in Korean")
+    example: str = Field(description="A natural example sentence using the expression")
     translation: str = Field(
-        description=BLOG_PROMPT["related_expression"]["translation_description"]
+        description="Korean translation of the 'example' field, written in a natural, conversational style (ending with '~해요')."
     )
 
 
 class Recommendation(BaseModel):
     data: list[RelatedExpression] = Field(
-        description="""- 5개의 관련 표현 목록
-- 유사되는 표현 3개, 반대되는 표현 2개""",
-        examples=[
-            [
-                RelatedExpression(
-                    expression=item[0],
-                    explanation=item[1],
-                    example=item[2],
-                    translation=item[3],
-                )
-                for item in BLOG_PROMPT["recommendation"]["examples"]
-            ]
-        ],
+        description="A set of related expressions to the given expression, including both synonyms and antonyms in balanced numbers.",
     )
 
 
@@ -172,15 +156,19 @@ class BlogWriter:
         Recommend other expressions for the given expression
         """
         logger.info("🔍 다른 표현 추천 중...")
+
+        examples = Recommendation.model_validate_json(
+            read_file("./data/recommendiation_examples.json")
+        )
         recommend_agent = Agent(
             self.model_recommend,
             output_type=PromptedOutput(list[RelatedExpression]),
+            system_prompt=BLOG_PROMPT["recommendation"]["prompt"].format(
+                count=self.recommendation_count,
+                examples=examples.model_dump_json(),
+            ),
         )
-        res = recommend_agent.run_sync(
-            BLOG_PROMPT["recommendation"]["prompt"].format(
-                expression=expression, recommendation_count=self.recommendation_count
-            )
-        )
+        res = recommend_agent.run_sync(expression)
         return res.output
 
     def _format_blog_examples(

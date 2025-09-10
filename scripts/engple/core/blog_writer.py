@@ -1,4 +1,5 @@
 import datetime
+import json
 from textwrap import dedent
 import tomllib
 from zoneinfo import ZoneInfo
@@ -30,11 +31,6 @@ class BlogContent(BaseModel):
     )
 
 
-class FAQ(BaseModel):
-    question: str
-    answer: str
-
-
 class RelatedExpression(BaseModel):
     expression: str = Field(
         description="Expression similar to or opposite of <expression> used in everyday conversations"
@@ -48,13 +44,22 @@ class RelatedExpression(BaseModel):
 
 class Recommendation(BaseModel):
     data: list[RelatedExpression] = Field(
-        description="A set of related expressions to the given expression, including both synonyms and antonyms in balanced numbers.",
+        description="A set of related expressions to the given expression",
     )
 
 
+class FAQ(BaseModel):
+    question: str
+    answer: str
+
+
 class BlogMeta(BaseModel):
-    description: str
-    faqs: list[FAQ]
+    description: str = Field(
+        description="A concise and engaging blog post description in Korean (~100 characters)."
+    )
+    faqs: list[FAQ] = Field(
+        description="A list of 4-5 question-and-answer pairs about the expression in Korean."
+    )
 
 
 class BlogWriter:
@@ -75,7 +80,7 @@ class BlogWriter:
         translations = self._translate_blog_examples(examples)
         formatted_examples = self._format_blog_examples(examples, translations)
         content = self._write_blog_content(expression)
-        blog_meta = self._write_blog_meta(expression, content)
+        blog_meta = self._write_blog_meta(expression)
         recommendations = self._recommend_other_expressions(expression)
         final = self._get_final_content(
             expression, content, blog_meta, formatted_examples, recommendations
@@ -87,16 +92,15 @@ class BlogWriter:
         Generate examples for the given expression
         """
         logger.info("📄 예제 생성 중...")
-        # Build agent that returns a list[str]
         examples_agent = Agent(
             config.model_examples,
-            output_type=PromptedOutput(list[str]),
+            output_type=list[str],
+            system_prompt=BLOG_PROMPT["example"]["prompt"].format(
+                count=self.expression_count,
+                examples=read_file("./data/example_sentences.json"),
+            ),
         )
-        res = examples_agent.run_sync(
-            BLOG_PROMPT["example"]["prompt"].format(
-                expression=expression, count=self.expression_count
-            )
-        )
+        res = examples_agent.run_sync(expression)
         return res.output
 
     def _translate_blog_examples(self, examples: list[str]) -> list[str]:
@@ -106,11 +110,10 @@ class BlogWriter:
         logger.info("📄 예제 번역 중...")
         translate_agent = Agent(
             self.model_translation,
-            output_type=PromptedOutput(list[str]),
+            output_type=list[str],
+            system_prompt=BLOG_PROMPT["translation"]["prompt"],
         )
-        res = translate_agent.run_sync(
-            BLOG_PROMPT["translation"]["prompt"].format(input=examples)
-        )
+        res = translate_agent.run_sync(json.dumps(examples))
         return res.output
 
     def _write_blog_content(self, expression: str) -> BlogContent:
@@ -135,20 +138,22 @@ class BlogWriter:
         res = content_agent.run_sync(expression)
         return res.output
 
-    def _write_blog_meta(self, expression: str, content: BlogContent) -> BlogMeta:
+    def _write_blog_meta(self, expression: str) -> BlogMeta:
         """
         Write a og description for the given expression
         """
         logger.info("📝 블로그 메타 설명 작성 중...")
+        example = BlogMeta.model_validate_json(
+            read_file("./data/blogmeta_example.json")
+        )
         meta_agent = Agent(
             self.model_meta,
-            output_type=PromptedOutput(BlogMeta),
+            output_type=BlogMeta,
+            system_prompt=BLOG_PROMPT["blogmeta"]["prompt"].format(
+                examples=example.model_dump_json()
+            ),
         )
-        res = meta_agent.run_sync(
-            BLOG_PROMPT["blogmeta"]["prompt"].format(
-                expression=expression, input=content.body
-            )
-        )
+        res = meta_agent.run_sync(expression)
         return res.output
 
     def _recommend_other_expressions(self, expression: str) -> list[RelatedExpression]:

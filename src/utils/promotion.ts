@@ -75,8 +75,8 @@ export const getSpeakCTA = ({
   } else if (!useDaysLeft) {
     return "70% 할인받기"
   } else if (daysLeft === 0) {
-    return "70% 할인받기 (오늘마감)"
+    return "70% 할인 오늘 마감"
   } else {
-    return `70% 할인받기 (D-${daysLeft})`
+    return `70% 할인 챙기기 (D-${daysLeft})`
   }
 }

@@ -32,16 +32,19 @@ const Banner: React.FC<BannerProps> = ({
           <Slogan>
             <Prelude>
               <FireIcon>🔥</FireIcon>
-              틀려라, 트일것이다.
-              {daysLeft !== undefined && daysLeft >= 0 && (
-                <EventBadge>
-                  {daysLeft === 0 ? "(오늘 마감)" : `(D-${daysLeft})`}
-                </EventBadge>
-              )}
+              아직도 <Highlight>영어 때문에</Highlight> 기회를 놓치고 계신가요?
             </Prelude>
             <div>
               <Title>
-                [9월 특별 할인] SPEAK 영어 공부 <Highlight>70% 할인</Highlight>
+                <Highlight>70% 특별 할인!</Highlight> 사라지기 전에 먼저
+                챙기세요
+                <InlineText>
+                  {daysLeft !== undefined && daysLeft >= 0 && (
+                    <EventBadge>
+                      {daysLeft === 0 ? "(오늘 마감)" : `(D-${daysLeft})`}
+                    </EventBadge>
+                  )}
+                </InlineText>
               </Title>
             </div>
           </Slogan>
@@ -176,6 +179,10 @@ const Title = styled.div`
   }
 `
 
+const InlineText = styled.span`
+  margin-left: 0.25rem;
+`
+
 const Highlight = styled.span`
   color: #ffd700;
   font-weight: 600;
@@ -233,16 +240,16 @@ const CloseButton = styled.button`
 
 const fireAnimation = keyframes`
   0%, 100% {
-    transform: scale(1) rotate(-10deg);
+    transform: scale(1) rotate(-3deg);
   }
   25% {
-    transform: scale(1.1) rotate(10deg);
+    transform: scale(1.1) rotate(3deg);
   }
   50% {
-    transform: scale(1.05) rotate(-5deg);
+    transform: scale(1.05) rotate(-1deg);
   }
   75% {
-    transform: scale(1.08) rotate(5deg);
+    transform: scale(1.08) rotate(1deg);
   }
 `
 

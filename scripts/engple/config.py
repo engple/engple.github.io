@@ -1,20 +1,17 @@
 import os
-from pathlib import Path
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Config(BaseSettings):
-    blog_dir: Path = Path(
-        os.path.join(os.path.dirname(__file__), "../../src/posts/blog")
-    )
-
     model_examples: str = "openai:gpt-4.1"
     model_translation: str = "openai:gpt-4.1-mini"
     model_content: str = "openai:gpt-4.1"
     model_meta: str = "openai:gpt-4.1"
     model_recommend: str = "openai:gpt-4.1"
     openai_api_key: SecretStr = SecretStr("YOUR_API_KEY")
+    notion_api_key: SecretStr = SecretStr("YOUR_API_KEY")
+    notion_engple_database_id: str = "YOUR_DATABASE_ID"
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

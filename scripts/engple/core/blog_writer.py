@@ -1,18 +1,20 @@
 import datetime
 import json
 from textwrap import dedent
-import tomllib
 from zoneinfo import ZoneInfo
 
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, PromptedOutput
 
-from engple.utils.file import read_file  # type: ignore[import-untyped]
 from loguru import logger
 from engple.config import config
-
-
-BLOG_PROMPT = tomllib.loads(read_file("./engple/prompts/blog.toml"))
+from engple.constants import (
+    BLOG_EXAMPLE_PATH,
+    BLOG_PROMPT,
+    BLOGMETA_EXAMPLE_PATH,
+    EXAMPLE_SENTENCES_PATH,
+    RECOMMENDATION_EXAMPLES_PATH,
+)
 
 
 class BlogContent(BaseModel):
@@ -71,7 +73,7 @@ class BlogWriter:
         self.model_recommend = config.model_recommend
         self.recommendation_count = recommendation_count
 
-    def generate(self, expression: str) -> str:
+    def generate(self, expression: str, blog_num: int) -> str:
         """
         Write a blog for the given expression using pydantic-ai agents
         """
@@ -83,7 +85,12 @@ class BlogWriter:
         blog_meta = self._write_blog_meta(expression)
         recommendations = self._recommend_other_expressions(expression)
         final = self._get_final_content(
-            expression, content, blog_meta, formatted_examples, recommendations
+            expression,
+            content,
+            blog_meta,
+            formatted_examples,
+            recommendations,
+            blog_num,
         )
         return final
 
@@ -97,7 +104,7 @@ class BlogWriter:
             output_type=list[str],
             system_prompt=BLOG_PROMPT["example"]["prompt"].format(
                 count=self.expression_count,
-                examples=read_file("./data/example_sentences.json"),
+                examples=EXAMPLE_SENTENCES_PATH.read_text(),
             ),
         )
         res = examples_agent.run_sync(expression)
@@ -121,12 +128,11 @@ class BlogWriter:
         Write a blog content for the given expression
         """
         logger.info("💬 블로그 작성 중...")
-        blog_example = read_file("./data/blog_example-delay.md")
 
         example = BlogContent(
             expression="delay",
             title="'지연되다' 영어로 어떻게 표현할까 ⏳ - 연기, 미룸 영어로",
-            body=blog_example,
+            body=BLOG_EXAMPLE_PATH.read_text(),
         )
         content_agent = Agent(
             self.model_content,
@@ -143,9 +149,7 @@ class BlogWriter:
         Write a og description for the given expression
         """
         logger.info("📝 블로그 메타 설명 작성 중...")
-        example = BlogMeta.model_validate_json(
-            read_file("./data/blogmeta_example.json")
-        )
+        example = BlogMeta.model_validate_json(BLOGMETA_EXAMPLE_PATH.read_bytes())
         meta_agent = Agent(
             self.model_meta,
             output_type=BlogMeta,
@@ -163,7 +167,7 @@ class BlogWriter:
         logger.info("🔍 다른 표현 추천 중...")
 
         examples = Recommendation.model_validate_json(
-            read_file("./data/recommendiation_examples.json")
+            RECOMMENDATION_EXAMPLES_PATH.read_bytes()
         )
         recommend_agent = Agent(
             self.model_recommend,
@@ -220,6 +224,7 @@ class BlogWriter:
         blog_meta: BlogMeta,
         formatted_examples: str,
         recommendations: list[RelatedExpression],
+        blog_num: int,
     ) -> str:
         """
         Get the final content for the given parameters
@@ -250,7 +255,7 @@ class BlogWriter:
                 "---\n"
                 f'category: "영어표현"\n'
                 f'date: "{datetime.datetime.now(tz=ZoneInfo("Asia/Seoul")).isoformat(timespec="seconds")}"\n'
-                f'thumbnail: "000.png"\n'
+                f'thumbnail: "{blog_num}.png"\n'
                 f"alt: \"'{expression}' 영어표현 썸네일\"\n"
                 f'title: "{self._escape_text(content.title)}"\n'
                 f"desc: "
@@ -258,7 +263,7 @@ class BlogWriter:
                 f"faqs: \n"
                 f"{faq_section}"
                 f"---\n\n"
-                f"!['{expression}' 영어표현](./000.png)\n\n"
+                f"!['{expression}' 영어표현](./{blog_num}.png)\n\n"
                 f"## 🌟 영어 표현 - {expression}\n\n"
                 f"{content_body}\n\n"
                 f"## 💬 연습해보기\n\n"

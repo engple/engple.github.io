@@ -1,6 +1,8 @@
 """CLI for automated expression linking system."""
 
+import datetime
 import sys
+from typing import Iterator, cast
 import typer
 from loguru import logger
 
@@ -9,9 +11,12 @@ from engple.core import (
     BatchLinker,
     BlogWriter,
 )
-from engple.models import Expression
+from engple.models import EngpleItem, Expression
 from engple.utils import generate_variations, get_expr_path
 from engple.utils.expr_path import iter_expr_path
+from engple.constants import BLOG_IN_ENGLISH_DIR
+from notion_client import Client as NotionClient
+from engple.config import config
 
 app = typer.Typer(help="Automated English Expression Linking System")
 
@@ -165,12 +170,66 @@ def link_all_expressions(
 
 
 @app.command()
-def write_blog(expression: str, count: int = 5):
+def write_blog(
+    count: int = typer.Option(1, help="Maximum number of posts to generate"),
+):
     """Generate a blog post draft with a specified number of expressions."""
-
     writer = BlogWriter()
-    data = writer.generate(expression)
-    print(data)
+
+    for item in stream_engple_item(count):
+        blog_num = get_blog_num(item.expression)
+        content = writer.generate(item.expression)
+
+        path = BLOG_IN_ENGLISH_DIR / f"{blog_num}.{item.expression}.md"
+        with open(path, "w") as f:
+            f.write(content)
+
+
+def stream_engple_item(count: int) -> Iterator[EngpleItem]:
+    notion_client = NotionClient(auth=config.notion_api_key.get_secret_value())
+    database = cast(
+        dict,
+        notion_client.databases.query(
+            database_id=config.notion_engple_database_id,
+            filter={
+                "and": [
+                    {"property": "status", "select": {"is_empty": True}},
+                    {"property": "thumbnail", "files": {"is_not_empty": True}},
+                ]
+            },
+        ),
+    )
+
+    for idx, page in enumerate(database["results"]):
+        status = (
+            page["properties"]["status"]["select"]["name"]
+            if page["properties"]["status"]["select"]
+            else None
+        )
+
+        yield EngpleItem(
+            expression=page["properties"]["expression"]["title"][0]["text"]["content"],
+            thumbnail_url=page["properties"]["thumbnail"]["files"][0]["file"]["url"],
+            status=status,
+            created=datetime.datetime.fromisoformat(
+                page["properties"]["created"]["created_time"]
+            ),
+        )
+
+        if count - 1 == idx:
+            break
+
+
+def get_blog_num() -> str:
+    last_num = max(
+        [
+            int(p.stem.split(".")[0])
+            for p in BLOG_IN_ENGLISH_DIR.rglob("*.md")
+            if p.stem.split(".")[0].isdigit()
+        ]
+    )
+    num = f"{last_num + 1:03d}"
+    return num
 
 
 if __name__ == "__main__":

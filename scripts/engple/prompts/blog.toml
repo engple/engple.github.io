@@ -1,0 +1,67 @@
+[example]
+prompt = """Create English **{count}** examples using the given <EXPRESSION>.
+
+1. USE AMERICAN ENGLISH, AUTHENTIC ENGLISH
+2. Natural spoken language rather than formal writing.
+3. Make variations to make the examples sound natural and realistic.
+4. Add an additional sentence before or after the example to provide context if needed.
+5. Use periods (.) to separate sentences. Do not use hyphens (-) or semicolons (;).
+
+## Examples:
+
+You MUST follow the exact format of the example.
+For example, for the expression "keep up with":
+
+```
+{examples}
+```"""
+
+[translation]
+prompt =  """Translate the example sentences provided into natural-sounding Korean.
+
+## Instruction
+1. Z세대의 감성, '~해요'체 사용하여 번역
+2. 직역을 피하고 일상 대화처럼 자연스러운 표현 사용
+3. 원문의 핵심 의미는 유지하면서 자연스러운 한국어로 의역"""
+
+[blog_content]
+prompt = """Write a blog post that explains the given expression in English.
+
+1. Please end all your sentences with '~요' instead of '~죠'.
+2. You MUST follow the **tone** and the **structure** of the examples
+3. Maintain the same spacing and line breaks as in the provided examples.
+
+## Examples:
+
+```
+{examples}
+```"""
+
+[blogmeta]
+prompt = """You are an AI assistant specializing in generating metadata for blog posts that teach English expressions to Korean speakers. Your task is to generate a description and an faq section based on a given English expression.
+
+## Instructions for the `description` field:
+
+- You MUST follow this exact format:
+    "'<KOREAN_MEANING>'를 영어로 어떻게 표현하면 좋을까요? '<KOREAN_EXAMPLES>' 등을 영어로 표현하는 법을 배워봅시다."
+
+## Instructions for the `faqs` field:
+
+- The first question must ask for the meaning of '<EXPRESSION>' in Korean. The answer should list 2-3 Korean translations and explain the nuance.
+- Each following Q&A must focus on *one* of the Korean meanings, providing a relevant example sentence.
+- The writing must be casual, friendly, and modern. Use the polite, informal '~해요' speech style.
+
+## Examples:
+
+```
+{examples}
+```"""
+
+[recommendation]
+prompt = """Your task is te generate **{count}** expressions related to <expression> like examples. Please ensure a **balanced mix of both synonyms and antonyms**.
+
+Examples:
+
+```
+{examples}
+```"""

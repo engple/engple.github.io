@@ -1,25 +1,23 @@
 """CLI for automated expression linking system."""
 
-import sys
-import typer
 from loguru import logger
+import typer
 
-from engple.core import (
-    ExpressionLinker,
-    BatchLinker,
-)
-from engple.models import Expression
-from engple.utils import generate_variations, get_expr_path
-from engple.utils.expr_path import iter_expr_path
+from engple.services.write_blog import handle_write_blog
+from engple.services.link_expression import handle_link_expression
+from engple.services.link_all_expressions import handle_link_all_expressions
 
 app = typer.Typer(help="Automated English Expression Linking System")
+
+logger.remove()
+logger.add(lambda msg: print(msg, end=""), level="INFO")
 
 
 @app.command()
 def link_expression(
     expr: str = typer.Argument(..., help="The expression to link"),
-    max_links: int | None = typer.Option(
-        None,
+    max_links: int = typer.Option(
+        8,
         "--max-links",
         help="Maximum links per post (omit for unlimited)",
     ),
@@ -44,51 +42,7 @@ def link_expression(
         python main.py link_expression "choice" --dry-run
         python main.py link_expression "honestly" --target-dir ./test --verbose
     """
-
-    if verbose:
-        logger.remove()
-        logger.add(lambda msg: print(msg, end=""), level="DEBUG")
-    else:
-        logger.remove()
-        logger.add(lambda msg: print(msg, end=""), level="INFO")
-
-    logger.info(f"🔗 Linking expression: '{expr}'")
-
-    # Validate max_links
-    if max_links is not None and max_links <= 0:
-        logger.error("--max-links must be a positive integer or omitted for unlimited")
-        sys.exit(2)
-
-    variations = generate_variations(expr)
-    expr_path = get_expr_path(expr)
-
-    print(expr_path)
-
-    if not expr_path:
-        logger.warning(f"❌ Expression path not found for: '{expr}'")
-        sys.exit(1)
-
-    expression = Expression(
-        base_form=expr,
-        url_path=expr_path.url_path,
-        file_path=expr_path.file_path,
-        variations=variations,
-    )
-    linker = ExpressionLinker(
-        dry_run=dry_run
-    )
-    result = linker.link_expression(expression, max_links)
-
-    logger.info("")
-    logger.info("📊 Results:")
-    logger.info(f"   Files processed: {result.files_processed}")
-    logger.info(f"   Files modified: {result.files_modified}")
-    logger.info(f"   Links added: {result.links_added}")
-
-    if dry_run:
-        logger.info("🔍 Dry run completed - no files were modified")
-    else:
-        logger.success("✅ Expression linking completed successfully!")
+    handle_link_expression(expr, max_links, dry_run, verbose)
 
 
 @app.command()
@@ -96,8 +50,8 @@ def link_all_expressions(
     target_expr: str = typer.Argument(
         ..., help="The target expression to link other expressions to"
     ),
-    max_links: int | None = typer.Option(
-        None,
+    max_links: int = typer.Option(
+        8,
         "--max-links",
         help="Maximum links per post (omit for unlimited)",
     ),
@@ -115,56 +69,26 @@ def link_all_expressions(
     - Links those occurrences to their dedicated posts.
     - Respects --max-links for the target file.
     """
+    handle_link_all_expressions(target_expr, max_links, dry_run, verbose)
 
-    if verbose:
-        logger.remove()
-        logger.add(lambda msg: print(msg, end=""), level="DEBUG")
-    else:
-        logger.remove()
-        logger.add(lambda msg: print(msg, end=""), level="INFO")
 
-    # Validate max_links
-    if max_links is not None and max_links <= 0:
-        logger.error("--max-links must be a positive integer or omitted for unlimited")
-        sys.exit(2)
+@app.command()
+def write_blog(
+    count: int = typer.Option(1, help="Maximum number of posts to generate"),
+    no_link: bool = typer.Option(False, help="Do not link the expressions"),
+    max_links: int = typer.Option(
+        8,
+        "--max-links",
+        help="Maximum links per post (omit for unlimited)",
+    ),
+):
+    """Generate a blog post draft with a specified number of expressions."""
+    expressions = handle_write_blog(count)
 
-    logger.info(f"🎯 Targeting expression: '{target_expr}'")
-
-    target_expr_path = get_expr_path(target_expr)
-    if not target_expr_path:
-        logger.error(f"Could not find file for target expression: '{target_expr}'")
-        sys.exit(1)
-
-    logger.info("🔎 Discovering all other expressions...")
-    other_expressions = [
-        Expression(
-            base_form=expr_path.expr,
-            url_path=expr_path.url_path,
-            file_path=expr_path.file_path,
-            variations=generate_variations(expr_path.expr),
-        )
-        for expr_path in iter_expr_path()
-        if expr_path.expr != target_expr
-    ]
-    logger.info(f"Found {len(other_expressions)} other expressions to link.")
-
-    batch = BatchLinker(
-        dry_run=dry_run,
-        max_links=max_links,
-    )
-    agg = batch.run(
-        target_post_path=target_expr_path.file_path, expressions=other_expressions
-    )
-
-    logger.info("")
-    logger.info("📊 Batch Results:")
-    logger.info(f"   File processed: {target_expr_path.file_path}")
-    logger.info(f"   Links added: {agg.total_links_added}")
-
-    if dry_run:
-        logger.info("🔍 Dry run completed - no files were modified")
-    else:
-        logger.success("✅ Batch expression linking completed successfully!")
+    if not no_link:
+        for expression in expressions:
+            handle_link_expression(expression, max_links=max_links)
+            handle_link_all_expressions(expression, max_links=max_links)
 
 
 if __name__ == "__main__":

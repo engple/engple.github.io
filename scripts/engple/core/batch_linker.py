@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from loguru import logger
 
 
-from ..models import  Expression
+from ..models import Expression
 from .expression_linker import ExpressionLinker
 from .context_detector import ContextDetector
 
@@ -32,9 +32,7 @@ class BatchLinker:
         self.dry_run = dry_run
         self.max_links = max_links
         self.context_detector = ContextDetector()
-        self.linker = ExpressionLinker(
-            dry_run=dry_run
-        )
+        self.linker = ExpressionLinker(dry_run=dry_run)
 
     def run(
         self, target_post_path: str | pathlib.Path, expressions: list[Expression]
@@ -61,7 +59,7 @@ class BatchLinker:
         if self.max_links is not None:
             existing_links = self.context_detector.count_existing_links(content)
             if existing_links >= self.max_links:
-                logger.warning(
+                logger.debug(
                     f"Skipping {target_path.name}: existing links {existing_links} >= max {self.max_links}"
                 )
                 return result
@@ -79,5 +77,5 @@ class BatchLinker:
             logger.info(f"[DRY RUN] Would write to {path}")
             return
 
-        with open(path, 'w', encoding='utf-8') as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write(content)

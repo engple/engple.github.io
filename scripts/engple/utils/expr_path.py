@@ -4,7 +4,7 @@ from typing import Iterable
 
 from pathlib import Path
 
-from engple.config import config
+from engple.constants import BLOG_DIR
 
 
 EXPR_HEADER_RE = re.compile(r"^##\s*🌟\s*영어 표현\s*-\s*(.+)$", re.MULTILINE)
@@ -28,7 +28,7 @@ def get_expr_path(expr: str) -> ExprPath | None:
 
 
 def iter_expr_path() -> Iterable[ExprPath]:
-    for md in config.blog_dir.rglob("*.md"):
+    for md in BLOG_DIR.rglob("*.md"):
         try:
             content = md.read_text(encoding="utf-8")
         except Exception:
@@ -45,7 +45,7 @@ def iter_expr_path() -> Iterable[ExprPath]:
 
 
 def _compute_url_path(md_file: Path) -> str:
-    rel = md_file.relative_to(config.blog_dir)
+    rel = md_file.relative_to(BLOG_DIR)
     rel_no_suffix = rel.with_suffix("")
     parts = rel_no_suffix.parts
     # Collapse season-1 to root, keep other subfolders (e.g., in-english, vocab-1)

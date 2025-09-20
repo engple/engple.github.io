@@ -1,6 +1,8 @@
 """Data models for expressions and linking results."""
 
 from dataclasses import dataclass
+import datetime
+import io
 from pathlib import Path
 from typing import List, Dict
 
@@ -39,3 +41,12 @@ class LinkingResult:
     def __post_init__(self):
         if self.errors is None:
             self.errors = []
+
+
+@dataclass
+class EngpleItem:
+    page_id: str
+    expression: str
+    thumbnail: io.BytesIO
+    status: str | None
+    created: datetime.datetime

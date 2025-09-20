@@ -3,7 +3,7 @@
 import re
 from pathlib import Path
 
-from engple.config import config
+from ..constants import BLOG_DIR
 from ..models import Expression, LinkingResult, LinkMatch
 from .context_detector import ContextDetector
 from loguru import logger
@@ -19,12 +19,14 @@ class ExpressionLinker:
         self.dry_run = dry_run
         self.context_detector = ContextDetector()
 
-    def link_expression(self, expression: Expression, max_links: int | None = None) -> LinkingResult:
+    def link_expression(
+        self, expression: Expression, max_links: int | None = None
+    ) -> LinkingResult:
         """Link a single expression across all markdown files."""
         logger.info(f"Linking expression: {expression.base_form}")
         logger.info(f"Variations: {expression.variations}")
         logger.info(f"Target path: {expression.url_path}")
-        markdown_files = list(config.blog_dir.rglob("*.md"))
+        markdown_files = list(BLOG_DIR.rglob("*.md"))
         logger.info(f"Found {len(markdown_files)} markdown files")
 
         result = LinkingResult(
@@ -43,7 +45,7 @@ class ExpressionLinker:
                 existing_links = self.context_detector.count_existing_links(content)
 
                 if existing_links >= max_links:
-                    logger.warning(
+                    logger.debug(
                         f"Skipping {file_path.name}: existing links {existing_links} >= max {max_links}"
                     )
                     result.files_processed += 1
@@ -68,7 +70,6 @@ class ExpressionLinker:
 
         return result
 
-
     def _process_file(self, file_path: Path, expression: Expression) -> LinkingResult:
         """Process a single markdown file."""
         with file_path.open("r", encoding="utf-8") as f:
@@ -85,9 +86,7 @@ class ExpressionLinker:
         modified_content, links_added = self.apply_link(content, expression)
 
         if links_added > 0 and modified_content != content:
-            if self._write_file(
-                file_path, modified_content, self.dry_run
-            ):
+            if self._write_file(file_path, modified_content, self.dry_run):
                 return LinkingResult(
                     files_processed=1,
                     files_modified=1,
@@ -98,7 +97,7 @@ class ExpressionLinker:
         return LinkingResult(
             files_processed=1, files_modified=0, links_added=0, expressions_linked={}
         )
-    
+
     def _write_file(self, file_path: Path, content: str, dry_run: bool) -> bool:
         """Write content to a file."""
         if dry_run:

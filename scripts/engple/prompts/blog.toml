@@ -29,6 +29,7 @@ prompt = """Write a blog post that explains the given expression in English.
 
 1. Please end all your sentences with '~요' instead of '~죠'.
 2. You MUST follow the **tone** and the **structure** of the examples
+3. Maintain the same spacing and line breaks as in the provided examples.
 
 ## Examples:
 

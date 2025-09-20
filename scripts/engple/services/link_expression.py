@@ -30,9 +30,6 @@ def handle_link_expression(
     if verbose:
         logger.remove()
         logger.add(lambda msg: print(msg, end=""), level="DEBUG")
-    else:
-        logger.remove()
-        logger.add(lambda msg: print(msg, end=""), level="INFO")
 
     logger.info(f"🔗 Linking expression: '{expr}'")
 

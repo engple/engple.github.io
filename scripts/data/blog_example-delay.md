@@ -8,6 +8,8 @@
 
 ## 📖 예문
 
+<!-- MAINTAIN the same spacing and line breaks as in the provided text below. -->
+
 1. "버스가 10분 지연되고 있어요."
 
    "The bus is delayed by 10 minutes."

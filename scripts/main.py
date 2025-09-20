@@ -1,5 +1,6 @@
 """CLI for automated expression linking system."""
 
+from loguru import logger
 import typer
 
 from engple.services.write_blog import handle_write_blog
@@ -7,6 +8,9 @@ from engple.services.link_expression import handle_link_expression
 from engple.services.link_all_expressions import handle_link_all_expressions
 
 app = typer.Typer(help="Automated English Expression Linking System")
+
+logger.remove()
+logger.add(lambda msg: print(msg, end=""), level="INFO")
 
 
 @app.command()
@@ -83,7 +87,7 @@ def write_blog(
 
     if not no_link:
         for expression in expressions:
-            link_expression(expression, max_links=max_links)
+            handle_link_expression(expression, max_links=max_links)
             handle_link_all_expressions(expression, max_links=max_links)
 
 

@@ -29,9 +29,6 @@ def handle_link_all_expressions(
     if verbose:
         logger.remove()
         logger.add(lambda msg: print(msg, end=""), level="DEBUG")
-    else:
-        logger.remove()
-        logger.add(lambda msg: print(msg, end=""), level="INFO")
 
     # Validate max_links
     if max_links is not None and max_links <= 0:

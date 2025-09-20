@@ -29,7 +29,7 @@ class BlogContent(BaseModel):
             """),
     )
     body: str = Field(
-        description="Content of the blog written in Korean (ending with '~해요').",
+        description="Content of the blog written in Korean.",
     )
 
 

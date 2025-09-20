@@ -5,10 +5,12 @@ prompt = """Create English **{count}** examples using the given <EXPRESSION>.
 2. Natural spoken language rather than formal writing.
 3. Make variations to make the examples sound natural and realistic.
 4. Add an additional sentence before or after the example to provide context if needed.
+5. Use periods (.) to separate sentences. Do not use hyphens (-) or semicolons (;).
 
 ## Examples:
 
-For example, for the expression "keep up with",
+You MUST follow the exact format of the example.
+For example, for the expression "keep up with":
 
 ```
 {examples}
@@ -24,9 +26,12 @@ prompt =  """Translate the example sentences provided into natural-sounding Kore
 
 [blog_content]
 prompt = """Write a blog post that explains the given expression in English.
-You MUST follow the **tone** and the **format** of the examples
+
+1. Please end all your sentences with '~요' instead of '~죠'.
+2. You MUST follow the **tone** and the **structure** of the examples
 
 ## Examples:
+
 ```
 {examples}
 ```"""

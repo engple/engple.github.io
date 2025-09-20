@@ -10,25 +10,28 @@ from notion_client import Client as NotionClient
 import datetime
 
 
-def handle_write_blog(count: int):
+def handle_write_blog(count: int) -> list[str]:
     writer = BlogWriter()
-
+    expressions = []
     for item in _stream_engple_item(count):
         blog_num = _get_next_blog_num()
         content = writer.generate(item.expression, blog_num)
 
-        blog_path = BLOG_IN_ENGLISH_DIR / f"{blog_num}.{item.expression}.md"
+        file_name = f"{blog_num}.{item.expression.replace(' ', '-')}.md"
+        blog_path = BLOG_IN_ENGLISH_DIR / file_name
         thumbnail_path = BLOG_IN_ENGLISH_DIR / f"{blog_num}.png"
 
         with open(blog_path, "w") as f:
             f.write(content)
-            logger.info("✅ Successfully wrote blog")
+            logger.debug(f"✅ Successfully wrote blog for {item.expression}")
 
         with open(thumbnail_path, "wb") as f:
             f.write(item.thumbnail.getbuffer())
-            logger.info("✅ Successfully wrote thumbnail")
+            logger.debug(f"✅ Successfully wrote thumbnail for {item.expression}")
 
+        expressions.append(item.expression)
         _mark_as_done(item.page_id)
+    return expressions
 
 
 def _stream_engple_item(count: int) -> Iterator[EngpleItem]:

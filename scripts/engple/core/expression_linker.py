@@ -45,7 +45,7 @@ class ExpressionLinker:
                 existing_links = self.context_detector.count_existing_links(content)
 
                 if existing_links >= max_links:
-                    logger.warning(
+                    logger.debug(
                         f"Skipping {file_path.name}: existing links {existing_links} >= max {max_links}"
                     )
                     result.files_processed += 1

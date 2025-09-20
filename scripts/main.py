@@ -12,8 +12,8 @@ app = typer.Typer(help="Automated English Expression Linking System")
 @app.command()
 def link_expression(
     expr: str = typer.Argument(..., help="The expression to link"),
-    max_links: int | None = typer.Option(
-        None,
+    max_links: int = typer.Option(
+        8,
         "--max-links",
         help="Maximum links per post (omit for unlimited)",
     ),
@@ -46,8 +46,8 @@ def link_all_expressions(
     target_expr: str = typer.Argument(
         ..., help="The target expression to link other expressions to"
     ),
-    max_links: int | None = typer.Option(
-        None,
+    max_links: int = typer.Option(
+        8,
         "--max-links",
         help="Maximum links per post (omit for unlimited)",
     ),
@@ -71,9 +71,20 @@ def link_all_expressions(
 @app.command()
 def write_blog(
     count: int = typer.Option(1, help="Maximum number of posts to generate"),
+    no_link: bool = typer.Option(False, help="Do not link the expressions"),
+    max_links: int = typer.Option(
+        8,
+        "--max-links",
+        help="Maximum links per post (omit for unlimited)",
+    ),
 ):
     """Generate a blog post draft with a specified number of expressions."""
-    handle_write_blog(count)
+    expressions = handle_write_blog(count)
+
+    if not no_link:
+        for expression in expressions:
+            link_expression(expression, max_links=max_links)
+            handle_link_all_expressions(expression, max_links=max_links)
 
 
 if __name__ == "__main__":

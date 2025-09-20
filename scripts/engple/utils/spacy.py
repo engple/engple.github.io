@@ -22,7 +22,7 @@ def load_spacy_model():
     try:
         return spacy.load("en_core_web_sm")
     except OSError:
-        logger.warning("en_core_web_sm not found, attempting to install...")
+        logger.debug("en_core_web_sm not found, attempting to install...")
         _install_spacy_model()
         # Try loading again after installation
         try:

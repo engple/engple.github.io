@@ -77,7 +77,6 @@ class BlogWriter:
         """
         Write a blog for the given expression using pydantic-ai agents
         """
-
         examples = self._generate_blog_examples(expression)
         translations = self._translate_blog_examples(examples)
         formatted_examples = self._format_blog_examples(examples, translations)
@@ -106,6 +105,7 @@ class BlogWriter:
                 count=self.expression_count,
                 examples=EXAMPLE_SENTENCES_PATH.read_text(),
             ),
+            retries=2,
         )
         res = examples_agent.run_sync(expression)
         return res.output
@@ -119,6 +119,7 @@ class BlogWriter:
             self.model_translation,
             output_type=list[str],
             system_prompt=BLOG_PROMPT["translation"]["prompt"],
+            retries=2,
         )
         res = translate_agent.run_sync(json.dumps(examples))
         return res.output
@@ -140,6 +141,7 @@ class BlogWriter:
             system_prompt=BLOG_PROMPT["blog_content"]["prompt"].format(
                 examples=[example.model_dump_json()]
             ),
+            retries=2,
         )
         res = content_agent.run_sync(expression)
         return res.output
@@ -156,6 +158,7 @@ class BlogWriter:
             system_prompt=BLOG_PROMPT["blogmeta"]["prompt"].format(
                 examples=example.model_dump_json()
             ),
+            retries=2,
         )
         res = meta_agent.run_sync(expression)
         return res.output
@@ -176,6 +179,7 @@ class BlogWriter:
                 count=self.recommendation_count,
                 examples=examples.model_dump_json(),
             ),
+            retries=2,
         )
         res = recommend_agent.run_sync(expression)
         return res.output

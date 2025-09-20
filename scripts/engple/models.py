@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 import datetime
+import io
 from pathlib import Path
 from typing import List, Dict
 
@@ -44,7 +45,8 @@ class LinkingResult:
 
 @dataclass
 class EngpleItem:
+    page_id: str
     expression: str
-    thumbnail_url: str
+    thumbnail: io.BytesIO
     status: str | None
     created: datetime.datetime

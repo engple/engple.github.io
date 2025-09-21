@@ -1,5 +1,5 @@
 import random
-from typing import Iterator, cast
+from typing import cast
 from zoneinfo import ZoneInfo
 from loguru import logger
 from engple.constants import BLOG_IN_ENGLISH_DIR
@@ -15,10 +15,11 @@ import datetime
 def handle_write_blog(count: int) -> list[str]:
     writer = BlogWriter()
     expressions = []
+    engple_items = _get_engple_items(count)
     first_post_at = datetime.datetime.now(
         tz=ZoneInfo("Asia/Seoul")
-    ) - _get_post_interval() * (count - 1)
-    for idx, item in enumerate(_stream_engple_item(count)):
+    ) - _get_post_interval() * (len(engple_items) - 1)
+    for idx, item in enumerate(engple_items):
         posted_at = first_post_at + _get_post_interval() * idx
         blog_num = _get_next_blog_num()
         content = writer.generate(item.expression, blog_num, posted_at)
@@ -46,7 +47,7 @@ def _get_post_interval() -> datetime.timedelta:
     )
 
 
-def _stream_engple_item(count: int) -> Iterator[EngpleItem]:
+def _get_engple_items(count: int) -> list[EngpleItem]:
     notion_client = NotionClient(auth=config.notion_api_key.get_secret_value())
     database = cast(
         dict,
@@ -67,6 +68,8 @@ def _stream_engple_item(count: int) -> Iterator[EngpleItem]:
         ),
     )
 
+    res = []
+
     for idx, page in enumerate(database["results"]):
         status = (
             page["properties"]["status"]["select"]["name"]
@@ -77,18 +80,24 @@ def _stream_engple_item(count: int) -> Iterator[EngpleItem]:
         thumbnail_url = page["properties"]["thumbnail"]["files"][0]["file"]["url"]
         thumbnail = url_to_file(thumbnail_url, image_format="WEBP")
 
-        yield EngpleItem(
-            page_id=page["id"],
-            expression=page["properties"]["expression"]["title"][0]["text"]["content"],
-            thumbnail=thumbnail,
-            status=status,
-            created=datetime.datetime.fromisoformat(
-                page["properties"]["created"]["created_time"]
-            ),
+        res.append(
+            EngpleItem(
+                page_id=page["id"],
+                expression=page["properties"]["expression"]["title"][0]["text"][
+                    "content"
+                ],
+                thumbnail=thumbnail,
+                status=status,
+                created=datetime.datetime.fromisoformat(
+                    page["properties"]["created"]["created_time"]
+                ),
+            )
         )
 
         if count - 1 == idx:
             break
+
+    return res
 
 
 def _get_next_blog_num() -> str:

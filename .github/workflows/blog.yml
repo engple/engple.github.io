@@ -1,0 +1,56 @@
+name: Daily Blog Generation
+
+on:
+  schedule:
+    # Runs daily at 4:00 PM KST
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: scripts
+
+jobs:
+  generate-blog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          uv sync --no-dev --locked
+
+      - name: Generate blog posts
+        run: |
+          uv run main.py write-blog --count 10
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_ENGPLE_DATABASE_ID: ${{ secrets.NOTION_ENGPLE_DATABASE_ID }}
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📝 블로그 작성 - $(date '+%Y-%m-%d %H:%M:%S')" --no-verify
+            git push
+          fi

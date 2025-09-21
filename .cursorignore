@@ -15,3 +15,7 @@
 !works
 !works/**
 !works/**/*.md
+
+!.github
+!.github/**
+!.github/**/*.yml

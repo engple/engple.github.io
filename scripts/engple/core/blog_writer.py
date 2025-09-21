@@ -3,7 +3,7 @@ import json
 from textwrap import dedent
 from zoneinfo import ZoneInfo
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from pydantic_ai import Agent, PromptedOutput
 
 from loguru import logger
@@ -31,6 +31,10 @@ class BlogContent(BaseModel):
     body: str = Field(
         description="Content of the blog written in Korean.",
     )
+
+    @field_validator("body")
+    def validate_body(cls, v: str) -> str:
+        return v.replace("\\n", "\n")
 
 
 class RelatedExpression(BaseModel):
@@ -73,7 +77,12 @@ class BlogWriter:
         self.model_recommend = config.model_recommend
         self.recommendation_count = recommendation_count
 
-    def generate(self, expression: str, blog_num: int) -> str:
+    def generate(
+        self,
+        expression: str,
+        blog_num: int,
+        posted_at: datetime.datetime | None = None,
+    ) -> str:
         """
         Write a blog for the given expression using pydantic-ai agents
         """
@@ -90,6 +99,7 @@ class BlogWriter:
             formatted_examples,
             recommendations,
             blog_num,
+            posted_at,
         )
         return final
 
@@ -229,6 +239,7 @@ class BlogWriter:
         formatted_examples: str,
         recommendations: list[RelatedExpression],
         blog_num: int,
+        posted_at: datetime.datetime | None = None,
     ) -> str:
         """
         Get the final content for the given parameters
@@ -254,11 +265,18 @@ class BlogWriter:
             recommendations_section += f'- "{recommendation.example}"\n'
             recommendations_section += f'- "{recommendation.translation}"\n\n'
 
+        post_date = (
+            posted_at.isoformat(timespec="seconds")
+            if posted_at
+            else datetime.datetime.now(tz=ZoneInfo("Asia/Seoul")).isoformat(
+                timespec="seconds"
+            )
+        )
         full_content = (
             (
                 "---\n"
                 f'category: "영어표현"\n'
-                f'date: "{datetime.datetime.now(tz=ZoneInfo("Asia/Seoul")).isoformat(timespec="seconds")}"\n'
+                f'date: "{post_date}"\n'
                 f'thumbnail: "{blog_num}.png"\n'
                 f"alt: \"'{expression}' 영어표현 썸네일\"\n"
                 f'title: "{self._escape_text(content.title)}"\n'

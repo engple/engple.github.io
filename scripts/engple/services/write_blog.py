@@ -1,4 +1,6 @@
+import random
 from typing import Iterator, cast
+from zoneinfo import ZoneInfo
 from loguru import logger
 from engple.constants import BLOG_IN_ENGLISH_DIR
 from engple.core.blog_writer import BlogWriter
@@ -13,9 +15,13 @@ import datetime
 def handle_write_blog(count: int) -> list[str]:
     writer = BlogWriter()
     expressions = []
-    for item in _stream_engple_item(count):
+    first_post_at = datetime.datetime.now(
+        tz=ZoneInfo("Asia/Seoul")
+    ) - _get_post_interval() * (count - 1)
+    for idx, item in enumerate(_stream_engple_item(count)):
+        posted_at = first_post_at + _get_post_interval() * idx
         blog_num = _get_next_blog_num()
-        content = writer.generate(item.expression, blog_num)
+        content = writer.generate(item.expression, blog_num, posted_at)
 
         file_name = f"{blog_num}.{item.expression.replace(' ', '-')}.md"
         blog_path = BLOG_IN_ENGLISH_DIR / file_name
@@ -34,6 +40,12 @@ def handle_write_blog(count: int) -> list[str]:
     return expressions
 
 
+def _get_post_interval() -> datetime.timedelta:
+    return datetime.timedelta(
+        minutes=30 + random.randint(0, 30), seconds=random.randint(0, 60)
+    )
+
+
 def _stream_engple_item(count: int) -> Iterator[EngpleItem]:
     notion_client = NotionClient(auth=config.notion_api_key.get_secret_value())
     database = cast(
@@ -46,6 +58,12 @@ def _stream_engple_item(count: int) -> Iterator[EngpleItem]:
                     {"property": "thumbnail", "files": {"is_not_empty": True}},
                 ]
             },
+            sorts=[
+                {
+                    "property": "created",
+                    "direction": "ascending",
+                }
+            ],
         ),
     )
 

@@ -46,11 +46,13 @@ jobs:
           git config --local user.name "GitHub Action"
 
       - name: Commit and push changes
+        working-directory: ./ # root of repo
         run: |
           git add .
-          if git diff --staged --quiet; then
+          if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📝 블로그 작성 - $(date '+%Y-%m-%d %H:%M:%S')" --no-verify
+            COMMIT_TIME=$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M:%S')
+            git commit -m "📝 블로그 작성 - $COMMIT_TIME" --no-verify
             git push
           fi

@@ -55,4 +55,12 @@ jobs:
             COMMIT_TIME=$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M:%S')
             git commit -m "📝 블로그 작성 - $COMMIT_TIME" --no-verify
             git push
+            echo "BLOG_CREATED=true" >> $GITHUB_ENV
           fi
+
+      - name: Trigger Gatsby deployment
+        if: env.BLOG_CREATED == 'true'
+        run: |
+          gh workflow run gatsby.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

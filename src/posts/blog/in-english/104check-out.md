@@ -71,7 +71,7 @@ faq:
   </li>
   <li data-interactive-item>
     <span data-toggler>헬스장에 가서 새로운 운동기구를 살펴볼 거야.</span>
-    <span data-answer>I'm heading to the gym to check out their new equipment.</span>
+    <span data-answer>I'm heading to the <a href="/blog/in-english/431.gym/">gym</a> to check out their new equipment.</span>
   </li>
   <li data-interactive-item>
     <span data-toggler>야, 내가 찾은 이 밈 봐봐. 완전 웃겨.</span>

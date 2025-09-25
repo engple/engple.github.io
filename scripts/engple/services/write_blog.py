@@ -43,7 +43,7 @@ def handle_write_blog(count: int) -> list[str]:
 
 def _get_post_interval() -> datetime.timedelta:
     return datetime.timedelta(
-        minutes=30 + random.randint(0, 30), seconds=random.randint(0, 60)
+        minutes=30 + random.randint(0, 20), seconds=random.randint(0, 60)
     )
 
 

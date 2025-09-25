@@ -117,7 +117,7 @@ class BlogWriter:
             ),
             retries=2,
         )
-        res = examples_agent.run_sync(expression)
+        res = examples_agent.run_sync(f"expression: '{expression}'")
         return res.output
 
     def _translate_blog_examples(self, examples: list[str]) -> list[str]:
@@ -153,7 +153,7 @@ class BlogWriter:
             ),
             retries=2,
         )
-        res = content_agent.run_sync(expression)
+        res = content_agent.run_sync(f"expression: '{expression}'")
         return res.output
 
     def _write_blog_meta(self, expression: str) -> BlogMeta:
@@ -170,7 +170,7 @@ class BlogWriter:
             ),
             retries=2,
         )
-        res = meta_agent.run_sync(expression)
+        res = meta_agent.run_sync(f"expression: '{expression}'")
         return res.output
 
     def _recommend_other_expressions(self, expression: str) -> list[RelatedExpression]:
@@ -191,7 +191,7 @@ class BlogWriter:
             ),
             retries=2,
         )
-        res = recommend_agent.run_sync(expression)
+        res = recommend_agent.run_sync(f"expression: '{expression}'")
         return res.output
 
     def _format_blog_examples(

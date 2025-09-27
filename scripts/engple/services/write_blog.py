@@ -22,21 +22,21 @@ def handle_write_blog(count: int) -> list[str]:
     for idx, item in enumerate(engple_items):
         posted_at = first_post_at + _get_post_interval() * idx
         blog_num = _get_next_blog_num()
-        content = writer.generate(item.expression, blog_num, posted_at)
+        generated_blog = writer.generate(item.expression, blog_num, posted_at)
 
-        file_name = f"{blog_num}.{item.expression.replace(' ', '-')}.md"
+        file_name = f"{blog_num}.{generated_blog.expression.replace(' ', '-')}.md"
         blog_path = BLOG_IN_ENGLISH_DIR / file_name
         thumbnail_path = BLOG_IN_ENGLISH_DIR / f"{blog_num}.png"
 
         with open(blog_path, "w") as f:
-            f.write(content)
+            f.write(generated_blog.content)
             logger.debug(f"✅ Successfully wrote blog for {item.expression}")
 
         with open(thumbnail_path, "wb") as f:
             f.write(item.thumbnail.getbuffer())
             logger.debug(f"✅ Successfully wrote thumbnail for {item.expression}")
 
-        expressions.append(item.expression)
+        expressions.append(generated_blog.expression)
         _mark_as_done(item.page_id)
     return expressions
 

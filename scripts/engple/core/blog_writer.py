@@ -68,6 +68,11 @@ class BlogMeta(BaseModel):
     )
 
 
+class GeneratedBlog(BaseModel):
+    expression: str
+    content: str
+
+
 class BlogWriter:
     def __init__(self, *, expression_count: int = 10, recommendation_count: int = 3):
         self.expression_count = expression_count
@@ -82,7 +87,7 @@ class BlogWriter:
         expression: str,
         blog_num: int,
         posted_at: datetime.datetime | None = None,
-    ) -> str:
+    ) -> GeneratedBlog:
         """
         Write a blog for the given expression using pydantic-ai agents
         """
@@ -101,7 +106,7 @@ class BlogWriter:
             blog_num,
             posted_at,
         )
-        return final
+        return GeneratedBlog(expression=content.expression, content=final)
 
     def _generate_blog_examples(self, expression: str) -> list[str]:
         """
@@ -152,8 +157,9 @@ class BlogWriter:
                 examples=[example.model_dump_json()]
             ),
             retries=2,
+            temperature=0.0,
         )
-        res = content_agent.run_sync(f"expression: '{expression}'")
+        res = content_agent.run_sync(self._get_expression_prompt(expression))
         return res.output
 
     def _write_blog_meta(self, expression: str) -> BlogMeta:
@@ -169,8 +175,9 @@ class BlogWriter:
                 examples=example.model_dump_json()
             ),
             retries=2,
+            temperature=0.0,
         )
-        res = meta_agent.run_sync(f"expression: '{expression}'")
+        res = meta_agent.run_sync(self._get_expression_prompt(expression))
         return res.output
 
     def _recommend_other_expressions(self, expression: str) -> list[RelatedExpression]:
@@ -309,3 +316,11 @@ class BlogWriter:
         Escape the text for the given expression
         """
         return text.replace('"', "'")
+
+    def _get_expression_prompt(self, expression: str) -> str:
+        """
+        Get the input prompt for the given expression
+        """
+        if "(" in expression and ")" in expression:
+            return f"expression: '{expression}'\n\n// Don't include parentheses in the output"
+        return f"expression: '{expression}'"

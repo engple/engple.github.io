@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, field_validator
 from pydantic_ai import Agent, PromptedOutput
 
 from loguru import logger
+from pydantic_ai.settings import ModelSettings
 from engple.config import config
 from engple.constants import (
     BLOG_EXAMPLE_PATH,
@@ -157,7 +158,7 @@ class BlogWriter:
                 examples=[example.model_dump_json()]
             ),
             retries=2,
-            temperature=0.0,
+            model_settings=ModelSettings(temperature=0.0),
         )
         res = content_agent.run_sync(self._get_expression_prompt(expression))
         return res.output
@@ -175,7 +176,7 @@ class BlogWriter:
                 examples=example.model_dump_json()
             ),
             retries=2,
-            temperature=0.0,
+            model_settings=ModelSettings(temperature=0.0),
         )
         res = meta_agent.run_sync(self._get_expression_prompt(expression))
         return res.output
@@ -197,6 +198,7 @@ class BlogWriter:
                 examples=examples.model_dump_json(),
             ),
             retries=2,
+            model_settings=ModelSettings(temperature=0.0),
         )
         res = recommend_agent.run_sync(f"expression: '{expression}'")
         return res.output

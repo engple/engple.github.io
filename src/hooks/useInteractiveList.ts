@@ -9,6 +9,7 @@ interface UseInteractiveListOptions {
   toggleAllButtonTextCollapse?: string
   toggleAllButtonClassName?: string
   useToggleAllBtn?: boolean
+  initialState?: "expanded" | "collapsed"
 }
 
 export function useInteractiveList(
@@ -22,6 +23,7 @@ export function useInteractiveList(
     toggleAllButtonTextCollapse = "🙈 모두 숨기기",
     toggleAllButtonClassName = "interactive-list-toggle-all-button",
     useToggleAllBtn = true,
+    initialState = "expanded",
   }: UseInteractiveListOptions = {},
 ) {
   useItemTogglers({
@@ -29,6 +31,7 @@ export function useInteractiveList(
     itemSelector,
     togglerSelector,
     openAttribute,
+    initialState,
   })
   useToggleAllButton({
     contentDependencies,
@@ -39,6 +42,7 @@ export function useInteractiveList(
     toggleAllButtonTextCollapse,
     toggleAllButtonClassName,
     useToggleAllBtn,
+    initialState,
   })
 }
 
@@ -47,11 +51,13 @@ function useItemTogglers({
   itemSelector,
   togglerSelector,
   openAttribute,
+  initialState,
 }: {
   contentDependencies: DependencyList
   itemSelector: string
   togglerSelector: string
   openAttribute: string
+  initialState: "expanded" | "collapsed"
 }) {
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
@@ -71,6 +77,13 @@ function useItemTogglers({
     }
 
     const togglers = document.querySelectorAll<HTMLElement>(togglerSelector)
+    const items = document.querySelectorAll<HTMLElement>(itemSelector)
+
+    if (initialState === "expanded") {
+      for (const item of items) {
+        item.setAttribute(openAttribute, "true")
+      }
+    }
 
     for (const toggler of togglers) {
       toggler.addEventListener("click", handleClick)
@@ -81,7 +94,13 @@ function useItemTogglers({
         toggler.removeEventListener("click", handleClick)
       }
     }
-  }, [contentDependencies, itemSelector, togglerSelector, openAttribute])
+  }, [
+    contentDependencies,
+    itemSelector,
+    togglerSelector,
+    openAttribute,
+    initialState,
+  ])
 }
 
 function useToggleAllButton({
@@ -93,6 +112,7 @@ function useToggleAllButton({
   toggleAllButtonTextCollapse,
   toggleAllButtonClassName,
   useToggleAllBtn,
+  initialState,
 }: {
   contentDependencies: DependencyList
   listSelector: string
@@ -102,6 +122,7 @@ function useToggleAllButton({
   toggleAllButtonTextCollapse: string
   toggleAllButtonClassName: string
   useToggleAllBtn: boolean
+  initialState: "expanded" | "collapsed"
 }) {
   useEffect(() => {
     let toggleAllButton: {
@@ -120,6 +141,7 @@ function useToggleAllButton({
           toggleAllButtonTextCollapse || "🙈 모두 숨기기",
         toggleAllButtonClassName:
           toggleAllButtonClassName || "interactive-list-toggle-all-button",
+        initialState,
       })
     }
 
@@ -141,6 +163,7 @@ function useToggleAllButton({
     toggleAllButtonTextCollapse,
     toggleAllButtonClassName,
     useToggleAllBtn,
+    initialState,
   ])
 }
 
@@ -151,6 +174,7 @@ function setupToggleAllButton({
   toggleAllButtonTextExpand,
   toggleAllButtonTextCollapse,
   toggleAllButtonClassName,
+  initialState,
 }: {
   listSelector: string
   itemSelector: string
@@ -158,14 +182,19 @@ function setupToggleAllButton({
   toggleAllButtonTextExpand: string
   toggleAllButtonTextCollapse: string
   toggleAllButtonClassName: string
+  initialState: "expanded" | "collapsed"
 }) {
   const listEl = document.querySelector(listSelector) as HTMLElement | null
   if (!listEl) return { button: undefined, handler: undefined }
 
   const button = document.createElement("button")
   button.className = toggleAllButtonClassName
-  button.textContent = toggleAllButtonTextExpand
-  button.dataset.state = "collapsed" // 'collapsed' or 'expanded'
+
+  button.textContent =
+    initialState === "expanded"
+      ? toggleAllButtonTextCollapse
+      : toggleAllButtonTextExpand
+  button.dataset.state = initialState
 
   const handler = () => {
     const items = document.querySelectorAll<HTMLElement>(itemSelector)

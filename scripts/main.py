@@ -87,8 +87,12 @@ def write_blog(
 
     if not no_link:
         for expression in expressions:
-            handle_link_expression(expression, max_links=max_links)
-            handle_link_all_expressions(expression, max_links=max_links)
+            try:
+                handle_link_expression(expression, max_links=max_links)
+                handle_link_all_expressions(expression, max_links=max_links)
+            except ValueError as e:
+                logger.exception(e)
+                continue
 
 
 if __name__ == "__main__":

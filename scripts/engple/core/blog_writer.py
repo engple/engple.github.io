@@ -19,7 +19,9 @@ from engple.constants import (
 
 
 class BlogContent(BaseModel):
-    expression: str
+    expression: str = Field(
+        description="The expression to write a blog for. Do not include parentheses in the output."
+    )
     title: str = Field(
         description=dedent("""\
             Blog title for the english. Follow the format.

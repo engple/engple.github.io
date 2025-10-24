@@ -2,6 +2,7 @@ import datetime
 import json
 from textwrap import dedent
 from zoneinfo import ZoneInfo
+import re
 
 from pydantic import BaseModel, Field, field_validator
 from pydantic_ai import Agent, PromptedOutput
@@ -19,9 +20,7 @@ from engple.constants import (
 
 
 class BlogContent(BaseModel):
-    expression: str = Field(
-        description="The expression to write a blog for. Do not include parentheses in the output."
-    )
+    expression: str = Field(description="The expression to write a blog for")
     title: str = Field(
         description=dedent("""\
             Blog title for the english. Follow the format.
@@ -38,6 +37,10 @@ class BlogContent(BaseModel):
     @field_validator("body")
     def validate_body(cls, v: str) -> str:
         return v.replace("\\n", "\n")
+
+    @field_validator("expression")
+    def validate_expression(cls, v: str) -> str:
+        return re.sub(r"\([^)]*\)", "", v)
 
 
 class RelatedExpression(BaseModel):
@@ -326,5 +329,5 @@ class BlogWriter:
         Get the input prompt for the given expression
         """
         if "(" in expression and ")" in expression:
-            return f"expression: '{expression}'\n\n// Don't include parentheses in the output"
+            return f"expression: '{expression}' // REMOVE text inside parentheses in the output"
         return f"expression: '{expression}'"

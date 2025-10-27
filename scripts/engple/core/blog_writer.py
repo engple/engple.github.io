@@ -40,7 +40,7 @@ class BlogContent(BaseModel):
 
     @field_validator("expression")
     def validate_expression(cls, v: str) -> str:
-        return re.sub(r"\([^)]*\)", "", v)
+        return re.sub(r"\([^)]*\)", "", v).strip()
 
 
 class RelatedExpression(BaseModel):

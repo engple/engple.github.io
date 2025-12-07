@@ -75,7 +75,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const { title, desc, thumbnail, date, category, faq = [] } = frontmatter!
   const site = useSiteMetadata()
 
-  useInteractiveList([html])
+  useInteractiveList([html], { initialState: "collapsed" })
   useInlineAdsense({
     idx: 1,
     adClient: site.googleAdsense ?? "",

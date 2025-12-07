@@ -259,6 +259,7 @@ class BlogWriter:
         Get the final content for the given parameters
         """
         logger.info("💾 블로그 출력 저장 중...")
+        sanitized_expression = re.sub(r"\([^)]*\)", "", expression).strip()
         try:
             content_body, content_footer = content.body.split("---\n\n")
         except ValueError:
@@ -292,15 +293,15 @@ class BlogWriter:
                 f'category: "영어표현"\n'
                 f'date: "{post_date}"\n'
                 f'thumbnail: "{blog_num}.png"\n'
-                f"alt: \"'{expression}' 영어표현 썸네일\"\n"
+                f"alt: \"'{sanitized_expression}' 영어표현 썸네일\"\n"
                 f'title: "{self._escape_text(content.title)}"\n'
                 f"desc: "
                 f'"{blog_meta.description} 다양한 예문을 통해서 연습하고 본인의 표현으로 만들어 보세요."\n'
                 f"faqs: \n"
                 f"{faq_section}"
                 f"---\n\n"
-                f"!['{expression}' 영어표현](./{blog_num}.png)\n\n"
-                f"## 🌟 영어 표현 - {expression}\n\n"
+                f"!['{sanitized_expression}' 영어표현](./{blog_num}.png)\n\n"
+                f"## 🌟 영어 표현 - {sanitized_expression}\n\n"
                 f"{content_body}\n\n"
                 f"## 💬 연습해보기\n\n"
                 f"{formatted_examples}\n\n"

@@ -26,6 +26,7 @@ interface SEOProperties {
   meta?: Meta
   jsonLds?: Thing[]
   url?: Queries.Maybe<string>
+  ogType?: "website" | "article"
 }
 
 const SEO: React.FC<SEOProperties> = ({
@@ -34,6 +35,7 @@ const SEO: React.FC<SEOProperties> = ({
   url = "",
   image,
   jsonLds = [],
+  ogType = "website",
 }) => {
   const site = useSiteMetadata()
   const description = desc || site.description || ""
@@ -104,7 +106,7 @@ const SEO: React.FC<SEOProperties> = ({
           },
           {
             property: "og:type",
-            content: "website",
+            content: ogType,
           },
           {
             property: "og:url",

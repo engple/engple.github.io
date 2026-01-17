@@ -180,7 +180,7 @@ const searchPlugins = [
     resolve: "gatsby-plugin-robots-txt",
     options: {
       host: "https://engple.github.io",
-      sitemap: null,
+      sitemap: "https://engple.github.io/sitemap-index.xml",
       policy: [{ userAgent: "*", allow: "/" }],
     },
   },

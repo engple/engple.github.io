@@ -191,6 +191,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         url={`${site.siteUrl}${slug}`}
         image={ogImagePath}
         jsonLds={jsonLds}
+        ogType="article"
       />
       <main>
         <article>

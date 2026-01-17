@@ -5,6 +5,7 @@ import {
   type Article,
   type BreadcrumbList,
   type FAQPage,
+  type LearningResource,
   type Thing,
 } from "schema-dts"
 import styled from "styled-components"
@@ -138,6 +139,10 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
       "@id": `${site.siteUrl}${slug}`,
     },
     wordCount: html?.split(" ").length,
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["article h1", "article h2", "[data-answer]"],
+    },
   } as Article
 
   const breadcrumbJsonLd = {
@@ -177,7 +182,30 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
       : [],
   } as FAQPage
 
-  const jsonLds: Thing[] = [articleJsonLd, breadcrumbJsonLd]
+  const learningResourceJsonLd = {
+    "@type": "LearningResource",
+    "@id": `${site.siteUrl}${slug}#learningresource`,
+    name: title,
+    description,
+    educationalLevel: "beginner",
+    learningResourceType: "lesson",
+    inLanguage: ["ko", "en"],
+    isAccessibleForFree: true,
+    teaches: title,
+    assesses: title,
+    audience: {
+      "@type": "EducationalAudience",
+      educationalRole: "student",
+      audienceType: "Korean English learners",
+    },
+    provider: { "@id": `${site.siteUrl}/#organization` },
+  } as LearningResource
+
+  const jsonLds: Thing[] = [
+    articleJsonLd,
+    breadcrumbJsonLd,
+    learningResourceJsonLd,
+  ]
 
   if (faq) {
     jsonLds.push(faqJsonLd)

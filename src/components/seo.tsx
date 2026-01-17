@@ -2,8 +2,8 @@ import React from "react"
 
 import { Helmet } from "react-helmet"
 import {
+  type EducationalOrganization,
   type Graph,
-  type Organization,
   type Thing,
   type WebSite,
 } from "schema-dts"
@@ -45,26 +45,36 @@ const SEO: React.FC<SEOProperties> = ({
     "@graph": [
       ...jsonLds,
       {
-        "@type": "Organization",
+        "@type": "EducationalOrganization",
         "@id": `${site.siteUrl}/#organization`,
-        name: site.title,
+        name: "잉플",
+        alternateName: "Engple",
         url: site.siteUrl,
         logo: {
           "@type": "ImageObject",
           url: `${site.siteUrl}${defaultOpenGraphImage}`,
         },
-        sameAs: [
-          // "https://www.instagram.com/username",
-        ],
-      } as Organization,
+        description:
+          "영어 패턴 학습으로 자연스러운 영어 실력 향상을 돕는 교육 사이트",
+        sameAs: ["https://github.com/engple"],
+      } as EducationalOrganization,
       {
         "@type": "WebSite",
         "@id": `${site.siteUrl}/#website`,
         name: site.title,
-        alternateName: site.title,
+        alternateName: "Engple",
         url: site.siteUrl,
         description: site.description,
         inLanguage: site.lang ?? DEFAULT_LANG,
+        publisher: { "@id": `${site.siteUrl}/#organization` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${site.siteUrl}/search?q={search_term_string}`,
+          },
+          "query-input": "required name=search_term_string",
+        },
       } as WebSite,
     ],
   } as Graph

@@ -78,11 +78,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
 
   useInteractiveList([html], { initialState: "collapsed" })
   useInlineAdsense({
-    idx: 1,
-    adClient: site.googleAdsense ?? "",
-    adSlot: HORIZONTAL_AD_SLOT,
-  })
-  useInlineAdsense({
     idx: -2,
     adClient: site.googleAdsense ?? "",
     adSlot: HORIZONTAL_AD_SLOT,

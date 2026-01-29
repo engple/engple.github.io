@@ -21,8 +21,6 @@ class ImageMetadata(BaseModel):
 
     id: str
     description: str | None
-    alt_description: str | None
-    tags: list[str]
     thumb_url: str
     regular_url: str
     photographer: str
@@ -33,8 +31,6 @@ class ImageMetadata(BaseModel):
         return cls(
             id=photo.id,
             description=photo.description,
-            alt_description=None,  # Photo 모델에 없음
-            tags=[],  # Photo 모델에 없음
             thumb_url=str(photo.urls.thumb),
             regular_url=str(photo.urls.regular),
             photographer=photo.user.name,
@@ -44,22 +40,13 @@ class ImageMetadata(BaseModel):
 class SearchQuery(BaseModel):
     """검색 쿼리"""
 
-    query: str = Field(description="Unsplash 검색용 영어 키워드 (1-2개 핵심 단어)")
+    query: str = Field(description="English keyword for Unsplash search")
 
 
 class ImageEvaluation(BaseModel):
     """이미지 결과 평가"""
 
-    is_satisfactory: bool = Field(
-        description="검색 결과가 만족스러운가? (적어도 하나의 적합한 이미지가 있는가)"
-    )
-    selected_id: str | None = Field(
-        description="선택된 이미지 ID (만족스러운 경우)", default=None
-    )
-    alternative_query: str | None = Field(
-        description="불만족스러운 경우 대안 검색어 제안 (영어, 1-2개 핵심 단어)",
-        default=None,
-    )
+    selected_id: str = Field(description="Selected image ID")
 
 
 class ImageCandidate(BaseModel):
@@ -200,10 +187,16 @@ class ImageSearcher:
         res = await self._evaluate_photos(photos, expression, search_query)
 
         # 평가 결과에 따라 처리
-        if res.output.is_satisfactory and res.output.selected_id:
-            return self._handle_satisfactory_result(res.output, photos)
+        selected_photo = next(
+            (p for p in photos if p.id == res.output.selected_id),
+            None,
+        )
+
+        if selected_photo:
+            return ImageMetadata.from_photo(selected_photo)
         else:
-            return self._handle_unsatisfactory_result(res.output, photos, attempt)
+            logger.warning("⚠️  선택된 ID를 찾을 수 없음, 첫 이미지 사용")
+            return ImageMetadata.from_photo(photos[0])
 
     async def _generate_initial_query(self, expression: str):
         """초기 검색 쿼리 생성"""
@@ -256,32 +249,6 @@ class ImageSearcher:
             f"Query: {search_query}\n\nCandidates:\n{candidates}"
         )
         return res
-
-    def _handle_satisfactory_result(
-        self, evaluation: ImageEvaluation, photos: list[Photo]
-    ) -> ImageMetadata:
-        """만족스러운 결과 처리"""
-        selected_photo = next(
-            (p for p in photos if p.id == evaluation.selected_id),
-            None,
-        )
-
-        if selected_photo:
-            return ImageMetadata.from_photo(selected_photo)
-        else:
-            logger.warning("⚠️  선택된 ID를 찾을 수 없음, 첫 이미지 사용")
-            return ImageMetadata.from_photo(photos[0])
-
-    def _handle_unsatisfactory_result(
-        self, evaluation: ImageEvaluation, photos: list[Photo], attempt: int
-    ) -> ImageMetadata | None:
-        """불만족스러운 결과 처리"""
-        if self._should_retry(attempt):
-            logger.info(f"🔄 결과 불만족 (시도 {attempt + 1}/{self.max_retries})")
-            return None
-        else:
-            logger.warning("⚠️  최대 재시도 도달, 현재 결과에서 최선 선택")
-            return ImageMetadata.from_photo(photos[0])
 
     def _handle_no_results(self, attempt: int) -> None:
         """검색 결과 없음 처리"""

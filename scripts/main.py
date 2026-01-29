@@ -1,5 +1,6 @@
 """CLI for automated expression linking system."""
 
+import asyncio
 from loguru import logger
 import typer
 
@@ -83,16 +84,20 @@ def write_blog(
     ),
 ):
     """Generate a blog post draft with a specified number of expressions."""
-    expressions = handle_write_blog(count)
 
-    if not no_link:
-        for expression in expressions:
-            try:
-                handle_link_expression(expression, max_links=max_links)
-                handle_link_all_expressions(expression, max_links=max_links)
-            except ValueError as e:
-                logger.exception(e)
-                continue
+    async def _write_blog():
+        expressions = await handle_write_blog(count)
+
+        if not no_link:
+            for expression in expressions:
+                try:
+                    handle_link_expression(expression, max_links=max_links)
+                    handle_link_all_expressions(expression, max_links=max_links)
+                except ValueError as e:
+                    logger.exception(e)
+                    continue
+
+    asyncio.run(_write_blog())
 
 
 if __name__ == "__main__":

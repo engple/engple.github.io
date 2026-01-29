@@ -21,6 +21,9 @@ from engple.constants import (
 
 class BlogContent(BaseModel):
     expression: str = Field(description="The expression to write a blog for")
+    korean_meanings: list[str] = Field(
+        description="The Korean meanings used in the title"
+    )
     title: str = Field(
         description=dedent("""\
             Blog title for the english. Follow the format.
@@ -77,6 +80,7 @@ class BlogMeta(BaseModel):
 class GeneratedBlog(BaseModel):
     expression: str
     content: str
+    meanings: list[str]
 
 
 class BlogWriter:
@@ -88,7 +92,7 @@ class BlogWriter:
         self.model_recommend = config.model_recommend
         self.recommendation_count = recommendation_count
 
-    def generate(
+    async def generate(
         self,
         expression: str,
         blog_num: int,
@@ -97,12 +101,12 @@ class BlogWriter:
         """
         Write a blog for the given expression using pydantic-ai agents
         """
-        examples = self._generate_blog_examples(expression)
-        translations = self._translate_blog_examples(examples)
+        examples = await self._generate_blog_examples(expression)
+        translations = await self._translate_blog_examples(examples)
         formatted_examples = self._format_blog_examples(examples, translations)
-        content = self._write_blog_content(expression)
-        blog_meta = self._write_blog_meta(expression)
-        recommendations = self._recommend_other_expressions(expression)
+        content = await self._write_blog_content(expression)
+        blog_meta = await self._write_blog_meta(expression)
+        recommendations = await self._recommend_other_expressions(expression)
         final = self._get_final_content(
             expression,
             content,
@@ -112,9 +116,13 @@ class BlogWriter:
             blog_num,
             posted_at,
         )
-        return GeneratedBlog(expression=content.expression, content=final)
+        return GeneratedBlog(
+            expression=content.expression,
+            meanings=content.korean_meanings,
+            content=final,
+        )
 
-    def _generate_blog_examples(self, expression: str) -> list[str]:
+    async def _generate_blog_examples(self, expression: str):
         """
         Generate examples for the given expression
         """
@@ -128,10 +136,10 @@ class BlogWriter:
             ),
             retries=2,
         )
-        res = examples_agent.run_sync(f"expression: '{expression}'")
+        res = await examples_agent.run(f"expression: '{expression}'")
         return res.output
 
-    def _translate_blog_examples(self, examples: list[str]) -> list[str]:
+    async def _translate_blog_examples(self, examples: list[str]):
         """
         Translate examples for the given expression
         """
@@ -142,10 +150,10 @@ class BlogWriter:
             system_prompt=BLOG_PROMPT["translation"]["prompt"],
             retries=2,
         )
-        res = translate_agent.run_sync(json.dumps(examples))
+        res = await translate_agent.run(json.dumps(examples))
         return res.output
 
-    def _write_blog_content(self, expression: str) -> BlogContent:
+    async def _write_blog_content(self, expression: str):
         """
         Write a blog content for the given expression
         """
@@ -153,6 +161,7 @@ class BlogWriter:
 
         example = BlogContent(
             expression="delay",
+            korean_meanings=["지연되다", "연기", "미룸"],
             title="'지연되다' 영어로 어떻게 표현할까 ⏳ - 연기, 미룸 영어로",
             body=BLOG_EXAMPLE_PATH.read_text(),
         )
@@ -165,10 +174,10 @@ class BlogWriter:
             retries=2,
             model_settings=ModelSettings(temperature=0.0),
         )
-        res = content_agent.run_sync(self._get_expression_prompt(expression))
+        res = await content_agent.run(self._get_expression_prompt(expression))
         return res.output
 
-    def _write_blog_meta(self, expression: str) -> BlogMeta:
+    async def _write_blog_meta(self, expression: str):
         """
         Write a og description for the given expression
         """
@@ -183,10 +192,10 @@ class BlogWriter:
             retries=2,
             model_settings=ModelSettings(temperature=0.0),
         )
-        res = meta_agent.run_sync(self._get_expression_prompt(expression))
+        res = await meta_agent.run(self._get_expression_prompt(expression))
         return res.output
 
-    def _recommend_other_expressions(self, expression: str) -> list[RelatedExpression]:
+    async def _recommend_other_expressions(self, expression: str):
         """
         Recommend other expressions for the given expression
         """
@@ -205,7 +214,7 @@ class BlogWriter:
             retries=2,
             model_settings=ModelSettings(temperature=0.0),
         )
-        res = recommend_agent.run_sync(f"expression: '{expression}'")
+        res = await recommend_agent.run(f"expression: '{expression}'")
         return res.output
 
     def _format_blog_examples(

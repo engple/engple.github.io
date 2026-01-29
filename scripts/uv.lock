@@ -234,7 +234,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pydantic-ai-slim", extras = ["google", "logfire", "openai"], specifier = ">=0.8.1" },
     { name = "pydantic-settings", specifier = ">=2.10.1" },
-    { name = "quickthumb", specifier = ">=0.1.0" },
+    { name = "quickthumb", specifier = ">=0.1.1" },
     { name = "requests", specifier = ">=2.31.0" },
     { name = "spacy", specifier = ">=3.8.7,<4.0.0" },
     { name = "typer", specifier = ">=0.16.0,<1.0.0" },
@@ -1199,16 +1199,16 @@ wheels = [
 
 [[package]]
 name = "quickthumb"
-version = "0.1.0"
+version = "0.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pillow" },
     { name = "pydantic" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9a/6a/672dac58485f706346daea8f950b03234df84fb78a2ba2fc527aa9b260ac/quickthumb-0.1.0.tar.gz", hash = "sha256:b18d478b942b9c5b3b2b75c9796e9230a21827d0d4d5b63ea60d7106b70182e2", size = 4210880, upload-time = "2026-01-27T12:56:40.054Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b5/7c/0743d0171b749a398b1655a8a3c8974de476c4c304e9a34180c547896819/quickthumb-0.1.1.tar.gz", hash = "sha256:4dbd91f930cc474cc4b242c6666eb735c5eee7b1ba25393e3f42fbe18dd9969f", size = 4286330, upload-time = "2026-01-29T13:38:36.442Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/01/2b/751d8c700d55deadc783bd1715bc2ecda618e2580a1202d09f7071e2e0b5/quickthumb-0.1.0-py3-none-any.whl", hash = "sha256:99ab6cf2dcd4e4f967495f83a33fc5d69b414ddc531c93e821cac405572addbd", size = 15355, upload-time = "2026-01-27T12:56:44.088Z" },
+    { url = "https://files.pythonhosted.org/packages/52/65/76a4e2891e76072ed894101faffac52a7265d47763f69bde7af74624253a/quickthumb-0.1.1-py3-none-any.whl", hash = "sha256:27a9a46d2eef8790e0acab7878e289228fae318af5c7b7a723f72631901adcb6", size = 16468, upload-time = "2026-01-29T13:38:35.421Z" },
 ]
 
 [[package]]

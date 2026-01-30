@@ -21,18 +21,44 @@ class ImageMetadata(BaseModel):
 
     id: str
     description: str | None
-    thumb_url: str
-    regular_url: str
+    url: str
     photographer: str
 
     @classmethod
-    def from_photo(cls, photo: Photo) -> "ImageMetadata":
-        """Photo 객체로부터 ImageMetadata 생성"""
+    def from_photo(
+        cls, photo: Photo, quality: int = 100, width: int = 1280
+    ) -> "ImageMetadata":
+        """Photo 객체로부터 ImageMetadata 생성
+
+        Args:
+            photo: Unsplash Photo 객체
+            quality: 이미지 품질 (1-100, 기본값: 100)
+            width: 이미지 너비 (픽셀, 기본값: 1280)
+        """
+        from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+
+        parsed = urlparse(str(photo.urls.raw))
+        query_params = parse_qs(parsed.query)
+        query_params["q"] = [str(quality)]
+        query_params["w"] = [str(width)]
+        new_query = urlencode(
+            {k: v[0] if isinstance(v, list) else v for k, v in query_params.items()}
+        )
+        modified_url = urlunparse(
+            (
+                parsed.scheme,
+                parsed.netloc,
+                parsed.path,
+                parsed.params,
+                new_query,
+                parsed.fragment,
+            )
+        )
+
         return cls(
             id=photo.id,
             description=photo.description,
-            thumb_url=str(photo.urls.thumb),
-            regular_url=str(photo.urls.regular),
+            url=modified_url,
             photographer=photo.user.name,
         )
 
@@ -62,12 +88,16 @@ ImageCandidates = TypeAdapter(list[ImageCandidate])
 class ImageSearcher:
     """AI 기반 이미지 검색 및 선별"""
 
-    def __init__(self, max_retries: int = 3):
+    def __init__(self, max_retries: int = 3, quality: int = 100, width: int = 1280):
         """
         Args:
             max_retries: 최대 재시도 횟수
+            quality: 이미지 품질 (1-100, 기본값: 100)
+            width: 이미지 너비 (픽셀, 기본값: 1280)
         """
         self.max_retries = max_retries
+        self.quality = quality
+        self.width = width
         self._client = UnsplashClient(
             access_key=config.unsplash_access_key.get_secret_value()
         )
@@ -193,10 +223,14 @@ class ImageSearcher:
         )
 
         if selected_photo:
-            return ImageMetadata.from_photo(selected_photo)
+            return ImageMetadata.from_photo(
+                selected_photo, quality=self.quality, width=self.width
+            )
         else:
             logger.warning("⚠️  선택된 ID를 찾을 수 없음, 첫 이미지 사용")
-            return ImageMetadata.from_photo(photos[0])
+            return ImageMetadata.from_photo(
+                photos[0], quality=self.quality, width=self.width
+            )
 
     async def _generate_initial_query(self, expression: str):
         """초기 검색 쿼리 생성"""
@@ -267,16 +301,19 @@ async def search_image(
     per_page: int = 10,
     orientation: Literal["landscape", "portrait", "squarish"] | None = None,
     max_retries: int = 3,
+    quality: int = 100,
+    width: int = 1280,
 ) -> ImageMetadata:
     """
     편의 함수: 표현식으로부터 이미지 검색 및 AI 선별 (자동으로 리소스 정리)
 
     Args:
         expression: 영어 표현 (예: "in the near future (머지않아)")
-        context: 이미지 사용 목적/맥락
         per_page: 검색 결과 수
         orientation: 이미지 방향
         max_retries: 최대 재시도 횟수
+        quality: 이미지 품질 (1-100, 기본값: 100)
+        width: 이미지 너비 (픽셀, 기본값: 1280)
 
     Returns:
         선택된 이미지 메타데이터
@@ -284,10 +321,11 @@ async def search_image(
     Example:
         >>> image = await search_image(
         ...     expression="break the ice (어색함을 깨다)",
-        ...     context="영어 블로그 썸네일"
+        ...     quality=100,
+        ...     width=1920
         ... )
     """
-    searcher = ImageSearcher(max_retries=max_retries)
+    searcher = ImageSearcher(max_retries=max_retries, quality=quality, width=width)
     try:
         return await searcher.search_and_select(expression, per_page, orientation)
     finally:

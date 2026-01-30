@@ -120,7 +120,7 @@ async def _generate_thumbnail(path: Path, expression: str, meanings: list[str]):
     best_meaning = meanings[0]
     query = f"{expression} ({best_meaning})"
     image = await search_image(query)
-    render_expression_thumbnail(path.as_posix(), image.thumb_url, best_meaning)
+    render_expression_thumbnail(path.as_posix(), image.url, best_meaning)
     logger.debug(f"✅ Successfully generated thumbnail for {expression}")
 
 

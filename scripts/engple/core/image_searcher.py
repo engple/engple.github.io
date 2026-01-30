@@ -210,7 +210,7 @@ class ImageSearcher:
         photos = await self._search_photos(search_query, per_page, orientation)
 
         if not photos:
-            return self._handle_no_results(attempt)
+            return await self._handle_no_results(search_query, orientation, attempt)
 
         logger.info(f"📸 {len(photos)}개 이미지 발견, AI 평가 중...")
 
@@ -284,11 +284,24 @@ class ImageSearcher:
         )
         return res
 
-    def _handle_no_results(self, attempt: int) -> None:
+    async def _handle_no_results(
+        self,
+        search_query: str,
+        orientation: Literal["landscape", "portrait", "squarish"] | None,
+        attempt: int,
+    ) -> ImageMetadata | None:
         """검색 결과 없음 처리"""
-        logger.warning(f"⚠️  검색 결과 없음 (시도 {attempt + 1}/{self.max_retries})")
+        logger.warning(f"⚠️ 검색 결과 없음 (시도 {attempt + 1}/{self.max_retries})")
+
+        # 마지막 시도인 경우 랜덤 이미지 반환
         if not self._should_retry(attempt):
-            raise ValueError("검색 결과를 찾을 수 없습니다")
+            logger.info("⚠️ 검색 결과 없음, 랜덤 이미지 사용")
+            response = await self._client.get_random_photo(orientation=orientation)
+            return ImageMetadata.from_photo(
+                response.data, quality=self.quality, width=self.width
+            )
+
+        # 재시도 가능한 경우 None 반환
         return None
 
     def _should_retry(self, attempt: int) -> bool:

@@ -76,6 +76,6 @@ class UnleashHeader(BaseModel):
 T = TypeVar("T")
 
 
-class UnleashResponse(BaseModel, Generic[T]):
+class UnsplashResponse(BaseModel, Generic[T]):
     headers: UnleashHeader
     data: T

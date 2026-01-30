@@ -1,12 +1,12 @@
 """Unsplash API 비동기 클라이언트"""
 
 from engple.clients.unsplash.models import UnleashHeader
-from engple.clients.unsplash.models import UnleashResponse
+from engple.clients.unsplash.models import UnsplashResponse
 import httpx
 from typing import Literal
 
 from engple.clients.unsplash.errors import UnsplashError, UnsplashHTTPError
-from engple.clients.unsplash.models import SearchPhotosResponse
+from engple.clients.unsplash.models import Photo, SearchPhotosResponse
 
 
 class UnsplashClient:
@@ -45,7 +45,7 @@ class UnsplashClient:
         query: str,
         per_page: int = 10,
         orientation: Literal["landscape", "portrait", "squarish"] | None = None,
-    ) -> UnleashResponse[SearchPhotosResponse]:
+    ) -> UnsplashResponse[SearchPhotosResponse]:
         """
         사진 검색 API 호출 - 원본 응답 반환
 
@@ -65,7 +65,37 @@ class UnsplashClient:
 
         response = await self._get("/search/photos", params)
 
-        return UnleashResponse(
+        return UnsplashResponse(
             headers=UnleashHeader.model_validate(response.headers),
             data=SearchPhotosResponse.model_validate(response.json()),
+        )
+
+    async def get_random_photo(
+        self,
+        query: str | None = None,
+        orientation: Literal["landscape", "portrait", "squarish"] | None = None,
+    ) -> UnsplashResponse[Photo]:
+        """
+        랜덤 사진 가져오기
+
+        Args:
+            query: 검색 키워드 (선택사항)
+            orientation: 이미지 방향 ("landscape", "portrait", "squarish")
+
+        Returns:
+            랜덤 사진
+        """
+        params: dict[str, str | int] = {}
+
+        if query:
+            params["query"] = query
+
+        if orientation:
+            params["orientation"] = orientation
+
+        response = await self._get("/photos/random", params)
+
+        return UnsplashResponse(
+            headers=UnleashHeader.model_validate(response.headers),
+            data=Photo.model_validate(response.json()),
         )

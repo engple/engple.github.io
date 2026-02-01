@@ -324,6 +324,7 @@ class BlogWriter:
             .replace("“", '"')
             .replace("”", '"')
             .replace("요~요", "요")
+            .replace("다~요", "다")
         )
 
         return full_content

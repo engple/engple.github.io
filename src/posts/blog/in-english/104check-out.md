@@ -63,7 +63,7 @@ faq:
   </li>
   <li data-interactive-item>
     <span data-toggler>상황을 확인하고 안전한지 알려줄게.</span>
-    <span data-answer>I'm gonna check out the situation and <a href="/blog/in-english/241.let-someone-know/">let you know</a> if it's safe.</span>
+    <span data-answer>I'm gonna check out the situation and <a href="/blog/in-english/241.let-someone-know/">let you know</a> if it's <a href="/blog/in-english/857.safe/">safe</a>.</span>
   </li>
   <li data-interactive-item>
     <span data-toggler>할인 코너 확인하는 거 잊지 마.</span>

@@ -59,7 +59,7 @@ faq:
   </li>
   <li data-interactive-item>
     <span data-toggler>내가 발견한 이 밴드 꼭 들어봐.</span>
-    <span data-answer>You've gotta check out this band I discovered.</span>
+    <span data-answer>You've gotta check out this band I <a href="/blog/in-english/955.discover/">discovered</a>.</span>
   </li>
   <li data-interactive-item>
     <span data-toggler>상황을 확인하고 안전한지 알려줄게.</span>

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -8,8 +9,9 @@ class Config(BaseSettings):
     model_translation: str = "openai:gpt-4.1-mini"
     model_content: str = "openai:gpt-4.1"
     model_meta: str = "openai:gpt-4.1"
-    model_recommend: str = "openai:gpt-4.1"
+    model_expressions: str = "openai:gpt-4.1-mini"
     model_image_selector: str = "openai:gpt-4.1-mini"
+    blog_dir: Path = Path(__file__).resolve().parents[2] / "src" / "posts" / "blog"
     openai_api_key: SecretStr = SecretStr("YOUR_API_KEY")
     notion_api_key: SecretStr = SecretStr("YOUR_API_KEY")
     notion_engple_database_id: str = "YOUR_DATABASE_ID"

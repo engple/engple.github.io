@@ -1,6 +1,12 @@
-from pathlib import Path
 import pytest
-from engple.utils import generate_variations, get_expr_path
+from pathlib import Path
+
+from engple.utils import (
+    clean_expression,
+    generate_variations,
+    get_expr_path,
+    normalize_expression,
+)
 
 
 class TestVariationGenerator:
@@ -73,3 +79,45 @@ class TestExprPath:
     def test_get_expr_path_not_found(self):
         """Test get_expr_path with expressions not found."""
         assert get_expr_path("nonexistent expression") is None
+
+
+class TestExpressionNormalization:
+    """Test cases for expression cleanup and normalization."""
+
+    @pytest.mark.parametrize(
+        "expression,expected",
+        [
+            ("  Drop Off  ", "Drop Off"),
+            ("take off (plane)", "take off"),
+            ("look   after", "look after"),
+        ],
+    )
+    def test_clean_expression(self, expression, expected):
+        """`clean_expression` should compare only the English part."""
+        # given
+        value = expression
+
+        # when
+        actual = clean_expression(value)
+
+        # then
+        assert actual == expected
+
+    @pytest.mark.parametrize(
+        "expression,expected",
+        [
+            ("  Drop Off  ", "drop off"),
+            ("take off (plane)", "take off"),
+            ("look   after", "look after"),
+        ],
+    )
+    def test_normalize_expression(self, expression, expected):
+        """`normalize_expression` should lowercase the extracted English part."""
+        # given
+        value = expression
+
+        # when
+        actual = normalize_expression(value)
+
+        # then
+        assert actual == expected

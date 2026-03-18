@@ -42,7 +42,8 @@ def handle_link_expression(
     expr_path = get_expr_path(expr)
 
     if not expr_path:
-        raise ValueError(f"Expression path not found for: '{expr}'")
+        logger.error(f"Expression path not found for: '{expr}'")
+        sys.exit(1)
 
     expression = Expression(
         base_form=expr,

@@ -65,3 +65,17 @@ Examples:
 ```
 {examples}
 ```"""
+
+[candidate_generation]
+prompt = """Generate everyday American English expressions for Korean learners.
+
+Rules:
+1. Output format: english expression (한국어 뜻)
+2. Use practical expressions.
+3. Exclude anything in the used list.
+4. Deduplicate by English only: if `go (가다)` exists, do not return `go (출발하다)`.
+5. Avoid multiple surface variants in one batch.
+
+Used:
+{existing_expressions}
+"""

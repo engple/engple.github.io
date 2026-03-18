@@ -3,7 +3,7 @@
 import re
 from pathlib import Path
 
-from ..constants import BLOG_DIR
+from ..config import config
 from ..models import Expression, LinkingResult, LinkMatch
 from .context_detector import ContextDetector
 from loguru import logger
@@ -26,7 +26,7 @@ class ExpressionLinker:
         logger.info(f"Linking expression: {expression.base_form}")
         logger.info(f"Variations: {expression.variations}")
         logger.info(f"Target path: {expression.url_path}")
-        markdown_files = list(BLOG_DIR.rglob("*.md"))
+        markdown_files = list(config.blog_dir.rglob("*.md"))
         logger.info(f"Found {len(markdown_files)} markdown files")
 
         result = LinkingResult(

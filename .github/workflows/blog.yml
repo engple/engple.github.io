@@ -34,7 +34,7 @@ jobs:
 
       - name: Generate blog posts
         run: |
-          uv run main.py write-blog --count 10
+          uv run main.py write-blog --count 5
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}

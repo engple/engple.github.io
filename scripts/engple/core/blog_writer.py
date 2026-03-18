@@ -1,3 +1,4 @@
+from typing import cast
 import datetime
 import json
 from textwrap import dedent
@@ -17,6 +18,7 @@ from engple.constants import (
     EXAMPLE_SENTENCES_PATH,
     RECOMMENDATION_EXAMPLES_PATH,
 )
+from engple.utils import normalize_expression
 
 
 class BlogContent(BaseModel):
@@ -89,7 +91,7 @@ class BlogWriter:
         self.model_translation = config.model_translation
         self.model_content = config.model_content
         self.model_meta = config.model_meta
-        self.model_recommend = config.model_recommend
+        self.model_expressions = config.model_expressions
         self.recommendation_count = recommendation_count
 
     async def generate(
@@ -107,6 +109,12 @@ class BlogWriter:
         content = await self._write_blog_content(expression)
         blog_meta = await self._write_blog_meta(expression)
         recommendations = await self._recommend_other_expressions(expression)
+        if normalize_expression(content.expression) != normalize_expression(expression):
+            logger.warning(
+                "Generated expression drifted from planned expression: '{}' -> '{}'",
+                expression,
+                content.expression,
+            )
         final = self._get_final_content(
             expression,
             content,
@@ -121,6 +129,24 @@ class BlogWriter:
             meanings=content.korean_meanings,
             content=final,
         )
+
+    async def generate_candidate_expressions(
+        self, existing_expressions: list[str], count: int
+    ) -> list[str]:
+        """Generate candidate expressions while avoiding the existing corpus."""
+        logger.info("🧠 새 표현 후보 생성 중...")
+        candidate_agent = Agent(
+            self.model_expressions,
+            output_type=list[str],
+            system_prompt=BLOG_PROMPT["candidate_generation"]["prompt"].format(
+                count=count,
+                existing_expressions=json.dumps(existing_expressions),
+            ),
+            retries=2,
+            model_settings=ModelSettings(temperature=1),
+        )
+        res = await candidate_agent.run(f"Generate {count} candidate expressions")
+        return cast(list[str], res.output)
 
     async def _generate_blog_examples(self, expression: str):
         """
@@ -137,7 +163,7 @@ class BlogWriter:
             retries=2,
         )
         res = await examples_agent.run(f"expression: '{expression}'")
-        return res.output
+        return cast(list[str], res.output)
 
     async def _translate_blog_examples(self, examples: list[str]):
         """
@@ -151,7 +177,7 @@ class BlogWriter:
             retries=2,
         )
         res = await translate_agent.run(json.dumps(examples))
-        return res.output
+        return cast(list[str], res.output)
 
     async def _write_blog_content(self, expression: str):
         """
@@ -175,7 +201,7 @@ class BlogWriter:
             model_settings=ModelSettings(temperature=0.0),
         )
         res = await content_agent.run(self._get_expression_prompt(expression))
-        return res.output
+        return cast(BlogContent, res.output)
 
     async def _write_blog_meta(self, expression: str):
         """
@@ -193,7 +219,7 @@ class BlogWriter:
             model_settings=ModelSettings(temperature=0.0),
         )
         res = await meta_agent.run(self._get_expression_prompt(expression))
-        return res.output
+        return cast(BlogMeta, res.output)
 
     async def _recommend_other_expressions(self, expression: str):
         """
@@ -205,7 +231,7 @@ class BlogWriter:
             RECOMMENDATION_EXAMPLES_PATH.read_bytes()
         )
         recommend_agent = Agent(
-            self.model_recommend,
+            self.model_expressions,
             output_type=PromptedOutput(list[RelatedExpression]),
             system_prompt=BLOG_PROMPT["recommendation"]["prompt"].format(
                 count=self.recommendation_count,
@@ -215,7 +241,7 @@ class BlogWriter:
             model_settings=ModelSettings(temperature=0.0),
         )
         res = await recommend_agent.run(f"expression: '{expression}'")
-        return res.output
+        return cast(list[RelatedExpression], res.output)
 
     def _format_blog_examples(
         self, examples: list[str], translations: list[str]
@@ -301,7 +327,7 @@ class BlogWriter:
                 "---\n"
                 f'category: "영어표현"\n'
                 f'date: "{post_date}"\n'
-                f'thumbnail: "{blog_num}.png"\n'
+                f'thumbnail: "{blog_num:03d}.png"\n'
                 f"alt: \"'{sanitized_expression}' 영어표현 썸네일\"\n"
                 f'title: "{self._escape_text(content.title)}"\n'
                 f"desc: "
@@ -309,7 +335,7 @@ class BlogWriter:
                 f"faqs: \n"
                 f"{faq_section}"
                 f"---\n\n"
-                f"!['{sanitized_expression}' 영어표현](./{blog_num}.png)\n\n"
+                f"!['{sanitized_expression}' 영어표현](./{blog_num:03d}.png)\n\n"
                 f"## 🌟 영어 표현 - {sanitized_expression}\n\n"
                 f"{content_body}\n\n"
                 f"## 💬 연습해보기\n\n"

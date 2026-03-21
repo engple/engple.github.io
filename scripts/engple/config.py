@@ -5,12 +5,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Config(BaseSettings):
-    model_examples: str = "openai:gpt-4.1"
-    model_translation: str = "openai:gpt-4.1-mini"
+    model_examples: str = "openai:gpt-4.1-mini"
+    model_translation: str = "openai:gpt-4o-mini"
     model_content: str = "openai:gpt-4.1"
-    model_meta: str = "openai:gpt-4.1"
+    model_meta: str = "openai:gpt-4.1-mini"
     model_expressions: str = "openai:gpt-4.1-mini"
-    model_image_selector: str = "openai:gpt-4.1-mini"
+    model_image_selector: str = "openai:gpt-4o-mini"
     blog_dir: Path = Path(__file__).resolve().parents[2] / "src" / "posts" / "blog"
     openai_api_key: SecretStr = SecretStr("YOUR_API_KEY")
     notion_api_key: SecretStr = SecretStr("YOUR_API_KEY")

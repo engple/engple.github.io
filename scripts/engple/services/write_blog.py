@@ -90,10 +90,19 @@ async def handle_write_blog(count: int) -> list[str]:
             )
 
     if len(accepted_expressions) < count:
-        raise RuntimeError(
-            "Unable to generate enough unique expressions. "
-            f"Requested {count}, wrote {len(accepted_expressions)} after "
-            f"{MAX_CANDIDATE_GENERATION_ROUNDS} rounds."
+        if not accepted_expressions:
+            raise RuntimeError(
+                "Unable to generate enough unique expressions. "
+                f"Requested {count}, wrote {len(accepted_expressions)} after "
+                f"{MAX_CANDIDATE_GENERATION_ROUNDS} rounds."
+            )
+
+        logger.warning(
+            "Generated only {} of {} requested expressions after {} rounds. "
+            "Continuing with partial output.",
+            len(accepted_expressions),
+            count,
+            MAX_CANDIDATE_GENERATION_ROUNDS,
         )
 
     return accepted_expressions

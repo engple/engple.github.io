@@ -200,6 +200,54 @@ def test_handle_write_blog_raises_when_retry_cap_is_hit(
     ]
 
 
+def test_handle_write_blog_returns_partial_results_when_two_of_three_posts_succeed(
+    temp_blog_dirs,
+    monkeypatch,
+):
+    """`handle_write_blog` should keep the two successful writes when the third never materializes."""
+    _, in_english_dir = temp_blog_dirs
+    before_names = {path.name for path in in_english_dir.glob("*.md")}
+
+    async def generate_candidate_expressions(
+        self, existing_expressions: list[str], count: int
+    ):
+        if "take off (떠나다)" in existing_expressions:
+            return ["drop off (내려주다)", "drop off (떨어뜨리다)"]
+
+        return [
+            "take off (떠나다)",
+            "look after (돌보다)",
+            "drop off (떨어뜨리다)",
+        ]
+
+    async def generate(
+        self, expression: str, blog_num: int, posted_at
+    ) -> GeneratedBlog:
+        english, meaning = _split_expression_seed(expression)
+        return _build_generated_blog(english, meaning)
+
+    monkeypatch.setattr(
+        BlogWriter, "generate_candidate_expressions", generate_candidate_expressions
+    )
+    monkeypatch.setattr(BlogWriter, "generate", generate)
+    monkeypatch.setattr(write_blog_service, "generate_thumbnail", _noop_thumbnail)
+    monkeypatch.setattr(write_blog_service, "MAX_CANDIDATE_GENERATION_ROUNDS", 2)
+
+    # given
+    count = 3
+
+    # when
+    result = asyncio.run(write_blog_service.handle_write_blog(count))
+    created_names = {path.name for path in in_english_dir.glob("*.md")} - before_names
+
+    # then
+    assert result == ["take off", "look after"]
+    assert sorted(created_names) == [
+        "002.take-off.md",
+        "003.look-after.md",
+    ]
+
+
 def test_handle_write_blog_rejects_expression_drift_to_existing_post(
     temp_blog_dirs,
     monkeypatch,
@@ -222,7 +270,7 @@ def test_handle_write_blog_rejects_expression_drift_to_existing_post(
     )
     monkeypatch.setattr(BlogWriter, "generate", generate)
     monkeypatch.setattr(write_blog_service, "MAX_CANDIDATE_GENERATION_ROUNDS", 1)
-    monkeypatch.setattr(write_blog_service, "_generate_thumbnail", _noop_thumbnail)
+    monkeypatch.setattr(write_blog_service, "generate_thumbnail", _noop_thumbnail)
 
     # given
     count = 1

@@ -33,6 +33,8 @@ jobs:
           uv sync --no-dev --locked
 
       - name: Generate blog posts
+        id: generate_blog
+        continue-on-error: true
         run: |
           uv run main.py write-blog --count 5
         env:
@@ -47,6 +49,7 @@ jobs:
           git config --local user.name "GitHub Action"
 
       - name: Commit and push changes
+        if: always()
         working-directory: ./ # root of repo
         run: |
           git add .
@@ -60,8 +63,14 @@ jobs:
           fi
 
       - name: Trigger Gatsby deployment
-        if: env.BLOG_CREATED == 'true'
+        if: always() && env.BLOG_CREATED == 'true'
         run: |
           gh workflow run gatsby.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fail if generation produced no publishable posts
+        if: always() && steps.generate_blog.outcome == 'failure' && env.BLOG_CREATED != 'true'
+        run: |
+          echo "Blog generation failed before any publishable changes were committed."
+          exit 1

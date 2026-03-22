@@ -92,7 +92,7 @@ faq:
 
 'browse through'는 **"훑어보다" 또는 "둘러보다"** 라는 뜻이에요. 책, 웹사이트, 또는 상점 등을 **가볍게 살펴보거나 둘러보는 행위**를 나타내요. 주로 특정한 목적 없이 가볍게 정보를 훑어볼 때 사용해요.
 
-- "I like to browse through magazines while waiting at the salon."
+- "I [like](/blog/in-english/1053.like/) to browse through magazines while waiting at the salon."
 - "미용실에서 기다리는 동안 잡지를 훑어보는 것을 좋아해요."
 
 ---

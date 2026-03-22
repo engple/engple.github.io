@@ -97,7 +97,7 @@ def _compute_url_path(md_file: Path, blog_dir: Path) -> str:
 def format_expression_seed(expression: str, meaning: str | None = None) -> str:
     if not meaning:
         return clean_expression(expression)
-    return f"{clean_expression(expression)} ({meaning.strip()})"
+    return f"{clean_expression(expression)}({meaning.strip()})"
 
 
 def _extract_primary_korean_meaning(content: str) -> str | None:

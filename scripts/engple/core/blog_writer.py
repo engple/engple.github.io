@@ -1,9 +1,9 @@
-from typing import cast
 import datetime
-import json
+from typing import cast
 from textwrap import dedent
 from zoneinfo import ZoneInfo
 import re
+import json
 
 from pydantic import BaseModel, Field, field_validator
 from pydantic_ai import Agent, PromptedOutput
@@ -18,6 +18,8 @@ from engple.constants import (
     EXAMPLE_SENTENCES_PATH,
     RECOMMENDATION_EXAMPLES_PATH,
 )
+from engple.core.candidate_meanings import CandidateMeaningCreator
+from engple.core.expression_candidates import ExpressionCandidateCreator
 from engple.utils import normalize_expression
 
 
@@ -133,20 +135,20 @@ class BlogWriter:
     async def generate_candidate_expressions(
         self, existing_expressions: list[str], count: int
     ) -> list[str]:
-        """Generate candidate expressions while avoiding the existing corpus."""
-        logger.info("🧠 새 표현 후보 생성 중...")
-        candidate_agent = Agent(
-            self.model_expressions,
-            output_type=list[str],
-            system_prompt=BLOG_PROMPT["candidate_generation"]["prompt"].format(
-                count=count,
-                existing_expressions=json.dumps(existing_expressions),
-            ),
-            retries=2,
-            model_settings=ModelSettings(temperature=1),
-        )
-        res = await candidate_agent.run(f"Generate {count} candidate expressions")
-        return cast(list[str], res.output)
+        """Generate plain English candidate expressions from ranked sources."""
+        logger.info("🧠 새 표현 후보 수집 중...")
+        candidate_creator = ExpressionCandidateCreator()
+        try:
+            return await candidate_creator.generate(existing_expressions, count)
+        finally:
+            await candidate_creator.aclose()
+
+    async def annotate_candidate_expressions(
+        self, candidate_expressions: list[str]
+    ) -> list[str]:
+        meaning_creator = CandidateMeaningCreator(self.model_expressions)
+        return await meaning_creator.annotate(candidate_expressions)
+
 
     async def _generate_blog_examples(self, expression: str):
         """

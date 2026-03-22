@@ -5,6 +5,8 @@ import pytest
 
 from engple.config import config
 from engple.core.blog_writer import BlogWriter, GeneratedBlog
+from engple.core.candidate_meanings import CandidateMeaningCreator
+from engple.core.expression_candidates import ExpressionCandidateCreator
 from engple.services import write_blog as write_blog_service
 
 
@@ -70,14 +72,23 @@ def test_handle_write_blog_writes_only_unique_english_expressions(
         self, existing_expressions: list[str], count: int
     ):
         requested_counts.append(count)
-        assert "drop off (내려주다)" in existing_expressions
+        assert "drop off(내려주다)" in existing_expressions
         return [
-            "drop off (떨어뜨리다)",
-            "take off (떠나다)",
-            "take off (벗다)",
-            "stop over (경유하다)",
-            "look after (돌보다)",
-            "brand new (완전히 새로운)",
+            "drop off",
+            "take off",
+            "take off",
+            "stop over",
+            "look after",
+            "brand new",
+        ]
+
+    async def annotate_candidate_expressions(self, candidate_expressions: list[str]):
+        assert candidate_expressions == ["take off", "stop over", "look after", "brand new"]
+        return [
+            "take off(떠나다)",
+            "stop over(경유하다)",
+            "look after(돌보다)",
+            "brand new(완전히 새로운)",
         ]
 
     async def generate(
@@ -88,6 +99,9 @@ def test_handle_write_blog_writes_only_unique_english_expressions(
 
     monkeypatch.setattr(
         BlogWriter, "generate_candidate_expressions", generate_candidate_expressions
+    )
+    monkeypatch.setattr(
+        BlogWriter, "annotate_candidate_expressions", annotate_candidate_expressions
     )
     monkeypatch.setattr(BlogWriter, "generate", generate)
     monkeypatch.setattr(write_blog_service, "generate_thumbnail", _noop_thumbnail)
@@ -123,18 +137,26 @@ def test_handle_write_blog_retries_until_requested_count(
 
         if candidate_round["value"] == 1:
             return [
-                "drop off (내려주다)",
-                "take off (떠나다)",
-                "take off (벗다)",
-                "drop off (떨어뜨리다)",
+                "drop off",
+                "take off",
+                "take off",
+                "drop off",
             ]
 
         return [
-            "look after (돌보다)",
-            "break down (고장 나다)",
-            "drop off (떨어뜨리다)",
-            "look after (보살피다)",
+            "look after",
+            "break down",
+            "drop off",
+            "look after",
         ]
+
+    async def annotate_candidate_expressions(self, candidate_expressions: list[str]):
+        if candidate_round["value"] == 1:
+            assert candidate_expressions == ["take off"]
+            return ["take off(떠나다)"]
+
+        assert candidate_expressions == ["look after", "break down"]
+        return ["look after(돌보다)", "break down(고장 나다)"]
 
     async def generate(
         self, expression: str, blog_num: int, posted_at
@@ -144,6 +166,9 @@ def test_handle_write_blog_retries_until_requested_count(
 
     monkeypatch.setattr(
         BlogWriter, "generate_candidate_expressions", generate_candidate_expressions
+    )
+    monkeypatch.setattr(
+        BlogWriter, "annotate_candidate_expressions", annotate_candidate_expressions
     )
     monkeypatch.setattr(BlogWriter, "generate", generate)
     monkeypatch.setattr(write_blog_service, "generate_thumbnail", _noop_thumbnail)
@@ -172,7 +197,11 @@ def test_handle_write_blog_raises_when_retry_cap_is_hit(
     async def generate_candidate_expressions(
         self, existing_expressions: list[str], count: int
     ):
-        return ["drop off (내려주다)", "drop off (떨어뜨리다)"]
+        return ["drop off", "drop off"]
+
+    async def annotate_candidate_expressions(self, candidate_expressions: list[str]):
+        assert candidate_expressions == []
+        return []
 
     async def generate(self, expression: str, blog_num: int, posted_at):
         raise AssertionError(
@@ -181,6 +210,9 @@ def test_handle_write_blog_raises_when_retry_cap_is_hit(
 
     monkeypatch.setattr(
         BlogWriter, "generate_candidate_expressions", generate_candidate_expressions
+    )
+    monkeypatch.setattr(
+        BlogWriter, "annotate_candidate_expressions", annotate_candidate_expressions
     )
     monkeypatch.setattr(BlogWriter, "generate", generate)
     monkeypatch.setattr(write_blog_service, "MAX_CANDIDATE_GENERATION_ROUNDS", 2)
@@ -211,14 +243,20 @@ def test_handle_write_blog_returns_partial_results_when_two_of_three_posts_succe
     async def generate_candidate_expressions(
         self, existing_expressions: list[str], count: int
     ):
-        if "take off (떠나다)" in existing_expressions:
-            return ["drop off (내려주다)", "drop off (떨어뜨리다)"]
+        if "take off(떠나다)" in existing_expressions:
+            return ["drop off", "drop off"]
 
         return [
-            "take off (떠나다)",
-            "look after (돌보다)",
-            "drop off (떨어뜨리다)",
+            "take off",
+            "look after",
+            "drop off",
         ]
+
+    async def annotate_candidate_expressions(self, candidate_expressions: list[str]):
+        if candidate_expressions == ["take off", "look after"]:
+            return ["take off(떠나다)", "look after(돌보다)"]
+        assert candidate_expressions == []
+        return []
 
     async def generate(
         self, expression: str, blog_num: int, posted_at
@@ -228,6 +266,9 @@ def test_handle_write_blog_returns_partial_results_when_two_of_three_posts_succe
 
     monkeypatch.setattr(
         BlogWriter, "generate_candidate_expressions", generate_candidate_expressions
+    )
+    monkeypatch.setattr(
+        BlogWriter, "annotate_candidate_expressions", annotate_candidate_expressions
     )
     monkeypatch.setattr(BlogWriter, "generate", generate)
     monkeypatch.setattr(write_blog_service, "generate_thumbnail", _noop_thumbnail)
@@ -258,7 +299,11 @@ def test_handle_write_blog_rejects_expression_drift_to_existing_post(
     async def generate_candidate_expressions(
         self, existing_expressions: list[str], count: int
     ):
-        return ["brand new (완전히 새로운)"]
+        return ["brand new"]
+
+    async def annotate_candidate_expressions(self, candidate_expressions: list[str]):
+        assert candidate_expressions == ["brand new"]
+        return ["brand new(완전히 새로운)"]
 
     async def generate(
         self, expression: str, blog_num: int, posted_at
@@ -267,6 +312,9 @@ def test_handle_write_blog_rejects_expression_drift_to_existing_post(
 
     monkeypatch.setattr(
         BlogWriter, "generate_candidate_expressions", generate_candidate_expressions
+    )
+    monkeypatch.setattr(
+        BlogWriter, "annotate_candidate_expressions", annotate_candidate_expressions
     )
     monkeypatch.setattr(BlogWriter, "generate", generate)
     monkeypatch.setattr(write_blog_service, "MAX_CANDIDATE_GENERATION_ROUNDS", 1)
@@ -285,3 +333,24 @@ def test_handle_write_blog_rejects_expression_drift_to_existing_post(
     assert sorted(path.name for path in in_english_dir.glob("*.md")) == [
         "001.drop-off.md"
     ]
+
+
+def test_generate_candidate_expressions_and_annotation_are_separate(monkeypatch):
+    async def fake_generate(self, existing_expressions: list[str], count: int):
+        assert existing_expressions == ["drop off(내려주다)"]
+        assert count == 2
+        return ["like", "set up"]
+
+    async def fake_annotate(self, expressions: list[str]):
+        assert expressions == ["like", "set up"]
+        return ["like(좋아하다)", "set up(설정하다)"]
+
+    monkeypatch.setattr(ExpressionCandidateCreator, "generate", fake_generate)
+    monkeypatch.setattr(CandidateMeaningCreator, "annotate", fake_annotate)
+
+    writer = BlogWriter()
+    generated = asyncio.run(writer.generate_candidate_expressions(["drop off(내려주다)"], 2))
+    annotated = asyncio.run(writer.annotate_candidate_expressions(generated))
+
+    assert generated == ["like", "set up"]
+    assert annotated == ["like(좋아하다)", "set up(설정하다)"]

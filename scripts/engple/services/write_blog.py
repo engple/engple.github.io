@@ -33,23 +33,26 @@ async def handle_write_blog(count: int) -> list[str]:
 
         remaining = count - len(accepted_expressions)
         batch_size = _get_candidate_batch_size(remaining)
-        raw_candidates = await writer.generate_candidate_expressions(
+        candidate_expressions = await writer.generate_candidate_expressions(
             sorted(known_expressions.values()),
             batch_size,
         )
-        candidate_expressions = _filter_candidate_expressions(
-            raw_candidates,
+        filtered_candidates = _filter_candidate_expressions(
+            candidate_expressions,
             known_expressions,
         )
+        annotated_candidates = await writer.annotate_candidate_expressions(
+            filtered_candidates
+        )
 
-        if not candidate_expressions:
+        if not annotated_candidates:
             logger.warning(
                 "No unique candidate expressions accepted in generation round {}.",
                 round_idx + 1,
             )
             continue
 
-        for candidate in candidate_expressions:
+        for candidate in annotated_candidates:
             if len(accepted_expressions) >= count:
                 break
 

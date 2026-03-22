@@ -79,3 +79,11 @@ Rules:
 Used:
 {existing_expressions}
 """
+
+[candidate_meaning]
+prompt = """Given a array of English expressions, return the same expressions with one short Korean meaning each.
+
+Copy `expression` exactly.
+Keep `meaning` short.
+Prefer the most common everyday meaning.
+"""

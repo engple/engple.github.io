@@ -28,8 +28,11 @@ import {
   RECTANGLE_TOC_AD_SLOT,
   VERTICAL_AD_SLOT,
 } from "../constants"
-import { useInlineAdsense } from "../hooks/useInlineAdsense"
 import { useInteractiveList } from "../hooks/useInteractiveList"
+import {
+  initializeInlineAdsenseSlots,
+  withInlineAdsense,
+} from "../utils/adsense"
 
 interface DataProps {
   current: {
@@ -75,13 +78,26 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   } = data.current!
   const { title, desc, thumbnail, date, category, faq = [] } = frontmatter!
   const site = useSiteMetadata()
+  const articleRef = React.useRef<HTMLElement | null>(null)
+  const htmlWithInlineAd =
+    site.googleAdsense && HORIZONTAL_AD_SLOT
+      ? withInlineAdsense(html ?? "", {
+          idx: -2,
+          adClient: site.googleAdsense,
+          adSlot: HORIZONTAL_AD_SLOT,
+        })
+      : html ?? ""
 
   useInteractiveList([html], { initialState: "collapsed" })
-  useInlineAdsense({
-    idx: -2,
-    adClient: site.googleAdsense ?? "",
-    adSlot: HORIZONTAL_AD_SLOT,
-  })
+  React.useEffect(() => {
+    if (!site.googleAdsense || process.env.NODE_ENV === "development") return
+
+    const article = articleRef.current
+
+    if (!article) return
+
+    return initializeInlineAdsenseSlots(article, HORIZONTAL_AD_SLOT)
+  }, [site.googleAdsense, slug, htmlWithInlineAd])
 
   const nextPost = data.next
     ? {
@@ -217,7 +233,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         ogType="article"
       />
       <main>
-        <article>
+        <article ref={articleRef}>
           <OuterWrapper>
             <InnerWrapper>
               <ContentHeader>
@@ -242,7 +258,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 </LeftAd>
                 <CenterWrapper>
                   <Markdown
-                    dangerouslySetInnerHTML={{ __html: html ?? "" }}
+                    dangerouslySetInnerHTML={{ __html: htmlWithInlineAd }}
                     rhythm={rhythm}
                   />
                 </CenterWrapper>

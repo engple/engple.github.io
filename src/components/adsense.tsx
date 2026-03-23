@@ -10,7 +10,6 @@ interface AdsenseProps {
   width?: string
   height?: string
   extraClassName?: string
-  noContainer?: boolean
   disabled?: boolean
 }
 
@@ -22,7 +21,6 @@ const Adsense: React.FC<AdsenseProps> = ({
   width = "100%",
   height = "100%",
   extraClassName,
-  noContainer = false,
   disabled = false,
 }) => {
   const isDev = process.env.NODE_ENV === "development"
@@ -44,26 +42,7 @@ const Adsense: React.FC<AdsenseProps> = ({
     ? `adsbygoogle ${extraClassName}`
     : "adsbygoogle"
 
-  return noContainer ? (
-    <>
-      {isDev ? (
-        <FakeAd width={width} height={height}>
-          광고영역
-        </FakeAd>
-      ) : (
-        <ins
-          style={{
-            display: "block",
-          }}
-          className={adClassName}
-          data-ad-client={adClient}
-          data-ad-slot={adSlot}
-          data-ad-format={adFormat}
-          data-full-width-responsive={fullWidthResponsive.toString()}
-        ></ins>
-      )}
-    </>
-  ) : (
+  return (
     <Container width={width} height={height} className={extraClassName}>
       {isDev ? (
         <FakeAd width={width} height={height}>

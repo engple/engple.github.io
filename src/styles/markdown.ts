@@ -507,6 +507,17 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     width: 100%;
     margin-bottom: var(--sizing-md);
   }
+
+  .inline-adsense__dev-placeholder {
+    width: 100%;
+    min-height: 90px;
+    background-color: var(--color-gray-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray-6);
+    border-radius: 4px;
+  }
 `
 
 export default Markdown

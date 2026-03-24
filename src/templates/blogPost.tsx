@@ -23,11 +23,7 @@ import Pronunciation from "../components/Pronunciation"
 import Adsense from "../components/adsense"
 import PostNavigator from "../components/postNavigator"
 import TableOfContents from "../components/tableOfContents"
-import {
-  HORIZONTAL_AD_SLOT,
-  RECTANGLE_TOC_AD_SLOT,
-  VERTICAL_AD_SLOT,
-} from "../constants"
+import { HORIZONTAL_AD_SLOT, VERTICAL_AD_SLOT } from "../constants"
 import { useInteractiveList } from "../hooks/useInteractiveList"
 import {
   initializeInlineAdsenseSlots,
@@ -265,17 +261,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 <Pronunciation />
                 <DetailsToggle />
                 <RightWrapper>
-                  <TocAd>
-                    <Adsense
-                      adClient={site.googleAdsense ?? ""}
-                      adSlot={RECTANGLE_TOC_AD_SLOT}
-                      adFormat="auto"
-                      fullWidthResponsive={true}
-                      width={"320px"}
-                      height={"250px"}
-                      extraClassName="lg-only-ads"
-                    />
-                  </TocAd>
                   <TableOfContents headings={headings} />
                 </RightWrapper>
               </ContentWrapper>
@@ -304,12 +289,6 @@ const InnerWrapper = styled.div`
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     width: 87.5%;
   }
-`
-
-const TocAd = styled.div`
-  width: 300px;
-  height: 250px;
-  margin-bottom: var(--padding-xl);
 `
 
 const ContentHeader = styled.div`

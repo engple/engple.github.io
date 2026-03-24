@@ -2,6 +2,8 @@ import React from "react"
 
 import styled from "styled-components"
 
+import { initializeAdsenseSlotWhenReady } from "../utils/adsense"
+
 interface AdsenseProps {
   adClient: string
   adSlot: string
@@ -24,26 +26,34 @@ const Adsense: React.FC<AdsenseProps> = ({
   disabled = false,
 }) => {
   const isDev = process.env.NODE_ENV === "development"
+  const containerRef = React.useRef<HTMLDivElement | null>(null)
 
   React.useEffect(() => {
     if (disabled) return
-    if (!isDev) {
-      try {
-        ;(window.adsbygoogle = window.adsbygoogle || []).push({})
-      } catch (error) {
-        console.error("Adsbygoogle error:", error)
-      }
-    }
-  }, [isDev, disabled])
+    if (isDev) return
+
+    const container = containerRef.current
+
+    if (!container) return
+
+    return initializeAdsenseSlotWhenReady(container)
+  }, [isDev, disabled, adClient, adSlot])
 
   if (disabled) return <></>
 
   const adClassName = extraClassName
     ? `adsbygoogle ${extraClassName}`
     : "adsbygoogle"
+  const slotKey = `${adClient}:${adSlot}`
 
   return (
-    <Container width={width} height={height} className={extraClassName}>
+    <Container
+      key={slotKey}
+      ref={containerRef}
+      width={width}
+      height={height}
+      className={extraClassName}
+    >
       {isDev ? (
         <FakeAd width={width} height={height}>
           광고영역

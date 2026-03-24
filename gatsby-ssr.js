@@ -1,6 +1,24 @@
 const React = require("react")
+const meta = require("./gatsby-meta-config")
 
-exports.onRenderBody = ({ setPreBodyComponents }) => {
+exports.onRenderBody = ({ setHeadComponents, setPreBodyComponents }) => {
+  if (process.env.NODE_ENV !== "development" && meta.googleAdsense) {
+    // AdSense rejects Helmet's bookkeeping attributes on these tags.
+    setHeadComponents([
+      React.createElement("meta", {
+        key: "google-adsense-account",
+        name: "google-adsense-account",
+        content: meta.googleAdsense,
+      }),
+      React.createElement("script", {
+        key: "google-adsense-script",
+        async: true,
+        src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${meta.googleAdsense}`,
+        crossOrigin: "anonymous",
+      }),
+    ])
+  }
+
   setPreBodyComponents([
     React.createElement("script", {
       dangerouslySetInnerHTML: {

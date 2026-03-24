@@ -87,10 +87,6 @@ const SEO: React.FC<SEOProperties> = ({
       meta={
         [
           {
-            property: "google-adsense-account",
-            content: site.googleAdsense,
-          },
-          {
             property: "image",
             content: ogImageUrl,
           },
@@ -145,11 +141,6 @@ const SEO: React.FC<SEOProperties> = ({
         ] as Meta
       }
     >
-      <script
-        async
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${site.googleAdsense}`}
-        crossOrigin="anonymous"
-      ></script>
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
     </Helmet>
   )

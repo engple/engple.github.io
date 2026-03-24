@@ -6,8 +6,8 @@ interface InlineAdsenseConfig {
 
 const INLINE_ADSENSE_SELECTOR = ".inline-adsense"
 const INLINE_ADSENSE_SLOT_ATTR = "data-inline-ad-slot"
+const ADSENSE_ELEMENT_SELECTOR = "ins.adsbygoogle"
 const AD_INITIALIZED_ATTR = "data-ad-initialized"
-const MAX_INIT_ATTEMPTS = 120
 
 export const withInlineAdsense = (
   html: string,
@@ -69,56 +69,70 @@ const getInlineAdsenseSlots = (root: ParentNode, adSlot: string) =>
     slot => slot.getAttribute(INLINE_ADSENSE_SLOT_ATTR) === adSlot,
   )
 
-const initializeInlineAdsenseSlot = (
-  slot: HTMLElement,
-  rafIds: number[],
-  previousWidth = 0,
-  stableFrames = 0,
-  attempts = 0,
-) => {
-  if (slot.getAttribute(AD_INITIALIZED_ATTR) === "true") {
-    return
-  }
-
-  const adElement = slot.querySelector<HTMLElement>("ins.adsbygoogle")
+export const initializeAdsenseSlotWhenReady = (slot: HTMLElement) => {
+  const adElement = slot.querySelector<HTMLModElement>(ADSENSE_ELEMENT_SELECTOR)
 
   if (!adElement) {
-    return
+    return () => {}
   }
 
-  const currentWidth = slot.getBoundingClientRect().width
-  const nextStableFrames =
-    currentWidth > 0 && Math.abs(currentWidth - previousWidth) <= 1
-      ? stableFrames + 1
-      : 0
+  let frameId = 0
+  let resizeObserver: ResizeObserver | undefined
 
-  if (nextStableFrames >= 1) {
+  const initializeSlot = () => {
+    if (slot.getAttribute(AD_INITIALIZED_ATTR) === "true") {
+      return
+    }
+
+    if (adElement.dataset.adsbygoogleStatus) {
+      slot.setAttribute(AD_INITIALIZED_ATTR, "true")
+      return
+    }
+
+    if (slot.getBoundingClientRect().width <= 0) {
+      return
+    }
+
     slot.setAttribute(AD_INITIALIZED_ATTR, "true")
 
     try {
       ;(window.adsbygoogle = window.adsbygoogle || []).push({})
     } catch (error) {
+      slot.removeAttribute(AD_INITIALIZED_ATTR)
       console.error("Adsbygoogle error:", error)
     }
-
-    return
   }
 
-  if (attempts >= MAX_INIT_ATTEMPTS) {
-    return
+  const scheduleInitialize = () => {
+    if (frameId) {
+      cancelAnimationFrame(frameId)
+    }
+
+    frameId = window.requestAnimationFrame(() => {
+      frameId = 0
+      initializeSlot()
+    })
   }
 
-  const rafId = window.requestAnimationFrame(() => {
-    initializeInlineAdsenseSlot(
-      slot,
-      rafIds,
-      currentWidth,
-      nextStableFrames,
-      attempts + 1,
-    )
-  })
+  scheduleInitialize()
 
-  rafIds.push(rafId)
+  if (typeof ResizeObserver === "undefined") {
+    window.addEventListener("resize", scheduleInitialize)
+  } else {
+    resizeObserver = new ResizeObserver(() => {
+      scheduleInitialize()
+    })
+    resizeObserver.observe(slot)
+  }
+
+  return () => {
+    if (frameId) {
+      cancelAnimationFrame(frameId)
+    }
+
+    resizeObserver?.disconnect()
+    window.removeEventListener("resize", scheduleInitialize)
+  }
 }
 
 export const initializeInlineAdsenseSlots = (
@@ -129,16 +143,12 @@ export const initializeInlineAdsenseSlots = (
     return () => {}
   }
 
-  const rafIds: number[] = []
   const inlineSlots = getInlineAdsenseSlots(root, adSlot)
-
-  for (const slot of inlineSlots) {
-    initializeInlineAdsenseSlot(slot, rafIds)
-  }
+  const cleanups = inlineSlots.map(slot => initializeAdsenseSlotWhenReady(slot))
 
   return () => {
-    for (const rafId of rafIds) {
-      cancelAnimationFrame(rafId)
+    for (const cleanup of cleanups) {
+      cleanup()
     }
   }
 }

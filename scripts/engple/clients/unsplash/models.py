@@ -48,7 +48,7 @@ class Photo(BaseModel):
     width: int
     height: int
     color: str
-    blur_hash: str
+    blur_hash: str | None = None
     description: Optional[str] = None
     user: User
     current_user_collections: list = Field(default_factory=list)

@@ -30,8 +30,9 @@ const DetailsToggle: React.FC = () => {
     }
 
     const setupDetailsToggle = () => {
-      const detailsElements =
-        document.querySelectorAll<HTMLDetailsElement>("details")
+      const detailsElements = document.querySelectorAll<HTMLDetailsElement>(
+        'details:not([data-faq-item="true"])',
+      )
       if (detailsElements.length === 0) return
 
       const firstDetails = detailsElements[0]

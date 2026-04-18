@@ -124,6 +124,13 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const description = desc || excerpt
   const faqItems = (faqs ?? []).filter(item => item?.question && item?.answer)
   const categoryPath = `/category/${kebabCase(category ?? "")}/`
+  const tocHeadings =
+    faqItems.length > 0
+      ? [
+          ...headings,
+          { id: "faq-heading", depth: 2, value: "❓ 자주 묻는 질문" },
+        ]
+      : headings
 
   const articleJsonLd = {
     "@type": "Article",
@@ -285,31 +292,30 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 <Pronunciation />
                 <DetailsToggle />
                 <RightWrapper>
-                  <TableOfContents headings={headings} />
+                  <TableOfContents headings={tocHeadings} />
                 </RightWrapper>
               </ContentWrapper>
               {faqItems.length > 0 && (
                 <FaqSection aria-labelledby="faq-heading">
                   <FaqSectionHeader>
-                    <FaqEyebrow>FAQ</FaqEyebrow>
-                    <FaqHeading id="faq-heading">자주 묻는 질문</FaqHeading>
-                    <FaqLead>
-                      이 표현을 검색해서 들어온 분들이 많이 궁금해하는 내용을 한
-                      번에 정리했어요.
-                    </FaqLead>
+                    <FaqHeading id="faq-heading">❓ 자주 묻는 질문</FaqHeading>
                   </FaqSectionHeader>
                   <FaqList>
-                    {faqItems.map(item => (
-                      <FaqCard key={item?.question ?? item?.answer ?? "faq"}>
-                        <FaqQuestionRow>
-                          <FaqBadge>Q</FaqBadge>
+                    {faqItems.map((item, index) => (
+                      <FaqItem
+                        key={item?.question ?? item?.answer ?? "faq"}
+                        data-faq-item="true"
+                        open={index === 0}
+                      >
+                        <FaqSummary>
+                          <FaqIndex>Q{index + 1}</FaqIndex>
                           <FaqQuestion>{item?.question}</FaqQuestion>
-                        </FaqQuestionRow>
-                        <FaqAnswerRow>
-                          <FaqBadge $isAnswer>A</FaqBadge>
+                          <FaqChevron aria-hidden="true" />
+                        </FaqSummary>
+                        <FaqAnswerWrap>
                           <FaqAnswer>{item?.answer}</FaqAnswer>
-                        </FaqAnswerRow>
-                      </FaqCard>
+                        </FaqAnswerWrap>
+                      </FaqItem>
                     ))}
                   </FaqList>
                 </FaqSection>
@@ -488,120 +494,122 @@ const FaqSection = styled.section`
   width: var(--post-width);
   margin: 0 auto;
   margin-top: var(--sizing-lg);
-  padding: var(--padding-xl);
-  border: 1px solid var(--color-divider);
-  border-radius: var(--border-radius-lg);
-  background: radial-gradient(
-      circle at top right,
-      rgba(10, 132, 255, 0.12),
-      transparent 30%
-    ),
-    linear-gradient(135deg, var(--color-card) 0%, var(--color-gray-1) 100%);
-  box-shadow: 0 28px 56px rgba(15, 23, 42, 0.08);
+  padding: var(--padding-lg) var(--padding-md) 0;
+  scroll-margin-top: 120px;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
-    padding: var(--padding-lg);
-    border-radius: calc(var(--border-radius-lg) - 8px);
+    margin-top: var(--sizing-md);
+    padding: var(--padding-md) var(--padding-sm) 0;
   }
 `
 
 const FaqSectionHeader = styled.div`
-  margin-bottom: var(--sizing-md);
-`
-
-const FaqEyebrow = styled.span`
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background-color: rgba(10, 132, 255, 0.12);
-  color: var(--color-blue);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.08em;
+  margin-bottom: 2px;
 `
 
 const FaqHeading = styled.h2`
-  margin-top: var(--sizing-sm);
-  font-size: 2rem;
-  font-weight: var(--font-weight-extra-bold);
-  line-height: 1.2;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: 1.75rem;
-  }
-`
-
-const FaqLead = styled.p`
-  margin-top: var(--sizing-sm);
-  color: var(--color-text-2);
-  font-size: var(--text-md);
-  line-height: 1.7;
-
-  @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: var(--text-base);
+    font-size: 1.25rem;
   }
 `
 
 const FaqList = styled.div`
-  display: grid;
-  gap: var(--sizing-base);
-`
-
-const FaqCard = styled.article`
-  padding: var(--padding-lg);
-  border: 1px solid var(--color-divider);
-  border-radius: var(--border-radius-md);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.32) 0%,
-    rgba(255, 255, 255, 0.06) 100%
-  );
+  margin-top: 8px;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
-    padding: var(--padding-sm);
+    margin-top: 2px;
   }
 `
 
-const FaqQuestionRow = styled.div`
+const FaqSummary = styled.summary`
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-`
-
-const FaqAnswerRow = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  margin-top: var(--sizing-base);
-`
-
-const FaqBadge = styled.span<{ $isAnswer?: boolean }>`
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  padding: 18px 0;
+  cursor: pointer;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    gap: 8px;
+    padding: 16px 0;
+  }
+`
+
+const FaqIndex = styled.span`
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: ${({ $isAnswer }) =>
-    $isAnswer ? "var(--color-gray-2)" : "var(--color-blue)"};
-  color: ${({ $isAnswer }) =>
-    $isAnswer ? "var(--color-text)" : "var(--color-white)"};
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-extra-bold);
+  min-width: 26px;
+  color: var(--color-text-3);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    min-width: 24px;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+  }
 `
 
 const FaqQuestion = styled.h3`
-  font-size: 1.125rem;
-  font-weight: var(--font-weight-bold);
-  line-height: 1.6;
+  flex: 1;
+  margin: 0;
+  color: var(--color-text-2);
+  font-size: 1rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1.55;
+  transition: color 0.2s ease;
+`
+
+const FaqChevron = styled.span`
+  position: relative;
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: 1px;
+  border-right: 1.5px solid var(--color-text-3);
+  border-bottom: 1.5px solid var(--color-text-3);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+`
+
+const FaqItem = styled.details`
+  border-bottom: 1px solid var(--color-divider);
+
+  &[open] {
+    ${FaqQuestion} {
+      color: var(--color-text);
+    }
+
+    ${FaqChevron} {
+      transform: rotate(-135deg);
+    }
+  }
+`
+
+const FaqAnswerWrap = styled.div`
+  padding: 0 0 18px 36px;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    padding-left: 32px;
+  }
 `
 
 const FaqAnswer = styled.p`
+  margin: 0;
   color: var(--color-text-2);
-  font-size: var(--text-base);
-  line-height: 1.8;
+  font-size: 0.9375rem;
+  line-height: 1.75;
 `
 
 export const query = graphql`

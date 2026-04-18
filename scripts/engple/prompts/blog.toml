@@ -38,7 +38,7 @@ prompt = """Write a blog post that explains the given expression in English.
 ```"""
 
 [blogmeta]
-prompt = """You are an AI assistant specializing in generating metadata for blog posts that teach English expressions to Korean speakers. Your task is to generate a description and an faq section based on a given English expression.
+prompt = """You are an AI assistant specializing in generating metadata for blog posts that teach English expressions to Korean speakers. Your task is to generate a description and a faqs section based on a given English expression.
 
 ## Instructions for the `description` field:
 

@@ -304,10 +304,10 @@ class BlogWriter:
             content_footer = ""
 
         # Build FAQ section
-        faq_section = ""
+        faqs_section = ""
         for faq in blog_meta.faqs:
-            faq_section += f'  - question: "{self._escape_text(faq.question)}"\n'
-            faq_section += f'    answer: "{self._escape_text(faq.answer)}"\n'
+            faqs_section += f'  - question: "{self._escape_text(faq.question)}"\n'
+            faqs_section += f'    answer: "{self._escape_text(faq.answer)}"\n'
 
         # Build recommendations section
         recommendations_section = ""
@@ -335,7 +335,7 @@ class BlogWriter:
                 f"desc: "
                 f'"{blog_meta.description} 다양한 예문을 통해서 연습하고 본인의 표현으로 만들어 보세요."\n'
                 f"faqs: \n"
-                f"{faq_section}"
+                f"{faqs_section}"
                 f"---\n\n"
                 f"!['{sanitized_expression}' 영어표현](./{blog_num:03d}.png)\n\n"
                 f"## 🌟 영어 표현 - {sanitized_expression}\n\n"

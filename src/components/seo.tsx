@@ -27,6 +27,7 @@ interface SEOProperties {
   jsonLds?: Thing[]
   url?: Queries.Maybe<string>
   ogType?: "website" | "article"
+  noIndex?: boolean
 }
 
 const SEO: React.FC<SEOProperties> = ({
@@ -36,10 +37,12 @@ const SEO: React.FC<SEOProperties> = ({
   image,
   jsonLds = [],
   ogType = "website",
+  noIndex = false,
 }) => {
   const site = useSiteMetadata()
   const description = desc || site.description || ""
   const ogImageUrl = image || (defaultOpenGraphImage as string)
+  const canonicalUrl = url || undefined
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -141,6 +144,9 @@ const SEO: React.FC<SEOProperties> = ({
         ] as Meta
       }
     >
+      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+      {noIndex && <meta name="robots" content="noindex,follow" />}
+      {noIndex && <meta name="googlebot" content="noindex,follow" />}
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
     </Helmet>
   )

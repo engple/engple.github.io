@@ -14,7 +14,6 @@ import styled from "styled-components"
 import SEO from "~/src/components/seo"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
-import Category from "~/src/styles/category"
 import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
@@ -243,7 +242,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
             <InnerWrapper>
               <ContentHeader>
                 <Info>
-                  <PostCategory>{category}</PostCategory>
                   <Time dateTime={date!}>{date?.split("T")[0]}</Time>
                 </Info>
                 <BreadcrumbNav aria-label="Breadcrumb">
@@ -420,18 +418,12 @@ const ContentWrapper = styled.div`
   gap: var(--sizing-xl);
 `
 
-const PostCategory = styled(Category)`
-  font-size: 0.875rem;
-  font-weight: var(--font-weight-semi-bold);
-`
-
 const Info = styled.div`
   margin-bottom: var(--sizing-sm);
 `
 
 const Time = styled(DateTime)`
   display: block;
-  margin-top: var(--sizing-xs);
 `
 
 const Divider = styled.div`

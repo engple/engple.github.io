@@ -595,9 +595,9 @@ const FaqBadge = styled.span<{ $isAnswer?: boolean }>`
   height: 32px;
   border-radius: 50%;
   background-color: ${({ $isAnswer }) =>
-    $isAnswer ? "var(--color-category-button)" : "var(--color-blue)"};
+    $isAnswer ? "var(--color-gray-2)" : "var(--color-blue)"};
   color: ${({ $isAnswer }) =>
-    $isAnswer ? "var(--color-blue)" : "var(--color-white)"};
+    $isAnswer ? "var(--color-text)" : "var(--color-white)"};
   font-size: var(--text-sm);
   font-weight: var(--font-weight-extra-bold);
 `

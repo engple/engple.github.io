@@ -57,7 +57,7 @@ const SearchPage: React.FC<PageProps<Queries.Query>> = ({ location, data }) => {
     <Layout>
       <SEO
         title={`'${searchQuery}'에 대한 검색 결과 - ${site.title}`}
-        url={`${site.siteUrl}/search`}
+        url={`${site.siteUrl}/search/`}
         noIndex
       />
       <Main>

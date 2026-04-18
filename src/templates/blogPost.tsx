@@ -72,7 +72,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     headings,
     fields: { slug, lastmod },
   } = data.current!
-  const { title, desc, thumbnail, date, category, faq } = frontmatter!
+  const { title, desc, thumbnail, date, category, faqs } = frontmatter!
   const site = useSiteMetadata()
   const articleRef = React.useRef<HTMLElement | null>(null)
   const htmlWithInlineAd =
@@ -122,7 +122,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     thumbnail?.childImageSharp?.gatsbyImageData!.images!.fallback!.src
 
   const description = desc || excerpt
-  const faqItems = (faq ?? []).filter(item => item?.question && item?.answer)
+  const faqItems = (faqs ?? []).filter(item => item?.question && item?.answer)
   const categoryPath = `/category/${kebabCase(category ?? "")}/`
 
   const articleJsonLd = {
@@ -625,7 +625,7 @@ export const query = graphql`
         }
         date(formatString: "YYYY-MM-DDTHH:MM:SSZ")
         category
-        faq {
+        faqs {
           question
           answer
         }

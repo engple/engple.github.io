@@ -1,6 +1,7 @@
 import React from "react"
 
-import { type PageProps, graphql } from "gatsby"
+import { Link, type PageProps, graphql } from "gatsby"
+import kebabCase from "lodash/kebabCase"
 import {
   type Article,
   type BreadcrumbList,
@@ -72,7 +73,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     headings,
     fields: { slug, lastmod },
   } = data.current!
-  const { title, desc, thumbnail, date, category, faq = [] } = frontmatter!
+  const { title, desc, thumbnail, date, category, faq } = frontmatter!
   const site = useSiteMetadata()
   const articleRef = React.useRef<HTMLElement | null>(null)
   const htmlWithInlineAd =
@@ -122,6 +123,8 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     thumbnail?.childImageSharp?.gatsbyImageData!.images!.fallback!.src
 
   const description = desc || excerpt
+  const faqItems = (faq ?? []).filter(item => item?.question && item?.answer)
+  const categoryPath = `/category/${kebabCase(category ?? "")}/`
 
   const articleJsonLd = {
     "@type": "Article",
@@ -161,12 +164,20 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         position: 1,
         item: {
           "@id": site.siteUrl,
-          name: "영어 표현",
+          name: "잉플",
         },
       },
       {
         "@type": "ListItem",
         position: 2,
+        item: {
+          "@id": `${site.siteUrl}${categoryPath}`,
+          name: category,
+        },
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
         item: {
           "@id": `${site.siteUrl}${slug}`,
           name: title,
@@ -177,16 +188,14 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
 
   const faqJsonLd = {
     "@type": "FAQPage",
-    mainEntity: faq
-      ? faq.map(item => ({
-          "@type": "Question",
-          name: item?.question || "",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: item?.answer || "",
-          },
-        }))
-      : [],
+    mainEntity: faqItems.map(item => ({
+      "@type": "Question",
+      name: item?.question || "",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item?.answer || "",
+      },
+    })),
   } as FAQPage
 
   const learningResourceJsonLd = {
@@ -214,7 +223,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     learningResourceJsonLd,
   ]
 
-  if (faq) {
+  if (faqItems.length > 0) {
     jsonLds.push(faqJsonLd)
   }
 
@@ -233,6 +242,23 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
           <OuterWrapper>
             <InnerWrapper>
               <ContentHeader>
+                <BreadcrumbNav aria-label="Breadcrumb">
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink to="/">잉플</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink to={categoryPath}>
+                        {category}
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbItem>
+                      <BreadcrumbCurrent aria-current="page">
+                        {title}
+                      </BreadcrumbCurrent>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </BreadcrumbNav>
                 <Info>
                   <PostCategory>{category}</PostCategory>
                   <Time dateTime={date!}>{date?.split("T")[0]}</Time>
@@ -264,6 +290,32 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   <TableOfContents headings={headings} />
                 </RightWrapper>
               </ContentWrapper>
+              {faqItems.length > 0 && (
+                <FaqSection aria-labelledby="faq-heading">
+                  <FaqSectionHeader>
+                    <FaqEyebrow>FAQ</FaqEyebrow>
+                    <FaqHeading id="faq-heading">자주 묻는 질문</FaqHeading>
+                    <FaqLead>
+                      이 표현을 검색해서 들어온 분들이 많이 궁금해하는 내용을 한
+                      번에 정리했어요.
+                    </FaqLead>
+                  </FaqSectionHeader>
+                  <FaqList>
+                    {faqItems.map(item => (
+                      <FaqCard key={item?.question ?? item?.answer ?? "faq"}>
+                        <FaqQuestionRow>
+                          <FaqBadge>Q</FaqBadge>
+                          <FaqQuestion>{item?.question}</FaqQuestion>
+                        </FaqQuestionRow>
+                        <FaqAnswerRow>
+                          <FaqBadge $isAnswer>A</FaqBadge>
+                          <FaqAnswer>{item?.answer}</FaqAnswer>
+                        </FaqAnswerRow>
+                      </FaqCard>
+                    ))}
+                  </FaqList>
+                </FaqSection>
+              )}
             </InnerWrapper>
           </OuterWrapper>
         </article>
@@ -297,6 +349,70 @@ const ContentHeader = styled.div`
   @media (min-width: ${({ theme }) => theme.device.sm}) {
     margin: 0 auto;
   }
+`
+
+const BreadcrumbNav = styled.nav`
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: var(--sizing-md);
+  padding: 10px 16px;
+  border: 1px solid var(--color-divider);
+  border-radius: 999px;
+  background: linear-gradient(
+    135deg,
+    var(--color-card) 0%,
+    var(--color-gray-1) 100%
+  );
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: var(--border-radius-md);
+  }
+`
+
+const BreadcrumbList = styled.ol`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  list-style: none;
+`
+
+const BreadcrumbItem = styled.li`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+
+  & + &::before {
+    content: "/";
+    color: var(--color-gray-5);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-bold);
+  }
+`
+
+const BreadcrumbLink = styled(Link)`
+  color: var(--color-text-2);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-semi-bold);
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    color: var(--color-blue);
+    transform: translateY(-1px);
+  }
+`
+
+const BreadcrumbCurrent = styled.span`
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
 `
 
 const ContentWrapper = styled.div`
@@ -344,12 +460,14 @@ const Title = styled.h1`
     font-size: 2rem;
   }
 `
+
 const LeftAd = styled.div`
   min-width: 300px;
   width: 300px;
   height: 600px;
   position: sticky;
   top: 124px;
+
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
   }
@@ -362,6 +480,7 @@ const RightWrapper = styled.div`
   flex-direction: column;
   gap: var(--sizing-lg);
   align-items: center;
+
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
   }
@@ -373,6 +492,126 @@ const CenterWrapper = styled.div`
   flex-direction: column;
   gap: var(--sizing-md);
   align-items: center;
+`
+
+const FaqSection = styled.section`
+  width: var(--post-width);
+  margin: 0 auto;
+  margin-top: var(--sizing-lg);
+  padding: var(--padding-xl);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius-lg);
+  background: radial-gradient(
+      circle at top right,
+      rgba(10, 132, 255, 0.12),
+      transparent 30%
+    ),
+    linear-gradient(135deg, var(--color-card) 0%, var(--color-gray-1) 100%);
+  box-shadow: 0 28px 56px rgba(15, 23, 42, 0.08);
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    padding: var(--padding-lg);
+    border-radius: calc(var(--border-radius-lg) - 8px);
+  }
+`
+
+const FaqSectionHeader = styled.div`
+  margin-bottom: var(--sizing-md);
+`
+
+const FaqEyebrow = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background-color: rgba(10, 132, 255, 0.12);
+  color: var(--color-blue);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+`
+
+const FaqHeading = styled.h2`
+  margin-top: var(--sizing-sm);
+  font-size: 2rem;
+  font-weight: var(--font-weight-extra-bold);
+  line-height: 1.2;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    font-size: 1.75rem;
+  }
+`
+
+const FaqLead = styled.p`
+  margin-top: var(--sizing-sm);
+  color: var(--color-text-2);
+  font-size: var(--text-md);
+  line-height: 1.7;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    font-size: var(--text-base);
+  }
+`
+
+const FaqList = styled.div`
+  display: grid;
+  gap: var(--sizing-base);
+`
+
+const FaqCard = styled.article`
+  padding: var(--padding-lg);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.32) 0%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    padding: var(--padding-sm);
+  }
+`
+
+const FaqQuestionRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+`
+
+const FaqAnswerRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-top: var(--sizing-base);
+`
+
+const FaqBadge = styled.span<{ $isAnswer?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: ${({ $isAnswer }) =>
+    $isAnswer ? "var(--color-category-button)" : "var(--color-blue)"};
+  color: ${({ $isAnswer }) =>
+    $isAnswer ? "var(--color-blue)" : "var(--color-white)"};
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-extra-bold);
+`
+
+const FaqQuestion = styled.h3`
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.6;
+`
+
+const FaqAnswer = styled.p`
+  color: var(--color-text-2);
+  font-size: var(--text-base);
+  line-height: 1.8;
 `
 
 export const query = graphql`

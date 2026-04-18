@@ -187,55 +187,6 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     border-radius: 3px;
   }
 
-  details {
-    border: 1px solid var(--color-gray-2);
-    border-radius: 4px;
-    line-height: 2;
-    margin: 1em 0;
-  }
-
-  details > span {
-    display: block;
-    padding: 0 32px;
-  }
-
-  summary {
-    cursor: pointer;
-    font-weight: bold;
-    padding: 0 8px;
-    background-color: var(--color-gray-1);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    focus: none;
-  }
-
-  summary::before {
-    content: "▶";
-    width: 16px;
-    height: 16px;
-    font-size: 12px;
-    color: black;
-    transition: transform 0.3s ease;
-    display: inline-block;
-    text-align: center;
-    margin-right: 8px;
-    lien-height: 16px;
-  }
-
-  details[open] summary {
-    border-radius: 4px 4px 0 0;
-  }
-
-  details[open] summary::before {
-    transform: rotate(90deg);
-  }
-
-  details summary::-webkit-details-marker {
-    display: none;
-  }
-
-  button.details-toggle-button,
   button.interactive-list-toggle-all-button {
     position: absolute;
     top: calc(-3.4rem);

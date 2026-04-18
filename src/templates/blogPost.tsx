@@ -18,7 +18,6 @@ import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
 
-import DetailsToggle from "../components/DetailsToggle"
 import Pronunciation from "../components/Pronunciation"
 import Adsense from "../components/adsense"
 import PostNavigator from "../components/postNavigator"
@@ -290,7 +289,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   />
                 </CenterWrapper>
                 <Pronunciation />
-                <DetailsToggle />
                 <RightWrapper>
                   <TableOfContents headings={tocHeadings} />
                 </RightWrapper>

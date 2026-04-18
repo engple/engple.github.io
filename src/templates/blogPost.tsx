@@ -242,6 +242,10 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
           <OuterWrapper>
             <InnerWrapper>
               <ContentHeader>
+                <Info>
+                  <PostCategory>{category}</PostCategory>
+                  <Time dateTime={date!}>{date?.split("T")[0]}</Time>
+                </Info>
                 <BreadcrumbNav aria-label="Breadcrumb">
                   <BreadcrumbList>
                     <BreadcrumbItem>
@@ -259,10 +263,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                     </BreadcrumbItem>
                   </BreadcrumbList>
                 </BreadcrumbNav>
-                <Info>
-                  <PostCategory>{category}</PostCategory>
-                  <Time dateTime={date!}>{date?.split("T")[0]}</Time>
-                </Info>
                 <Title>{title}</Title>
               </ContentHeader>
               <Divider />
@@ -352,23 +352,17 @@ const ContentHeader = styled.div`
 `
 
 const BreadcrumbNav = styled.nav`
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
-  margin-bottom: var(--sizing-md);
-  padding: 10px 16px;
-  border: 1px solid var(--color-divider);
-  border-radius: 999px;
-  background: linear-gradient(
-    135deg,
-    var(--color-card) 0%,
-    var(--color-gray-1) 100%
-  );
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+  margin-bottom: 14px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: var(--border-radius-md);
+    max-width: 100%;
+    margin-bottom: 10px;
   }
 `
 
@@ -376,43 +370,47 @@ const BreadcrumbList = styled.ol`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 12px;
+  gap: 4px 10px;
   list-style: none;
+  margin: 0;
+  padding: 0;
 `
 
 const BreadcrumbItem = styled.li`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
 
   & + &::before {
-    content: "/";
-    color: var(--color-gray-5);
-    font-size: var(--text-sm);
-    font-weight: var(--font-weight-bold);
+    content: "·";
+    color: var(--color-gray-4);
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-regular);
+  }
+
+  &:last-child {
+    flex: 1 1 12rem;
   }
 `
 
 const BreadcrumbLink = styled(Link)`
-  color: var(--color-text-2);
-  font-size: 0.875rem;
-  font-weight: var(--font-weight-semi-bold);
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease;
+  color: var(--color-text-3);
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  transition: color 0.2s ease;
 
   &:hover {
-    color: var(--color-blue);
-    transform: translateY(-1px);
+    color: var(--color-text);
   }
 `
 
 const BreadcrumbCurrent = styled.span`
-  color: var(--color-text);
-  font-size: 0.875rem;
-  font-weight: var(--font-weight-bold);
-  line-height: 1.5;
+  color: var(--color-text-2);
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1.4;
 `
 
 const ContentWrapper = styled.div`
@@ -428,7 +426,7 @@ const PostCategory = styled(Category)`
 `
 
 const Info = styled.div`
-  margin-bottom: var(--sizing-md);
+  margin-bottom: var(--sizing-sm);
 `
 
 const Time = styled(DateTime)`

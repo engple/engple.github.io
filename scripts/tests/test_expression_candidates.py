@@ -168,6 +168,99 @@ def test_generate_rejects_foreign_dominant_words(
     assert "traveler" in generated
 
 
+def test_generate_keeps_common_english_loanwords(
+    monkeypatch,
+):
+    """`generate` should keep common English words even when they score well in other languages too."""
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "top_n_list",
+        _build_top_n_list(
+            [
+                "menu",
+                "pizza",
+                "cafe",
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "zipf_frequency",
+        _build_zipf_frequency_lookup(
+            {
+                ("menu", "en"): 4.26,
+                ("menu", "fr"): 4.2,
+                ("pizza", "en"): 4.43,
+                ("pizza", "it"): 4.62,
+                ("cafe", "en"): 4.09,
+                ("cafe", "es"): 3.81,
+                ("cafe", "fr"): 3.18,
+            }
+        ),
+    )
+
+    creator = ExpressionCandidateCreator(
+        client=_FakeAsyncClient({}),
+        rng=random.Random(5),
+        word_pool_size=3,
+        datamuse_results=1,
+    )
+
+    # Given: The candidate source contains common English loanwords.
+    existing_expressions: list[str] = []
+
+    # When: Candidate generation runs end-to-end.
+    generated = asyncio.run(creator.generate(existing_expressions, 3))
+
+    # Then: The common English words should remain eligible.
+    assert generated == ["pizza", "menu", "cafe"]
+
+
+def test_generate_keeps_tire_distinct_from_existing_tier(
+    monkeypatch,
+):
+    """`generate` should not collapse unrelated `-re` and `-er` words into one family."""
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "top_n_list",
+        _build_top_n_list(
+            [
+                "tire",
+                "look after",
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "zipf_frequency",
+        _build_zipf_frequency_lookup(
+            {
+                ("tire", "en"): 4.02,
+                ("tire", "fr"): 4.53,
+                ("tire", "pt"): 4.09,
+                ("look after", "en"): 5.2,
+                ("look", "en"): 5.1,
+            }
+        ),
+    )
+
+    creator = ExpressionCandidateCreator(
+        client=_FakeAsyncClient({}),
+        rng=random.Random(13),
+        word_pool_size=2,
+        datamuse_results=1,
+    )
+
+    # Given: A different word with a similar ending is already published.
+    existing_expressions = ["tier"]
+
+    # When: Candidate generation selects new expressions.
+    generated = asyncio.run(creator.generate(existing_expressions, 2))
+
+    # Then: The new word should still be considered distinct.
+    assert "tire" in generated
+
+
 class _FakeAsyncClient:
     def __init__(self, topic_results: dict[str, list[str]]) -> None:
         self._topic_results = topic_results

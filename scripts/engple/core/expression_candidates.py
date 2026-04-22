@@ -39,28 +39,10 @@ DATAMUSE_TOPIC_SEEDS = (
     "time",
 )
 EXPRESSION_RE = re.compile(r"^[a-z][a-z' -]*[a-z]$")
+# Compare against a small set of high-signal non-English corpora so we can
+# catch obvious foreign-dominant tokens without rejecting common English
+# loanwords due to noise from every supported language in wordfreq.
 NON_ENGLISH_LANGUAGE_CODES = ("es", "fr", "de", "it", "pt")
-PARTICLE_WORDS = {
-    "about",
-    "across",
-    "after",
-    "around",
-    "away",
-    "back",
-    "down",
-    "for",
-    "from",
-    "in",
-    "into",
-    "off",
-    "on",
-    "out",
-    "over",
-    "through",
-    "to",
-    "up",
-    "with",
-}
 SPELLING_VARIANT_SUFFIXES = (
     ("isations", "izations"),
     ("isation", "ization"),
@@ -75,7 +57,6 @@ SPELLING_VARIANT_SUFFIXES = (
     ("lling", "ling"),
     ("lled", "led"),
     ("ogue", "og"),
-    ("re", "er"),
 )
 BLOCKED_SINGLE_WORDS = {
     "a",
@@ -420,7 +401,6 @@ class CandidateOption:
     family_key: str
     diversity_key: str
     is_multiword: bool
-    is_phrasal: bool
 
 
 class ExpressionCandidateCreator:
@@ -521,22 +501,9 @@ class ExpressionCandidateCreator:
         selected: list[CandidateOption] = []
         remaining = list(candidates)
 
-        phrasal_quota = min(
-            len([candidate for candidate in remaining if candidate.is_phrasal]),
-            max(1, count // 3),
-        )
-        selected.extend(
-            self._draw_candidates(
-                [candidate for candidate in remaining if candidate.is_phrasal],
-                phrasal_quota,
-                selected,
-            )
-        )
-        remaining = self._exclude_selected_candidates(remaining, selected)
-
         multiword_quota = min(
             len([candidate for candidate in remaining if candidate.is_multiword]),
-            max(0, count // 2 - len(selected)),
+            max(1, count // 2),
         )
         selected.extend(
             self._draw_candidates(
@@ -717,7 +684,6 @@ class ExpressionCandidateCreator:
             family_key=family_key,
             diversity_key=self._get_candidate_diversity_key(expression),
             is_multiword=" " in clean_expression(expression),
-            is_phrasal=self._is_phrasal_expression(expression),
         )
         current_option = grouped_candidates.get(family_key)
         if current_option is None or self._should_replace_candidate(
@@ -773,7 +739,6 @@ class ExpressionCandidateCreator:
         if any(
             len(word) > 2 and not self._looks_like_english_word(word)
             for word in words
-            if word not in PARTICLE_WORDS
         ):
             return False
 
@@ -791,7 +756,14 @@ class ExpressionCandidateCreator:
             float(zipf_frequency(word, language))
             for language in NON_ENGLISH_LANGUAGE_CODES
         ]
-        return english_score >= max(foreign_scores, default=0.0) + 0.35
+        max_foreign_score = max(foreign_scores, default=0.0)
+
+        # Keep established English loanwords and homographs unless another
+        # language is overwhelmingly more likely for this token.
+        if english_score >= self.min_zipf + 0.4:
+            return True
+
+        return max_foreign_score < english_score + 0.75
 
     def _get_candidate_family_key(self, expression: str) -> str:
         normalized = normalize_expression(expression)
@@ -803,7 +775,7 @@ class ExpressionCandidateCreator:
         normalized = normalize_expression(expression)
         tokens = normalized.split()
         content_tokens = [
-            token for token in tokens if token not in PARTICLE_WORDS and token not in ENGLISH_STOP_WORDS
+            token for token in tokens if token not in ENGLISH_STOP_WORDS
         ]
         seed_token = content_tokens[0] if content_tokens else tokens[0]
         return self._canonicalize_token(seed_token)
@@ -820,13 +792,5 @@ class ExpressionCandidateCreator:
                 )
                 break
         return canonical_token
-
-    def _is_phrasal_expression(self, expression: str) -> bool:
-        tokens = normalize_expression(expression).split()
-        if len(tokens) < 2:
-            return False
-
-        return any(token in PARTICLE_WORDS for token in tokens[1:])
-
 
 __all__ = ["ExpressionCandidateCreator"]

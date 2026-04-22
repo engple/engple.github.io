@@ -71,7 +71,6 @@ def test_generate_groups_spelling_variants_and_keeps_multiword_candidates(
     assert sum(" " in expression for expression in generated) >= 2
     assert {"look after", "figure out", "make for"} & set(generated)
 
-
 def test_generate_mixes_single_and_multiword_candidates_when_both_exist(
     monkeypatch,
 ):
@@ -136,8 +135,6 @@ def test_generate_mixes_single_and_multiword_candidates_when_both_exist(
     assert len(generated) == 5
     assert any(" " in expression for expression in generated)
     assert any(" " not in expression for expression in generated)
-
-
 def test_generate_expands_candidate_search_when_top_results_are_exhausted(
     monkeypatch,
 ):
@@ -326,7 +323,6 @@ def test_generate_keeps_tire_distinct_from_existing_tier(
     # Then: The new word should still be considered distinct.
     assert "tire" in generated
 
-
 def test_generate_keeps_filled_distinct_from_existing_filed(
     monkeypatch,
 ):
@@ -368,8 +364,6 @@ def test_generate_keeps_filled_distinct_from_existing_filed(
 
     # Then: The doubled-l word should remain distinct instead of being deduped away.
     assert "filled" in generated
-
-
 class _FakeAsyncClient:
     def __init__(self, topic_results: dict[str, list[str]]) -> None:
         self._topic_results = topic_results

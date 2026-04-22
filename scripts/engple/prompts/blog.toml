@@ -66,20 +66,6 @@ Examples:
 {examples}
 ```"""
 
-[candidate_generation]
-prompt = """Generate everyday American English vocabulary and phrases for Korean learners.
-
-Rules:
-1. Output format: english word/phrase (한국어 뜻)
-2. Use single words, phrasal verbs, or collocations. 
-3. Strictly avoid full sentences (e.g., No "How's it going?", No "What's up?").
-4. Exclude anything in the used list.
-5. Deduplicate by English only.
-
-Used:
-{existing_expressions}
-"""
-
 [candidate_meaning]
 prompt = """Given a array of English expressions, return the same expressions with one short Korean meaning each.
 

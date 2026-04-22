@@ -52,11 +52,35 @@ SPELLING_VARIANT_SUFFIXES = (
     ("ise", "ize"),
     ("ours", "ors"),
     ("our", "or"),
-    ("llers", "lers"),
-    ("ller", "ler"),
-    ("lling", "ling"),
-    ("lled", "led"),
     ("ogue", "og"),
+)
+DOUBLE_L_VARIANT_SUFFIXES = (
+    ("lers", "ers"),
+    ("ler", "er"),
+    ("ling", "ing"),
+    ("led", "ed"),
+)
+DOUBLE_L_VARIANT_STEMS = (
+    "cancel",
+    "channel",
+    "dial",
+    "duel",
+    "equal",
+    "fuel",
+    "label",
+    "level",
+    "marshal",
+    "marvel",
+    "model",
+    "panel",
+    "pedal",
+    "quarrel",
+    "rival",
+    "signal",
+    "total",
+    "travel",
+    "trial",
+    "tunnel",
 )
 BLOCKED_SINGLE_WORDS = {
     "a",
@@ -500,15 +524,31 @@ class ExpressionCandidateCreator:
 
         selected: list[CandidateOption] = []
         remaining = list(candidates)
-
-        multiword_quota = min(
-            len([candidate for candidate in remaining if candidate.is_multiword]),
-            max(1, count // 2),
+        multiword_candidates = [
+            candidate for candidate in remaining if candidate.is_multiword
+        ]
+        single_word_candidates = [
+            candidate for candidate in remaining if not candidate.is_multiword
+        ]
+        multiword_quota, single_word_quota = self._get_type_selection_quotas(
+            multiword_candidates,
+            single_word_candidates,
+            count,
         )
+
         selected.extend(
             self._draw_candidates(
-                [candidate for candidate in remaining if candidate.is_multiword],
+                multiword_candidates,
                 multiword_quota,
+                selected,
+            )
+        )
+        remaining = self._exclude_selected_candidates(remaining, selected)
+
+        selected.extend(
+            self._draw_candidates(
+                [candidate for candidate in remaining if not candidate.is_multiword],
+                single_word_quota,
                 selected,
             )
         )
@@ -523,6 +563,23 @@ class ExpressionCandidateCreator:
         )
 
         return [candidate.expression for candidate in selected[:count]]
+
+    def _get_type_selection_quotas(
+        self,
+        multiword_candidates: list[CandidateOption],
+        single_word_candidates: list[CandidateOption],
+        count: int,
+    ) -> tuple[int, int]:
+        if count <= 1 or not multiword_candidates or not single_word_candidates:
+            return 0, 0
+
+        multiword_quota = min(len(multiword_candidates), max(1, count // 2))
+        single_word_quota = min(
+            len(single_word_candidates),
+            max(1, count - multiword_quota),
+        )
+
+        return multiword_quota, single_word_quota
 
     def _draw_candidates(
         self,
@@ -791,6 +848,14 @@ class ExpressionCandidateCreator:
                     canonical_token[: -len(source_suffix)] + target_suffix
                 )
                 break
-        return canonical_token
+        return self._canonicalize_double_l_variant(canonical_token)
+
+    def _canonicalize_double_l_variant(self, token: str) -> str:
+        for stem in DOUBLE_L_VARIANT_STEMS:
+            for source_suffix, target_suffix in DOUBLE_L_VARIANT_SUFFIXES:
+                if token == f"{stem}{source_suffix}":
+                    return f"{stem}{target_suffix}"
+
+        return token
 
 __all__ = ["ExpressionCandidateCreator"]

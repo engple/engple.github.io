@@ -71,7 +71,70 @@ def test_generate_groups_spelling_variants_and_keeps_multiword_candidates(
     assert sum(" " in expression for expression in generated) >= 2
     assert {"look after", "figure out", "make for"} & set(generated)
 
+def test_generate_mixes_single_and_multiword_candidates_when_both_exist(
+    monkeypatch,
+):
+    """`generate` should not fill the whole result with multi-word candidates when single words are available."""
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "top_n_list",
+        _build_top_n_list(
+            [
+                "look after",
+                "figure out",
+                "make for",
+                "inside joke",
+                "work on",
+                "traveler",
+                "schoolhouse",
+                "outing",
+                "plow",
+                "harbor",
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "zipf_frequency",
+        _build_zipf_frequency_lookup(
+            {
+                ("look after", "en"): 5.8,
+                ("figure out", "en"): 5.7,
+                ("make for", "en"): 5.6,
+                ("inside joke", "en"): 5.5,
+                ("work on", "en"): 5.4,
+                ("traveler", "en"): 4.0,
+                ("schoolhouse", "en"): 4.2,
+                ("outing", "en"): 4.1,
+                ("plow", "en"): 3.9,
+                ("harbor", "en"): 3.8,
+                ("look", "en"): 5.2,
+                ("figure", "en"): 5.1,
+                ("make", "en"): 5.0,
+                ("inside", "en"): 5.0,
+                ("joke", "en"): 4.9,
+                ("work", "en"): 5.0,
+            }
+        ),
+    )
 
+    creator = ExpressionCandidateCreator(
+        client=_FakeAsyncClient({}),
+        rng=random.Random(4),
+        word_pool_size=10,
+        datamuse_results=1,
+    )
+
+    # Given: The candidate pool contains enough high-scoring multi-word and single-word options.
+    existing_expressions: list[str] = []
+
+    # When: Candidate generation selects five public candidates.
+    generated = asyncio.run(creator.generate(existing_expressions, 5))
+
+    # Then: The result should keep a visible mix instead of becoming all multi-word expressions.
+    assert len(generated) == 5
+    assert any(" " in expression for expression in generated)
+    assert any(" " not in expression for expression in generated)
 def test_generate_expands_candidate_search_when_top_results_are_exhausted(
     monkeypatch,
 ):
@@ -260,7 +323,47 @@ def test_generate_keeps_tire_distinct_from_existing_tier(
     # Then: The new word should still be considered distinct.
     assert "tire" in generated
 
+def test_generate_keeps_filled_distinct_from_existing_filed(
+    monkeypatch,
+):
+    """`generate` should not collapse unrelated doubled-l words into a spelling-variant family."""
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "top_n_list",
+        _build_top_n_list(
+            [
+                "filled",
+                "look after",
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "zipf_frequency",
+        _build_zipf_frequency_lookup(
+            {
+                ("filled", "en"): 4.6,
+                ("look after", "en"): 5.2,
+                ("look", "en"): 5.1,
+            }
+        ),
+    )
 
+    creator = ExpressionCandidateCreator(
+        client=_FakeAsyncClient({}),
+        rng=random.Random(17),
+        word_pool_size=2,
+        datamuse_results=1,
+    )
+
+    # Given: A different English word with a similar doubled-l ending is already published.
+    existing_expressions = ["filed"]
+
+    # When: Candidate generation selects new expressions.
+    generated = asyncio.run(creator.generate(existing_expressions, 2))
+
+    # Then: The doubled-l word should remain distinct instead of being deduped away.
+    assert "filled" in generated
 class _FakeAsyncClient:
     def __init__(self, topic_results: dict[str, list[str]]) -> None:
         self._topic_results = topic_results

@@ -34,7 +34,7 @@ const NavBar: React.FC<NavBarProperties> = ({ title }) => {
 
   const handleSearch = (searchTerm: string) => {
     setIsSearchOpen(false)
-    void navigate(`/search?q=${encodeURIComponent(searchTerm)}`)
+    void navigate(`/search/?q=${encodeURIComponent(searchTerm)}`)
   }
 
   const handleOpenSearch = () => {

@@ -17,30 +17,34 @@ const useInfiniteScroll = ({
 }: UseInfiniteScrollProperties) => {
   const [hasMore, setHasMore] = useState(false)
   const [currentList, setCurrentList] = useState<Post[]>([])
-  const [isLoading, setIsLoading] = useState(false)
   const [observerLoading, setObserverLoading] = useState(false)
 
   const observer = useRef<IntersectionObserver>()
 
   useLayoutEffect(() => {
-    if (posts.length === 0 || isLoading) return
     setHasMore(posts.length > maxPostNumber)
     setCurrentList(posts.slice(0, maxPostNumber))
-    setIsLoading(true)
-  }, [isLoading, posts, maxPostNumber])
+    setObserverLoading(false)
+  }, [posts, maxPostNumber])
 
   useEffect(() => {
     const loadEdges = () => {
-      const currentLength = currentList.length
-      const more = currentLength < posts.length
-      const nextEdges = more
-        ? posts.slice(currentLength, currentLength + maxPostNumber)
-        : []
-      setHasMore(more)
-      setCurrentList([...currentList, ...nextEdges])
+      setCurrentList(previousList => {
+        const currentLength = previousList.length
+        const nextEdges = posts.slice(
+          currentLength,
+          currentLength + maxPostNumber,
+        )
+        const nextList = [...previousList, ...nextEdges]
+
+        setHasMore(nextList.length < posts.length)
+
+        return nextList
+      })
     }
 
     const scrollEdgeElement = scrollEdgeRef.current
+    if (!scrollEdgeElement) return
 
     const option = {
       rootMargin: `0px 0px ${offsetY}px 0px`,
@@ -61,7 +65,15 @@ const useInfiniteScroll = ({
     observer.current.observe(scrollEdgeElement!)
 
     return () => observer.current && observer.current.disconnect()
-  })
+  }, [
+    currentList.length,
+    hasMore,
+    maxPostNumber,
+    observerLoading,
+    offsetY,
+    posts,
+    scrollEdgeRef,
+  ])
 
   return currentList
 }

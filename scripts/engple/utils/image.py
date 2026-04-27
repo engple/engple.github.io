@@ -74,3 +74,46 @@ def render_expression_thumbnail(path: str, image_url: str, ko: str) -> None:
         .outline(width=16, color="#1FFFAA")
     )
     canvas.render(path)
+
+
+def render_topic_thumbnail(path: str, image_url: str, topic: str) -> None:
+    """
+    Render a topic vocabulary thumbnail image from a topic name.
+
+    Args:
+        path: The path to save the thumbnail
+        image_url: The URL of the image
+        topic: The Korean topic name
+    """
+    font_dir = os.path.join(os.path.dirname(__file__), "../assets/fonts")
+    canvas = (
+        Canvas.from_aspect_ratio("16:9", 1280)
+        .background(image=image_url, fit=FitMode.COVER)
+        .background(color="#000000", opacity=0.66)
+        .text(
+            content=[
+                TextPart(
+                    text=f"{topic}\n",
+                    color="#FFBF1F",
+                    size=120,
+                    font=os.path.join(font_dir, "JalnanGothic.otf"),
+                    effects=[Stroke(width=8, color="#000000")],
+                ),
+                TextPart(
+                    text=" \n",
+                    size=28,
+                ),
+                TextPart(
+                    text="영어로 어떻게 표현할까?",
+                    color="#FFFFFF",
+                    size=56,
+                    font=os.path.join(font_dir, "SpoqaHanSansNeo-Medium.otf"),
+                ),
+            ],
+            position=("50%", "50%"),
+            align=("center", "middle"),
+            bold=True,
+        )
+        .outline(width=16, color="#FFBF1F")
+    )
+    canvas.render(path)

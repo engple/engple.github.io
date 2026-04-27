@@ -32,11 +32,22 @@ jobs:
         run: |
           uv sync --no-dev --locked
 
-      - name: Generate blog posts
+      - name: Generate expression blog posts
         id: generate_blog
         continue-on-error: true
         run: |
-          uv run main.py write-blog --count 5
+          uv run main.py write-blog --count 4
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_ENGPLE_DATABASE_ID: ${{ secrets.NOTION_ENGPLE_DATABASE_ID }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+
+      - name: Generate topic blog post
+        id: generate_topic_blog
+        continue-on-error: true
+        run: |
+          uv run main.py write-topic-blog
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
@@ -73,4 +84,10 @@ jobs:
         if: always() && steps.generate_blog.outcome == 'failure' && env.BLOG_CREATED != 'true'
         run: |
           echo "Blog generation failed before any publishable changes were committed."
+          exit 1
+
+      - name: Fail if any generator failed
+        if: always() && (steps.generate_blog.outcome == 'failure' || steps.generate_topic_blog.outcome == 'failure')
+        run: |
+          echo "One or more blog generators failed."
           exit 1

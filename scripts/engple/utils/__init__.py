@@ -6,7 +6,7 @@ from .expr_path import (
     get_expr_path,
     normalize_expression,
 )
-from .image import url_to_file
+from .image import render_topic_thumbnail, url_to_file
 
 __all__ = [
     "clean_expression",
@@ -15,5 +15,6 @@ __all__ = [
     "get_existing_expression_map",
     "get_expr_path",
     "normalize_expression",
+    "render_topic_thumbnail",
     "url_to_file",
 ]

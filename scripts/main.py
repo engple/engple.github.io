@@ -5,6 +5,7 @@ from loguru import logger
 import typer
 
 from engple.services.write_blog import handle_write_blog
+from engple.services.write_topic_blog import handle_write_topic_blog
 from engple.services.link_expression import handle_link_expression
 from engple.services.link_all_expressions import handle_link_all_expressions
 
@@ -98,6 +99,36 @@ def write_blog(
                     continue
 
     asyncio.run(_write_blog())
+
+
+@app.command()
+def write_topic_blog(
+    topic: str | None = typer.Argument(
+        None,
+        help="The Korean topic to generate. Omit to auto-select a new topic.",
+    ),
+    exclude: list[str] = typer.Option(
+        [],
+        "--exclude",
+        help="Vocabulary item to avoid. Repeat this option for multiple items.",
+    ),
+    no_thumbnail: bool = typer.Option(
+        False,
+        "--no-thumbnail",
+        help="Do not generate a thumbnail image",
+    ),
+) -> None:
+    """Generate a topic vocabulary blog post."""
+
+    async def _write_topic_blog():
+        blog_path = await handle_write_topic_blog(
+            topic,
+            excludes=exclude,
+            with_thumbnail=not no_thumbnail,
+        )
+        logger.info(f"Generated topic blog: {blog_path}\n")
+
+    asyncio.run(_write_topic_blog())
 
 
 if __name__ == "__main__":

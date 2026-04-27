@@ -113,16 +113,20 @@ const markdownPlugins = [
                 rawMarkdownBody
                 frontmatter {
                   title
+                  desc
+                  category
                 }
               }
             }
           }
         `,
-      keys: ["title", "body"],
+      keys: ["title", "desc", "category", "body"],
       normalizer: ({ data }) =>
         data.allMarkdownRemark.nodes.map(node => ({
           id: node.id,
           title: node.frontmatter.title,
+          desc: node.frontmatter.desc,
+          category: node.frontmatter.category,
           body: node.rawMarkdownBody,
         })),
     },

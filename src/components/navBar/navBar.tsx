@@ -1,6 +1,6 @@
 import React, { useContext, useRef, useState } from "react"
 
-import { Link } from "gatsby"
+import { Link, navigate } from "gatsby"
 import styled, { ThemeContext } from "styled-components"
 
 import Background from "~/src/styles/background"
@@ -22,6 +22,7 @@ const NavBar: React.FC<NavBarProperties> = ({ title }) => {
   const navReference = useRef<HTMLElement>(null)
   const curtainReference = useRef<HTMLDivElement>(null)
   const listReference = useRef<HTMLUListElement>(null)
+  const searchTriggerReference = useRef<HTMLButtonElement>(null)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   const { toggle, setToggle } = useMenu({
@@ -31,14 +32,20 @@ const NavBar: React.FC<NavBarProperties> = ({ title }) => {
     device,
   })
 
-  const handleSearch = async (searchTerm: string) => {
-    if (searchTerm.length < 2) {
-      alert("검색어는 2글자 이상이어야 합니다.")
-      return
-    }
-
-    window.location.href = `/search?q=${searchTerm}`
+  const handleSearch = (searchTerm: string) => {
     setIsSearchOpen(false)
+    void navigate(`/search/?q=${encodeURIComponent(searchTerm)}`)
+  }
+
+  const handleOpenSearch = () => {
+    setIsSearchOpen(true)
+  }
+
+  const handleCloseSearch = () => {
+    setIsSearchOpen(false)
+    window.requestAnimationFrame(() => {
+      searchTriggerReference.current?.focus()
+    })
   }
 
   return (
@@ -50,13 +57,16 @@ const NavBar: React.FC<NavBarProperties> = ({ title }) => {
         </Title>
         <Curtain ref={curtainReference} toggle={toggle} />
         <IconWrapper>
-          <SearchIcon onClick={() => setIsSearchOpen(true)} />
+          <SearchIcon
+            buttonRef={searchTriggerReference}
+            onClick={handleOpenSearch}
+          />
         </IconWrapper>
       </Content>
       {isSearchOpen && (
         <SearchBar
-          onClickOutside={() => setIsSearchOpen(false)}
-          onEscape={() => setIsSearchOpen(false)}
+          onClickOutside={handleCloseSearch}
+          onEscape={handleCloseSearch}
           onSearch={handleSearch}
         />
       )}

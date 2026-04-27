@@ -54,7 +54,11 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
   return (
     <PopupOverlay onClick={handleOverlayClick}>
       <PopupContainer>
-        <CloseButton onClick={handleCloseButtonClick}>
+        <CloseButton
+          type="button"
+          onClick={handleCloseButtonClick}
+          aria-label="팝업 닫기"
+        >
           <CloseIcon width={12} height={12} />
         </CloseButton>
 
@@ -67,7 +71,11 @@ const PopupBanner: React.FC<PopupBannerProps> = ({
             playsInline
             muted
           />
-          <MuteButton onClick={handleToggleMute}>
+          <MuteButton
+            type="button"
+            onClick={handleToggleMute}
+            aria-label={isMuted ? "동영상 음소거 해제" : "동영상 음소거"}
+          >
             {isMuted ? (
               <MutedIcon width={16} height={16} />
             ) : (

@@ -4,11 +4,17 @@ import styled from "styled-components"
 
 interface SearchIconProps {
   onClick: () => void
+  buttonRef?: React.Ref<HTMLButtonElement>
 }
 
-const SearchIcon: React.FC<SearchIconProps> = ({ onClick }) => {
+const SearchIcon: React.FC<SearchIconProps> = ({ onClick, buttonRef }) => {
   return (
-    <StyledSearchIcon onClick={onClick}>
+    <StyledSearchIcon
+      ref={buttonRef}
+      type="button"
+      onClick={onClick}
+      aria-label="검색 열기"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"

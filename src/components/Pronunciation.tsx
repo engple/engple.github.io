@@ -26,7 +26,9 @@ const Pronunciation: React.FC = () => {
 
         if (!element.querySelector(".pronunciation-button")) {
           const button = document.createElement("button")
+          button.type = "button"
           button.className = "pronunciation-button"
+          button.setAttribute("aria-label", `${pronunciation} 발음 듣기`)
           button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`
 
           const clickHandler = () => {

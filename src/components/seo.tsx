@@ -40,9 +40,13 @@ const SEO: React.FC<SEOProperties> = ({
   noIndex = false,
 }) => {
   const site = useSiteMetadata()
+  const displayTitle = title || site.title || ""
   const description = desc || site.description || ""
-  const ogImageUrl = image || (defaultOpenGraphImage as string)
   const canonicalUrl = url || undefined
+  const ogImageUrl = getAbsoluteUrl(
+    image || (defaultOpenGraphImage as string),
+    site.siteUrl || "",
+  )
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -85,8 +89,8 @@ const SEO: React.FC<SEOProperties> = ({
   return (
     <Helmet
       htmlAttributes={{ lang: site.lang ?? DEFAULT_LANG }}
-      title={title || site.title!}
-      titleTemplate={title || site.title!.replace(" 🍎", "")}
+      title={displayTitle}
+      titleTemplate={displayTitle.replace(" 🍎", "")}
       meta={
         [
           {
@@ -111,7 +115,7 @@ const SEO: React.FC<SEOProperties> = ({
           },
           {
             property: "og:title",
-            content: title,
+            content: displayTitle,
           },
           {
             property: "og:type",
@@ -127,7 +131,7 @@ const SEO: React.FC<SEOProperties> = ({
           },
           {
             name: "twitter:card",
-            content: "summary",
+            content: "summary_large_image",
           },
           {
             name: "twitter:creator",
@@ -139,7 +143,7 @@ const SEO: React.FC<SEOProperties> = ({
           },
           {
             name: "twitter:title",
-            content: title,
+            content: displayTitle,
           },
         ] as Meta
       }
@@ -150,6 +154,16 @@ const SEO: React.FC<SEOProperties> = ({
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
     </Helmet>
   )
+}
+
+function getAbsoluteUrl(pathOrUrl: string, siteUrl: string) {
+  if (!pathOrUrl) return ""
+
+  try {
+    return new URL(pathOrUrl, siteUrl).toString()
+  } catch {
+    return pathOrUrl
+  }
 }
 
 export default SEO

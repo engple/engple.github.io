@@ -2,6 +2,7 @@ import React, { useContext } from "react"
 
 import styled from "styled-components"
 
+import { DARK } from "~/src/constants"
 import ThemeContext from "~/src/stores/themeContext"
 import Background from "~/src/styles/background"
 
@@ -15,9 +16,10 @@ const ThemeToggleButton: React.FC<ThemeToggleButtonProperties> = ({
   onClick,
 }) => {
   const theme = useContext(ThemeContext)
+  const ariaLabel = theme === DARK ? "라이트 모드로 변경" : "다크 모드로 변경"
 
   return (
-    <Button onClick={onClick}>
+    <Button type="button" onClick={onClick} aria-label={ariaLabel}>
       <ButtonBackground />
       <Content>
         <Icon version="1.1" x="0px" y="0px" viewBox="0 0 24 24">

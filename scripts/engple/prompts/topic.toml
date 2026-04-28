@@ -1,0 +1,239 @@
+prompt = """Write a Korean blog post that teaches English vocabulary for the given <TOPIC>.
+
+Rules:
+- The post is for Korean speakers learning practical English vocabulary.
+- Choose vocabulary items that belong to the same hierarchy level.
+- For a topic like "동물", use direct animal names such as "개", "고양이", "토끼", "소", "치타".
+- For a topic like "가구", use direct furniture names such as "소파", "의자", "테이블", "책상", "침대".
+- Do not mix parent/child levels in the same post.
+- Explain each English word in Korean.
+- Include two natural American English example sentences and Korean translations for each word.
+- Write Korean translations in the friendly "~해요" style.
+- Use <span data-pronunciation="word"> for pronunciation.
+- Prefer natural Korean terms that people actually use in daily life.
+- Prefer native Korean terms over loanwords when both are natural.
+- Do not use two or more emojis in a row.
+- Follow the structure and line spacing of the example.
+
+## Example:
+
+```
+{example}
+```
+"""
+
+exclude_prompt = """Avoid these vocabulary items because they were already used for this topic:
+{excludes}
+"""
+
+meta_prompt = """Write Korean metadata for a topic English vocabulary blog post.
+
+Rules:
+- Base the metadata only on the given content.
+- Follow the examples in each field description.
+- If series_number is greater than 1, include '#<series_number>' in the title.
+- Write 4 or 5 FAQ pairs.
+- FAQ questions should ask how to say Korean vocabulary from the content in English.
+- FAQ answers should include the English word and a practical usage example.
+- Use the friendly "~해요" style.
+"""
+
+topic_pool = [
+  "가구",
+  "가전제품",
+  "가족 관계",
+  "감정",
+  "강아지 용품",
+  "건물",
+  "건강검진",
+  "겨울 옷",
+  "결혼식",
+  "공구",
+  "공항",
+  "교통수단",
+  "교통 표지판",
+  "금융",
+  "꽃",
+  "낚시",
+  "날씨",
+  "냉장고 음식",
+  "농장 동물",
+  "동물",
+  "디저트",
+  "미용실",
+  "바다 생물",
+  "반려동물",
+  "방향",
+  "배달 음식",
+  "버스",
+  "부동산",
+  "사무실",
+  "문구류",
+  "병원",
+  "보드게임",
+  "봄 옷",
+  "사진 촬영",
+  "사무용품",
+  "산",
+  "생일파티",
+  "세탁",
+  "수영",
+  "수족관",
+  "색깔",
+  "스마트폰",
+  "쇼핑",
+  "식기",
+  "식당",
+  "신발",
+  "악기",
+  "약국",
+  "어린이 장난감",
+  "여름 옷",
+  "여행준비물",
+  "영화관",
+  "옷감",
+  "운동",
+  "운동 기구",
+  "운전",
+  "은행",
+  "음료",
+  "음식 맛",
+  "의류",
+  "인체",
+  "자동차",
+  "자동차 부품",
+  "자연재해",
+  "잠",
+  "전자기기",
+  "정원",
+  "주방",
+  "주방가전",
+  "조리도구",
+  "청소",
+  "카페",
+  "캠핑",
+  "컴퓨터",
+  "직업",
+  "채소",
+  "책",
+  "초등학교",
+  "치과",
+  "취미",
+  "컴퓨터 용품",
+  "택배",
+  "패스트푸드",
+  "피부관리",
+  "해변",
+  "헬스장",
+  "호텔",
+  "화장품",
+  "회사 직책",
+  "회의",
+  "가방",
+  "간식",
+  "감기 증상",
+  "거리 시설",
+  "건강식품",
+  "게임",
+  "계절",
+  "과일",
+  "교실",
+  "국가",
+  "날짜",
+  "도서관",
+  "동작",
+  "마트",
+  "명절",
+  "문",
+  "미술 도구",
+  "방",
+  "방송",
+  "법원",
+  "보석",
+  "비즈니스 문서",
+  "소셜미디어",
+  "숫자",
+  "시간",
+  "악천후",
+  "앱",
+  "아파트",
+  "요가",
+  "우체국",
+  "위치",
+  "음악 장르",
+  "의학 용어",
+  "인터넷",
+  "재료",
+  "지하철",
+  "카메라",
+  "캠핑 장비",
+  "컴퓨터 부품",
+  "패션 소품",
+  "학교 과목",
+  "항공",
+  "해산물",
+  "환경",
+  "회사 부서",
+]
+
+[content]
+example = """주방에서 요리를 할 때 가장 많이 사용하는 도구들을 영어로는 어떻게 표현할까요? 오늘은 칼(knife), 냄비(pot), 프라이팬(frying pan) 등 기본적인 조리도구들의 영어 표현을 알아볼게요. 각 도구의 발음과 함께 관련 표현, 예문들도 함께 살펴볼 거예요. 이 표현들을 익히고 나면 요리 관련 영어 대화나 레시피를 이해하는 데 큰 도움이 될 거예요.
+
+## 1. 칼 (Knife)
+
+음식을 자르고 썰기 위해 사용하는 가장 기본적인 주방 도구예요.
+
+### 🗣️ 발음
+
+- <span data-pronunciation="knife">발음기호: /naɪf/</span>
+- 한국어 발음: 나이프
+
+### 💭 관련 표현
+
+- sharp knife: 날카로운 칼
+- kitchen knife: 주방용 칼
+- butter knife: 버터 나이프
+
+### 📝 예문으로 연습하기!
+
+1. "Always be careful when using a sharp knife."
+
+   "날카로운 칼을 사용할 때는 항상 조심해야 해요."
+
+2. "I need a knife to chop these vegetables."
+
+   "야채를 썰려면 칼이 필요해요."
+
+## 2. 냄비 (Pot)
+
+음식을 끓이거나 조리하는 데 사용하는 깊이가 있는 조리 용기예요.
+
+### 🗣️ 발음
+
+- <span data-pronunciation="pot">발음기호: /pɑːt/</span>
+- 한국어 발음: 팟
+
+### 💭 관련 표현
+
+- cooking pot: 요리 냄비
+- soup pot: 수프 냄비
+- stainless steel pot: 스테인리스 냄비
+
+### 📝 예문으로 연습하기!
+
+1. "I boiled water in the pot for pasta."
+
+   "파스타를 위해 냄비에 물을 끓였어요."
+
+2. "This pot is perfect for making stew."
+
+   "이 냄비는 스튜 만들기에 딱이에요."
+
+---
+
+이렇게 조리도구와 관련된 영어 단어와 예문을 알아봤어요!
+
+오늘 배운 단어와 예문들을 최소 3번 소리내어 말해보세요. 반복해서 소리내어 말하는 것만큼 영어 학습에 도움되는 것은 없어요!
+
+그럼 다음에 더 유용한 단어와 예문들로 찾아올게요~
+"""

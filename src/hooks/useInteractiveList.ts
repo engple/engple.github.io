@@ -9,8 +9,10 @@ interface UseInteractiveListOptions {
   toggleAllButtonTextCollapse?: string
   toggleAllButtonClassName?: string
   useToggleAllBtn?: boolean
-  initialState?: "expanded" | "collapsed"
+  initialState?: InteractiveListInitialState
 }
+
+type InteractiveListInitialState = "expanded" | "collapsed" | "first-expanded"
 
 export function useInteractiveList(
   contentDependencies: DependencyList,
@@ -57,7 +59,7 @@ function useItemTogglers({
   itemSelector: string
   togglerSelector: string
   openAttribute: string
-  initialState: "expanded" | "collapsed"
+  initialState: InteractiveListInitialState
 }) {
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
@@ -79,11 +81,7 @@ function useItemTogglers({
     const togglers = document.querySelectorAll<HTMLElement>(togglerSelector)
     const items = document.querySelectorAll<HTMLElement>(itemSelector)
 
-    if (initialState === "expanded") {
-      for (const item of items) {
-        item.setAttribute(openAttribute, "true")
-      }
-    }
+    applyInitialItemState(items, openAttribute, initialState)
 
     for (const toggler of togglers) {
       toggler.addEventListener("click", handleClick)
@@ -101,6 +99,28 @@ function useItemTogglers({
     openAttribute,
     initialState,
   ])
+}
+
+function applyInitialItemState(
+  items: NodeListOf<HTMLElement>,
+  openAttribute: string,
+  initialState: InteractiveListInitialState,
+) {
+  if (initialState === "expanded") {
+    for (const item of items) {
+      item.setAttribute(openAttribute, "true")
+    }
+
+    return
+  }
+
+  for (const [index, item] of items.entries()) {
+    if (initialState === "first-expanded" && index === 0) {
+      item.setAttribute(openAttribute, "true")
+    } else {
+      item.removeAttribute(openAttribute)
+    }
+  }
 }
 
 function useToggleAllButton({
@@ -122,7 +142,7 @@ function useToggleAllButton({
   toggleAllButtonTextCollapse: string
   toggleAllButtonClassName: string
   useToggleAllBtn: boolean
-  initialState: "expanded" | "collapsed"
+  initialState: InteractiveListInitialState
 }) {
   useEffect(() => {
     let toggleAllButton: {
@@ -182,19 +202,20 @@ function setupToggleAllButton({
   toggleAllButtonTextExpand: string
   toggleAllButtonTextCollapse: string
   toggleAllButtonClassName: string
-  initialState: "expanded" | "collapsed"
+  initialState: InteractiveListInitialState
 }) {
   const listEl = document.querySelector(listSelector) as HTMLElement | null
   if (!listEl) return { button: undefined, handler: undefined }
 
   const button = document.createElement("button")
   button.className = toggleAllButtonClassName
+  const buttonState = getToggleAllButtonState(initialState)
 
   button.textContent =
-    initialState === "expanded"
+    buttonState === "expanded"
       ? toggleAllButtonTextCollapse
       : toggleAllButtonTextExpand
-  button.dataset.state = initialState
+  button.dataset.state = buttonState
 
   const handler = () => {
     const items = document.querySelectorAll<HTMLElement>(itemSelector)
@@ -223,4 +244,8 @@ function setupToggleAllButton({
   listEl.append(button)
 
   return { button, handler }
+}
+
+function getToggleAllButtonState(initialState: InteractiveListInitialState) {
+  return initialState === "expanded" ? "expanded" : "collapsed"
 }

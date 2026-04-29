@@ -217,6 +217,7 @@ const searchPlugins = [
               allMarkdownRemark(
                 filter: { fileAbsolutePath: { regex: "/(posts/blog)/" } }
                 sort: { frontmatter: { date: DESC } }
+                limit: 100
               ) {
                 edges {
                   node {

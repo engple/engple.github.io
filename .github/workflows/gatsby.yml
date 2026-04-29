@@ -37,7 +37,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "18"
           cache: yarn
       - name: Restore cache
         uses: actions/cache@v4
@@ -53,6 +53,7 @@ jobs:
       - name: Build with Gatsby
         env:
           PREFIX_PATHS: "true"
+          NODE_OPTIONS: "--experimental-global-webcrypto"
         run: yarn build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

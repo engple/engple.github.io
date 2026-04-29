@@ -1,6 +1,7 @@
-import React, { useLayoutEffect, useState } from "react"
+import React, { useLayoutEffect, useMemo, useState } from "react"
 
 import { type PageProps, graphql } from "gatsby"
+import kebabCase from "lodash/kebabCase"
 import styled from "styled-components"
 
 import Adsense from "~/src/components/adsense"
@@ -9,8 +10,11 @@ import SEO from "~/src/components/seo"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
 import type Post from "~/src/types/Post"
+import { createPostItemListJsonLd } from "~/src/utils/structuredData"
 
 import { VERTICAL_AD_SLOT } from "../constants"
+
+const STRUCTURED_POST_LIST_LIMIT = 10
 
 const Home = ({
   pageContext,
@@ -19,22 +23,22 @@ const Home = ({
   const [posts, setPosts] = useState<Post[]>([])
   const currentCategory = pageContext.category
   const postData = data.allMarkdownRemark.edges
-  useLayoutEffect(() => {
-    const filteredPostData = currentCategory
+  const visiblePostData = useMemo(() => {
+    return currentCategory
       ? postData.filter(
           ({ node }) => node?.frontmatter?.category === currentCategory,
         )
       : postData
+  }, [currentCategory, postData])
+  useLayoutEffect(() => {
+    setPosts(
+      visiblePostData.map(({ node }) => {
+        const { id, fields, frontmatter } = node
+        const { slug } = fields!
+        const { title, desc, date, category, thumbnail, alt } = frontmatter!
+        const { childImageSharp } = thumbnail!
 
-    for (const { node } of filteredPostData) {
-      const { id, fields, frontmatter } = node
-      const { slug } = fields!
-      const { title, desc, date, category, thumbnail, alt } = frontmatter!
-      const { childImageSharp } = thumbnail!
-
-      setPosts(previousPost => [
-        ...previousPost,
-        {
+        return {
           id,
           slug,
           title,
@@ -43,17 +47,44 @@ const Home = ({
           category,
           thumbnail: childImageSharp?.id,
           alt,
-        },
-      ])
-    }
-  }, [currentCategory, postData])
+        }
+      }),
+    )
+  }, [visiblePostData])
 
   const site = useSiteMetadata()
   const postTitle = currentCategory || site.postTitle
+  const pagePath = currentCategory
+    ? `/category/${kebabCase(currentCategory)}/`
+    : "/"
+  const pageUrl = `${site.siteUrl}${pagePath}`
+  const itemListId = `${pageUrl}#itemlist`
+  const itemListJsonLd = createPostItemListJsonLd({
+    id: itemListId,
+    name: `${postTitle} 글 목록`,
+    posts: visiblePostData
+      .slice(0, STRUCTURED_POST_LIST_LIMIT)
+      .map(({ node }) => ({
+        slug: node.fields?.slug,
+        title: node.frontmatter?.title,
+      })),
+    siteUrl: site.siteUrl || "",
+  })
 
   return (
     <Layout>
-      <SEO />
+      <SEO
+        title={currentCategory ? `${postTitle} - ${site.title}` : undefined}
+        desc={
+          currentCategory
+            ? `${postTitle} 카테고리의 영어 표현 학습 글을 확인해보세요.`
+            : undefined
+        }
+        url={pageUrl}
+        pageType="CollectionPage"
+        mainEntityId={itemListId}
+        jsonLds={[itemListJsonLd]}
+      />
       <Main>
         <LeftAd>
           <Adsense

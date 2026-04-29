@@ -166,9 +166,11 @@ export function createPracticeQuizJsonLd({
 }
 
 function getPracticeCards(html: string) {
-  return [...html.matchAll(/<li\b[^>]*data-interactive-item[^>]*>([\S\s]*?)<\/li>/gi)]
+  return [
+    ...html.matchAll(/<li\b[^>]*data-interactive-item[^>]*>([\S\s]*?)<\/li>/gi),
+  ]
     .map(match => createPracticeCard(match[1]))
-    .filter(Boolean)
+    .filter((card): card is PracticeCard => card !== undefined)
 }
 
 function createPracticeCard(block: string) {

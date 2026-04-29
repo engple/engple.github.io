@@ -198,8 +198,8 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     border: 1px solid var(--color-gray-2);
     border-radius: 4px;
     background-color: var(--color-gray-1);
-    color: var(--color-gray-8);
-    font-size: var(--font-size-sm);
+    color: var(--color-text-2);
+    font-size: var(--text-sm);
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px var(--color-gray-2);
@@ -288,7 +288,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     font-weight: var(--font-weight-semi-bold);
-    color: var(--color-gray-8);
+    color: var(--color-text-2);
     font-size: 0.9875rem;
     line-height: 1.65;
     padding: 2.25rem 2.75rem 1rem 1rem;
@@ -366,6 +366,56 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     display: block;
   }
 
+  body.dark & {
+    button.interactive-list-toggle-all-button {
+      border-color: rgba(255, 255, 255, 0.12);
+      background-color: var(--color-gray-2);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+
+      &:hover {
+        background-color: var(--color-gray-3);
+      }
+    }
+
+    [data-interactive-item] {
+      background-color: rgba(44, 44, 44, 0.96);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.18);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.32);
+      }
+    }
+
+    [data-interactive-item][data-open="true"] {
+      background-color: rgba(34, 34, 34, 0.98);
+      border-color: rgba(255, 255, 255, 0.16);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.34);
+    }
+
+    [data-toggler]::before {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: var(--color-text-3);
+    }
+
+    [data-interactive-item][data-open="true"] [data-toggler]::before {
+      background-color: rgba(255, 255, 255, 0.12);
+      color: var(--color-text-2);
+    }
+
+    [data-answer] {
+      border-color: rgba(255, 255, 255, 0.08);
+      background-color: rgba(255, 255, 255, 0.06);
+      color: var(--color-text-2);
+
+      a {
+        color: inherit;
+        text-decoration-color: rgba(255, 255, 255, 0.32);
+      }
+    }
+  }
+
   @media (hover: none) and (pointer: coarse) {
     [data-interactive-item] {
       border-color: rgba(15, 23, 42, 0.1);
@@ -383,6 +433,10 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
 
     [data-interactive-item]:active [data-toggler]::before {
       background-color: rgba(15, 23, 42, 0.08);
+    }
+
+    body.dark & [data-interactive-item]:active [data-toggler]::before {
+      background-color: rgba(255, 255, 255, 0.12);
     }
   }
 

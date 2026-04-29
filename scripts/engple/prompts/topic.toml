@@ -9,6 +9,16 @@ Rules:
 - Explain each English word in Korean.
 - Include two natural American English example sentences and Korean translations for each word.
 - Write Korean translations in the friendly "~해요" style.
+- In every "### 📝 예문으로 연습하기!" section, format the ordered list with blank lines exactly like this:
+  1. "English sentence."
+
+     "Korean translation."
+
+  2. "English sentence."
+
+     "Korean translation."
+- Do not put the English sentence and Korean translation on adjacent lines without a blank line.
+- Do not use <br> to force line breaks in example lists.
 - Use <span data-pronunciation="word"> for pronunciation.
 - Prefer natural Korean terms that people actually use in daily life.
 - Prefer native Korean terms over loanwords when both are natural.

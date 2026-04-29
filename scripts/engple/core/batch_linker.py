@@ -59,7 +59,7 @@ class BatchLinker:
         if self.max_links is not None:
             existing_links = self.context_detector.count_existing_links(content)
             if existing_links >= self.max_links:
-                logger.debug(
+                logger.info(
                     f"Skipping {target_path.name}: existing links {existing_links} >= max {self.max_links}"
                 )
                 return result

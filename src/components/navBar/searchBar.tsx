@@ -44,6 +44,8 @@ interface SearchSuggestionItem {
   body: string
 }
 
+const NO_ACTIVE_INDEX = -1
+
 const SearchBar: React.FC<SearchBarProps> = ({
   onClickOutside = () => {},
   onEscape = () => {},
@@ -53,7 +55,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null)
   const resultListId = useId()
   const [searchTerm, setSearchTerm] = useState("")
-  const [activeIndex, setActiveIndex] = useState<number | undefined>()
+  const [activeIndex, setActiveIndex] = useState(NO_ACTIVE_INDEX)
   const [errorMessage, setErrorMessage] = useState("")
   const data = useStaticQuery<SearchBarQueryData>(graphql`
     query SearchBar {
@@ -207,7 +209,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   }, [onClickOutside])
 
   useEffect(() => {
-    setActiveIndex()
+    setActiveIndex(NO_ACTIVE_INDEX)
   }, [commandItems, searchTerm])
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -215,12 +217,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
       event.preventDefault()
 
       if (commandItems.length === 0) {
-        setActiveIndex()
+        setActiveIndex(NO_ACTIVE_INDEX)
         return
       }
 
       setActiveIndex(currentIndex =>
-        currentIndex === undefined
+        currentIndex === NO_ACTIVE_INDEX
           ? 0
           : Math.min(currentIndex + 1, commandItems.length - 1),
       )
@@ -231,12 +233,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
       event.preventDefault()
 
       if (commandItems.length === 0) {
-        setActiveIndex()
+        setActiveIndex(NO_ACTIVE_INDEX)
         return
       }
 
       setActiveIndex(currentIndex =>
-        currentIndex === undefined
+        currentIndex === NO_ACTIVE_INDEX
           ? commandItems.length - 1
           : Math.max(currentIndex - 1, 0),
       )
@@ -249,7 +251,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     ) {
       event.preventDefault()
 
-      if (activeIndex !== undefined && commandItems[activeIndex]) {
+      if (activeIndex !== NO_ACTIVE_INDEX && commandItems[activeIndex]) {
         onSearch(commandItems[activeIndex].label)
         return
       }
@@ -296,7 +298,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   ) => {
     setSearchTerm(event.currentTarget.value)
     setErrorMessage("")
-    setActiveIndex()
+    setActiveIndex(NO_ACTIVE_INDEX)
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -364,7 +366,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 }
                 aria-controls={resultListId}
                 aria-activedescendant={
-                  activeIndex !== undefined && commandItems[activeIndex]?.id
+                  activeIndex !== NO_ACTIVE_INDEX &&
+                  commandItems[activeIndex]?.id
                     ? commandItems[activeIndex].id
                     : undefined
                 }

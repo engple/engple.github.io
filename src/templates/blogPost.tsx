@@ -3,7 +3,7 @@ import React from "react"
 import { Link, type PageProps, graphql } from "gatsby"
 import kebabCase from "lodash/kebabCase"
 import {
-  type Article,
+  type BlogPosting,
   type BreadcrumbList,
   type FAQPage,
   type LearningResource,
@@ -28,6 +28,11 @@ import {
   initializeInlineAdsenseSlots,
   withInlineAdsense,
 } from "../utils/adsense"
+import {
+  createDefinedTermJsonLd,
+  createPracticeQuizJsonLd,
+  getExpressionTerm,
+} from "../utils/structuredData"
 
 interface DataProps {
   current: {
@@ -123,6 +128,10 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const description = desc || excerpt
   const faqItems = (faqs ?? []).filter(item => item?.question && item?.answer)
   const categoryPath = `/category/${kebabCase(category ?? "")}/`
+  const pageUrl = `${site.siteUrl}${slug}`
+  const articleId = `${pageUrl}#article`
+  const definedTermId = `${pageUrl}#definedterm`
+  const expression = getExpressionTerm({ category, title, faqs })
   const tocHeadings =
     faqItems.length > 0
       ? [
@@ -132,8 +141,8 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
       : headings
 
   const articleJsonLd = {
-    "@type": "Article",
-    "@id": `${site.siteUrl}${slug}`,
+    "@type": "BlogPosting",
+    "@id": articleId,
     headline: title,
     datePublished: date,
     dateModified: lastmod || date,
@@ -144,25 +153,26 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
       url: "https://github.com/engple",
     },
     description,
-    url: `${site.siteUrl}${slug}`,
+    url: pageUrl,
     thumbnailUrl: `${site.siteUrl}${ogImagePath}`,
     image: `${site.siteUrl}${ogImagePath}`,
     copyrightHolder: { "@id": `${site.siteUrl}/#organization` },
     publisher: { "@id": `${site.siteUrl}/#organization` },
+    isPartOf: { "@id": `${site.siteUrl}/#website` },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${site.siteUrl}${slug}`,
+      "@id": `${pageUrl}#webpage`,
     },
     wordCount: html?.split(" ").length,
     speakable: {
       "@type": "SpeakableSpecification",
       cssSelector: ["article h1", "article h2", "[data-answer]"],
     },
-  } as Article
+  } as BlogPosting
 
   const breadcrumbJsonLd = {
     "@type": "BreadcrumbList",
-    "@id": `${site.siteUrl}${slug}#breadcrumb`,
+    "@id": `${pageUrl}#breadcrumb`,
     itemListElement: [
       {
         "@type": "ListItem",
@@ -184,7 +194,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         "@type": "ListItem",
         position: 3,
         item: {
-          "@id": `${site.siteUrl}${slug}`,
+          "@id": pageUrl,
           name: title,
         },
       },
@@ -193,6 +203,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
 
   const faqJsonLd = {
     "@type": "FAQPage",
+    "@id": `${pageUrl}#faq`,
     mainEntity: faqItems.map(item => ({
       "@type": "Question",
       name: item?.question || "",
@@ -205,7 +216,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
 
   const learningResourceJsonLd = {
     "@type": "LearningResource",
-    "@id": `${site.siteUrl}${slug}#learningresource`,
+    "@id": `${pageUrl}#learningresource`,
     name: title,
     description,
     educationalLevel: "beginner",
@@ -214,6 +225,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     isAccessibleForFree: true,
     teaches: title,
     assesses: title,
+    ...(expression ? { about: { "@id": definedTermId } } : {}),
     audience: {
       "@type": "EducationalAudience",
       educationalRole: "student",
@@ -222,11 +234,36 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     provider: { "@id": `${site.siteUrl}/#organization` },
   } as LearningResource
 
+  const definedTermJsonLd = expression
+    ? createDefinedTermJsonLd({
+        category,
+        description,
+        expression,
+        id: definedTermId,
+        siteUrl: site.siteUrl || "",
+        url: pageUrl,
+      })
+    : undefined
+  const practiceQuizJsonLd = createPracticeQuizJsonLd({
+    aboutId: expression ? definedTermId : undefined,
+    expression,
+    html,
+    id: `${pageUrl}#practice-quiz`,
+    title: title || "",
+  })
   const jsonLds: Thing[] = [
     articleJsonLd,
     breadcrumbJsonLd,
     learningResourceJsonLd,
   ]
+
+  if (definedTermJsonLd) {
+    jsonLds.push(definedTermJsonLd)
+  }
+
+  if (practiceQuizJsonLd) {
+    jsonLds.push(practiceQuizJsonLd)
+  }
 
   if (faqItems.length > 0) {
     jsonLds.push(faqJsonLd)
@@ -237,10 +274,11 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
       <SEO
         title={title}
         desc={description}
-        url={`${site.siteUrl}${slug}`}
+        url={pageUrl}
         image={ogImagePath}
         jsonLds={jsonLds}
         ogType="article"
+        mainEntityId={articleId}
       />
       <main>
         <article ref={articleRef}>

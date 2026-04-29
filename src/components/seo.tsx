@@ -2,9 +2,11 @@ import React from "react"
 
 import { Helmet } from "react-helmet"
 import {
+  type CollectionPage,
   type EducationalOrganization,
   type Graph,
   type Thing,
+  type WebPage,
   type WebSite,
 } from "schema-dts"
 
@@ -28,6 +30,8 @@ interface SEOProperties {
   url?: Queries.Maybe<string>
   ogType?: "website" | "article"
   noIndex?: boolean
+  pageType?: "WebPage" | "CollectionPage"
+  mainEntityId?: string
 }
 
 const SEO: React.FC<SEOProperties> = ({
@@ -38,18 +42,36 @@ const SEO: React.FC<SEOProperties> = ({
   jsonLds = [],
   ogType = "website",
   noIndex = false,
+  pageType = "WebPage",
+  mainEntityId,
 }) => {
   const site = useSiteMetadata()
   const displayTitle = title || site.title || ""
   const description = desc || site.description || ""
   const canonicalUrl = url || undefined
+  const pageUrl = canonicalUrl || site.siteUrl || ""
   const ogImageUrl = getAbsoluteUrl(
     image || (defaultOpenGraphImage as string),
     site.siteUrl || "",
   )
+  const webPageJsonLd = canonicalUrl
+    ? [
+        createWebPageJsonLd({
+          description,
+          imageUrl: ogImageUrl,
+          language: site.lang ?? DEFAULT_LANG,
+          mainEntityId,
+          pageType,
+          siteUrl: site.siteUrl || "",
+          title: displayTitle,
+          url: pageUrl,
+        }),
+      ]
+    : []
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
+      ...webPageJsonLd,
       ...jsonLds,
       {
         "@type": "EducationalOrganization",
@@ -154,6 +176,44 @@ const SEO: React.FC<SEOProperties> = ({
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
     </Helmet>
   )
+}
+
+function createWebPageJsonLd({
+  description,
+  imageUrl,
+  language,
+  mainEntityId,
+  pageType,
+  siteUrl,
+  title,
+  url,
+}: {
+  description: string
+  imageUrl: string
+  language: string
+  mainEntityId?: string
+  pageType: "WebPage" | "CollectionPage"
+  siteUrl: string
+  title: string
+  url: string
+}) {
+  const pageJsonLd = {
+    "@type": pageType,
+    "@id": `${url}#webpage`,
+    name: title,
+    description,
+    url,
+    inLanguage: language,
+    isPartOf: { "@id": `${siteUrl}/#website` },
+    publisher: { "@id": `${siteUrl}/#organization` },
+    primaryImageOfPage: {
+      "@type": "ImageObject",
+      url: imageUrl,
+    },
+    ...(mainEntityId ? { mainEntity: { "@id": mainEntityId } } : {}),
+  }
+
+  return pageJsonLd as CollectionPage | WebPage
 }
 
 function getAbsoluteUrl(pathOrUrl: string, siteUrl: string) {

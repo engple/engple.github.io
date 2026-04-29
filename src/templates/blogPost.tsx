@@ -83,7 +83,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         })
       : html ?? ""
 
-  useInteractiveList([html], { initialState: "collapsed" })
+  useInteractiveList([html], { initialState: "first-expanded" })
   React.useEffect(() => {
     if (!site.googleAdsense || process.env.NODE_ENV === "development") return
 

@@ -45,8 +45,9 @@ jobs:
           path: |
             public
             .cache
-          key: ${{ runner.os }}-gatsby-build-${{ hashFiles('public') }}
+          key: ${{ runner.os }}-gatsby-build-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}
           restore-keys: |
+            ${{ runner.os }}-gatsby-build-${{ hashFiles('yarn.lock') }}-
             ${{ runner.os }}-gatsby-build-
       - name: Install dependencies
         run: yarn install

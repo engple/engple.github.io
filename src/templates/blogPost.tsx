@@ -50,23 +50,19 @@ interface DataProps {
       lastmod: string
     }
   }
-  next?: {
-    id: string
-    excerpt: string
-    frontmatter: Queries.MarkdownRemarkFrontmatter
-    fields: {
-      slug: string
-    }
+  previousPosts: {
+    edges: {
+      node: {
+        id: string
+        excerpt: string
+        frontmatter: Queries.MarkdownRemarkFrontmatter
+        fields: {
+          slug: string
+        }
+      }
+    }[]
   }
-  prev?: {
-    id: string
-    excerpt: string
-    frontmatter: Queries.MarkdownRemarkFrontmatter
-    fields: {
-      slug: string
-    }
-  }
-  relatedPosts: {
+  nextPosts: {
     edges: {
       node: {
         id: string
@@ -80,7 +76,15 @@ interface DataProps {
   }
 }
 
-const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
+interface PageContextProps {
+  previousSlugs?: string[]
+  nextSlugs?: string[]
+}
+
+const BlogPost: React.FC<PageProps<DataProps, PageContextProps>> = ({
+  data,
+  pageContext,
+}) => {
   const {
     frontmatter,
     html,
@@ -111,15 +115,18 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     return initializeInlineAdsenseSlots(article, HORIZONTAL_AD_SLOT)
   }, [site.googleAdsense, slug, htmlWithInlineAd])
 
-  const nextPost = data.next ? mapPostNodeToPost(data.next) : undefined
-  const prevPost = data.prev ? mapPostNodeToPost(data.prev) : undefined
-  const relatedPosts = data.relatedPosts.edges
-    .map(({ node }) => mapPostNodeToPost(node))
-    .slice(0, 4)
-  const continuePosts =
-    relatedPosts.length > 0
-      ? relatedPosts
-      : [nextPost, prevPost].filter(post => isDefinedPost(post))
+  const previousPosts = sortPostsBySlugOrder(
+    data.previousPosts.edges.map(({ node }) => mapPostNodeToPost(node)),
+    pageContext.previousSlugs ?? [],
+  )
+  const nextPosts = sortPostsBySlugOrder(
+    data.nextPosts.edges.map(({ node }) => mapPostNodeToPost(node)),
+    pageContext.nextSlugs ?? [],
+  )
+  const continuePosts = [
+    ...previousPosts.map(post => ({ ...post, direction: "이전 글" })),
+    ...nextPosts.map(post => ({ ...post, direction: "다음 글" })),
+  ]
 
   const ogImagePath =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -359,11 +366,11 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                       Keep Exploring
                     </AsideHeading>
                     <AsidePostList>
-                      {relatedPosts.map(post => (
+                      {continuePosts.map(post => (
                         <AsidePostItem key={post.id}>
                           <AsidePostLink to={post.slug as string}>
                             <AsidePostCategory>
-                              {post.category}
+                              {post.direction}
                             </AsidePostCategory>
                             <AsidePostTitle>{post.title}</AsidePostTitle>
                           </AsidePostLink>
@@ -428,13 +435,19 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                         ) : (
                           <ContinueCardMediaFallback aria-hidden="true" />
                         )}
-                        <ContinueCardCategory>
-                          {post.category}
-                        </ContinueCardCategory>
-                        <ContinueCardTitle>{post.title}</ContinueCardTitle>
-                        {post.desc ? (
-                          <ContinueCardCopy>{post.desc}</ContinueCardCopy>
-                        ) : undefined}
+                        <ContinueCardBody>
+                          <ContinueCardMetaRow>
+                            <ContinueCardCategory>
+                              {post.direction}
+                            </ContinueCardCategory>
+                            {post.category ? (
+                              <ContinueCardContext>
+                                {post.category}
+                              </ContinueCardContext>
+                            ) : undefined}
+                          </ContinueCardMetaRow>
+                          <ContinueCardTitle>{post.title}</ContinueCardTitle>
+                        </ContinueCardBody>
                       </ContinueCard>
                     ))}
                   </ContinueGrid>
@@ -460,7 +473,18 @@ const startsWithHeroImage = (html?: string | null, imagePath?: string) => {
   return Boolean(leadingImage?.[0]?.includes(imagePath))
 }
 
-const isDefinedPost = Boolean
+const sortPostsBySlugOrder = (posts: Post[], slugOrder: string[]) => {
+  const slugIndexMap = new Map(slugOrder.map((slug, index) => [slug, index]))
+
+  return [...posts].sort((left, right) => {
+    const leftIndex =
+      slugIndexMap.get(left.slug as string) ?? Number.POSITIVE_INFINITY
+    const rightIndex =
+      slugIndexMap.get(right.slug as string) ?? Number.POSITIVE_INFINITY
+
+    return leftIndex - rightIndex
+  })
+}
 
 const mapPostNodeToPost = ({
   id,
@@ -888,9 +912,21 @@ const ContinueCardMediaFallback = styled.div`
     linear-gradient(180deg, var(--color-gray-1) 0%, var(--color-gray-2) 100%);
 `
 
+const ContinueCardBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px 20px;
+`
+
+const ContinueCardMetaRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+`
+
 const ContinueCardCategory = styled.span`
-  display: block;
-  padding: 18px 20px 0;
   color: var(--color-text-3);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
@@ -898,24 +934,17 @@ const ContinueCardCategory = styled.span`
   text-transform: uppercase;
 `
 
+const ContinueCardContext = styled.span`
+  color: var(--color-text-3);
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+`
+
 const ContinueCardTitle = styled.h3`
-  margin-top: 10px;
-  padding: 0 20px;
   font-size: 1.1rem;
   font-weight: var(--font-weight-bold);
   line-height: 1.45;
-`
-
-const ContinueCardCopy = styled.p`
-  margin-top: 10px;
-  padding: 0 20px 20px;
-  color: var(--color-text-2);
-  font-size: 0.9375rem;
-  line-height: 1.7;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 `
 
 const CenterWrapper = styled.div`
@@ -1051,9 +1080,8 @@ const FaqAnswer = styled.p`
 export const query = graphql`
   query BlogPostPage(
     $slug: String
-    $nextSlug: String
-    $prevSlug: String
-    $category: String
+    $previousSlugs: [String!]
+    $nextSlugs: [String!]
   ) {
     current: markdownRemark(fields: { slug: { eq: $slug } }) {
       id
@@ -1086,54 +1114,42 @@ export const query = graphql`
       }
     }
 
-    next: markdownRemark(fields: { slug: { eq: $nextSlug } }) {
-      id
-      excerpt(format: PLAIN)
-      frontmatter {
-        title
-        desc
-        thumbnail {
-          childImageSharp {
-            gatsbyImageData(placeholder: BLURRED, layout: FIXED)
-          }
-        }
-        date(formatString: "YYYY-MM-DD")
-        category
-        alt
-      }
-      fields {
-        slug
-      }
-    }
-
-    prev: markdownRemark(fields: { slug: { eq: $prevSlug } }) {
-      id
-      excerpt(format: PLAIN)
-      frontmatter {
-        title
-        desc
-        thumbnail {
-          childImageSharp {
-            gatsbyImageData(placeholder: BLURRED, layout: FIXED)
-          }
-        }
-        date(formatString: "YYYY-MM-DD")
-        category
-        alt
-      }
-      fields {
-        slug
-      }
-    }
-
-    relatedPosts: allMarkdownRemark(
+    previousPosts: allMarkdownRemark(
       filter: {
         fileAbsolutePath: { regex: "/(posts/blog)/" }
-        frontmatter: { category: { eq: $category } }
-        fields: { slug: { ne: $slug } }
+        fields: { slug: { in: $previousSlugs } }
       }
-      sort: { frontmatter: { date: DESC } }
-      limit: 4
+      limit: 2
+    ) {
+      edges {
+        node {
+          id
+          excerpt(format: PLAIN)
+          frontmatter {
+            title
+            desc
+            thumbnail {
+              childImageSharp {
+                gatsbyImageData(placeholder: BLURRED, layout: FIXED)
+              }
+            }
+            date(formatString: "YYYY-MM-DD")
+            category
+            alt
+          }
+          fields {
+            slug
+          }
+        }
+      }
+    }
+
+    nextPosts: allMarkdownRemark(
+      filter: {
+        fileAbsolutePath: { regex: "/(posts/blog)/" }
+        fields: { slug: { in: $nextSlugs } }
+      }
+      limit: 2
     ) {
       edges {
         node {

@@ -122,8 +122,8 @@ const GlobalStyle = createGlobalStyle`
       --color-gray-5: #767676;
       --color-gray-6: #989898;
       --color-divider: rgba(255, 255, 255, 0.15);
-      --color-inline-link-highlight: rgba(125, 180, 255, 0.07);
-      --color-inline-link-highlight-hover: rgba(125, 180, 255, 0.11);
+      --color-inline-link-highlight: rgba(10, 132, 255, 0.18);
+      --color-inline-link-highlight-hover: rgba(10, 132, 255, 0.26);
       --color-dimmed: rgba(0, 0, 0, 0.15);
       --color-floating-button: rgba(50, 50, 50, 0.7);
       --color-floating-button-hover: rgba(255, 255, 255, 0.9);

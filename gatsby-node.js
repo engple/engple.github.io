@@ -34,21 +34,10 @@ exports.createPages = async ({ graphql, actions }) => {
           node {
             frontmatter {
               category
-              date
             }
             fields {
               slug
               lastmod
-            }
-          }
-          next {
-            fields {
-              slug
-            }
-          }
-          previous {
-            fields {
-              slug
             }
           }
         }
@@ -84,33 +73,18 @@ function createCategoryPages({ result, createPage }) {
 const createPostPages = ({ result, createPage }) => {
   const template = path.resolve(`./src/templates/blogPost.tsx`)
 
-  result.data.postsRemark.edges.forEach(
-    ({ node, next, previous }, index, edges) => {
-      const previousSlugs = edges
-        .slice(index + 1, index + 3)
-        .map(edge => edge.node.fields.slug)
-      const nextSlugs = edges
-        .slice(Math.max(0, index - 2), index)
-        .map(edge => edge.node.fields.slug)
-        .reverse()
-
-      createPage({
-        path: node.fields.slug,
-        component: template,
-        context: {
-          // additional data can be passed via context
-          slug: node.fields.slug,
-          category: node.frontmatter?.category ?? "",
-          date: node.frontmatter?.date ?? "",
-          lastmod: node.fields.lastmod,
-          previousSlugs,
-          nextSlugs,
-          nextSlug: next?.fields.slug ?? "",
-          prevSlug: previous?.fields.slug ?? "",
-        },
-      })
-    },
-  )
+  result.data.postsRemark.edges.forEach(({ node }) => {
+    createPage({
+      path: node.fields.slug,
+      component: template,
+      context: {
+        // additional data can be passed via context
+        slug: node.fields.slug,
+        category: node.frontmatter?.category ?? "",
+        lastmod: node.fields.lastmod,
+      },
+    })
+  })
 }
 
 const createSearchPage = ({ createPage }) => {

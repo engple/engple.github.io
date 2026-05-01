@@ -50,23 +50,10 @@ interface DataProps {
       lastmod: string
     }
   }
-  previousPosts: {
+  allPosts: {
     edges: {
       node: {
         id: string
-        excerpt: string
-        frontmatter: Queries.MarkdownRemarkFrontmatter
-        fields: {
-          slug: string
-        }
-      }
-    }[]
-  }
-  nextPosts: {
-    edges: {
-      node: {
-        id: string
-        excerpt: string
         frontmatter: Queries.MarkdownRemarkFrontmatter
         fields: {
           slug: string
@@ -76,15 +63,7 @@ interface DataProps {
   }
 }
 
-interface PageContextProps {
-  previousSlugs?: string[]
-  nextSlugs?: string[]
-}
-
-const BlogPost: React.FC<PageProps<DataProps, PageContextProps>> = ({
-  data,
-  pageContext,
-}) => {
+const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const {
     frontmatter,
     html,
@@ -115,18 +94,10 @@ const BlogPost: React.FC<PageProps<DataProps, PageContextProps>> = ({
     return initializeInlineAdsenseSlots(article, HORIZONTAL_AD_SLOT)
   }, [site.googleAdsense, slug, htmlWithInlineAd])
 
-  const previousPosts = sortPostsBySlugOrder(
-    data.previousPosts.edges.map(({ node }) => mapPostNodeToPost(node)),
-    pageContext.previousSlugs ?? [],
+  const allPosts = sortPostsForContinue(
+    data.allPosts.edges.map(({ node }) => mapPostNodeToPost(node)),
   )
-  const nextPosts = sortPostsBySlugOrder(
-    data.nextPosts.edges.map(({ node }) => mapPostNodeToPost(node)),
-    pageContext.nextSlugs ?? [],
-  )
-  const continuePosts = [
-    ...previousPosts.map(post => ({ ...post, direction: "이전 글" })),
-    ...nextPosts.map(post => ({ ...post, direction: "다음 글" })),
-  ]
+  const continuePosts = selectContinuePosts(allPosts, slug)
 
   const ogImagePath =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -473,27 +444,38 @@ const startsWithHeroImage = (html?: string | null, imagePath?: string) => {
   return Boolean(leadingImage?.[0]?.includes(imagePath))
 }
 
-const sortPostsBySlugOrder = (posts: Post[], slugOrder: string[]) => {
-  const slugIndexMap = new Map(slugOrder.map((slug, index) => [slug, index]))
+const selectContinuePosts = (posts: Post[], currentSlug: string) => {
+  const currentIndex = posts.findIndex(post => post.slug === currentSlug)
 
+  if (currentIndex === -1) return []
+
+  return [
+    ...posts
+      .slice(currentIndex + 1, currentIndex + 3)
+      .map(post => ({ ...post, direction: "이전 글" })),
+    ...posts
+      .slice(Math.max(0, currentIndex - 2), currentIndex)
+      .reverse()
+      .map(post => ({ ...post, direction: "다음 글" })),
+  ]
+}
+
+const sortPostsForContinue = (posts: Post[]) => {
   return [...posts].sort((left, right) => {
-    const leftIndex =
-      slugIndexMap.get(left.slug as string) ?? Number.POSITIVE_INFINITY
-    const rightIndex =
-      slugIndexMap.get(right.slug as string) ?? Number.POSITIVE_INFINITY
+    const dateCompare = (right.date ?? "").localeCompare(left.date ?? "")
 
-    return leftIndex - rightIndex
+    if (dateCompare !== 0) return dateCompare
+
+    return (right.slug as string).localeCompare(left.slug as string)
   })
 }
 
 const mapPostNodeToPost = ({
   id,
-  excerpt,
   frontmatter,
   fields,
 }: {
   id: string
-  excerpt: string
   frontmatter: Queries.MarkdownRemarkFrontmatter
   fields: {
     slug: string
@@ -502,9 +484,10 @@ const mapPostNodeToPost = ({
   return {
     id,
     ...frontmatter,
-    desc: frontmatter.desc || excerpt,
+    desc: frontmatter.desc || undefined,
     slug: fields.slug,
     thumbnail:
+      frontmatter.thumbnail?.publicURL ||
       frontmatter.thumbnail?.childImageSharp?.gatsbyImageData?.images?.fallback
         ?.src,
   }
@@ -1078,11 +1061,7 @@ const FaqAnswer = styled.p`
 `
 
 export const query = graphql`
-  query BlogPostPage(
-    $slug: String
-    $previousSlugs: [String!]
-    $nextSlugs: [String!]
-  ) {
+  query BlogPostPage($slug: String) {
     current: markdownRemark(fields: { slug: { eq: $slug } }) {
       id
       html
@@ -1114,58 +1093,22 @@ export const query = graphql`
       }
     }
 
-    previousPosts: allMarkdownRemark(
-      filter: {
-        fileAbsolutePath: { regex: "/(posts/blog)/" }
-        fields: { slug: { in: $previousSlugs } }
-      }
-      limit: 2
+    allPosts: allMarkdownRemark(
+      filter: { fileAbsolutePath: { regex: "/(posts/blog)/" } }
+      sort: { frontmatter: { date: DESC } }
+      limit: 2000
     ) {
       edges {
         node {
           id
-          excerpt(format: PLAIN)
           frontmatter {
             title
-            desc
-            thumbnail {
-              childImageSharp {
-                gatsbyImageData(placeholder: BLURRED, layout: FIXED)
-              }
-            }
             date(formatString: "YYYY-MM-DD")
             category
             alt
-          }
-          fields {
-            slug
-          }
-        }
-      }
-    }
-
-    nextPosts: allMarkdownRemark(
-      filter: {
-        fileAbsolutePath: { regex: "/(posts/blog)/" }
-        fields: { slug: { in: $nextSlugs } }
-      }
-      limit: 2
-    ) {
-      edges {
-        node {
-          id
-          excerpt(format: PLAIN)
-          frontmatter {
-            title
-            desc
             thumbnail {
-              childImageSharp {
-                gatsbyImageData(placeholder: BLURRED, layout: FIXED)
-              }
+              publicURL
             }
-            date(formatString: "YYYY-MM-DD")
-            category
-            alt
           }
           fields {
             slug

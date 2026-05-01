@@ -39,16 +39,15 @@ jobs:
         with:
           node-version: "18"
           cache: yarn
-      - name: Restore cache
-        uses: actions/cache@v4
+      - name: Restore Gatsby cache
+        uses: actions/cache/restore@v4
         with:
           path: |
             public
             .cache
-          key: ${{ runner.os }}-gatsby-build-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}
+          key: ${{ runner.os }}-gatsby-build-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
             ${{ runner.os }}-gatsby-build-${{ hashFiles('yarn.lock') }}-
-            ${{ runner.os }}-gatsby-build-
       - name: Install dependencies
         run: yarn install
       - name: Build with Gatsby
@@ -56,6 +55,13 @@ jobs:
           PREFIX_PATHS: "true"
           NODE_OPTIONS: "--experimental-global-webcrypto"
         run: yarn build
+      - name: Save Gatsby cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            public
+            .cache
+          key: ${{ runner.os }}-gatsby-build-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

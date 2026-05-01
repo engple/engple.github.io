@@ -21,7 +21,6 @@ import type Post from "~/src/types/Post"
 
 import Pronunciation from "../components/Pronunciation"
 import Adsense from "../components/adsense"
-import PostNavigator from "../components/postNavigator"
 import TableOfContents from "../components/tableOfContents"
 import { HORIZONTAL_AD_SLOT, VERTICAL_AD_SLOT } from "../constants"
 import { useInteractiveList } from "../hooks/useInteractiveList"
@@ -117,6 +116,10 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const relatedPosts = data.relatedPosts.edges
     .map(({ node }) => mapPostNodeToPost(node))
     .slice(0, 4)
+  const continuePosts =
+    relatedPosts.length > 0
+      ? relatedPosts
+      : [nextPost, prevPost].filter(post => isDefinedPost(post))
 
   const ogImagePath =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -395,41 +398,51 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   </FaqList>
                 </FaqSection>
               )}
-              <ContinueSection aria-labelledby="continue-heading">
-                <ContinueHeader>
-                  <ContinueEyebrow>Continue Learning</ContinueEyebrow>
-                  <ContinueHeading id="continue-heading">
-                    같은 흐름으로 더 탐색해보세요
-                  </ContinueHeading>
-                </ContinueHeader>
-                <ContinueGrid>
-                  <CategoryArchiveCard to={categoryPath}>
-                    <CategoryArchiveLabel>{category}</CategoryArchiveLabel>
-                    <CategoryArchiveTitle>
-                      {category} 카테고리 전체 보기
-                    </CategoryArchiveTitle>
-                    <CategoryArchiveCopy>
-                      같은 결의 표현을 한 번에 둘러볼 수 있는 아카이브로
-                      이동합니다.
-                    </CategoryArchiveCopy>
-                  </CategoryArchiveCard>
-                  {relatedPosts.map(post => (
-                    <ContinueCard key={post.id} to={post.slug as string}>
-                      <ContinueCardCategory>
-                        {post.category}
-                      </ContinueCardCategory>
-                      <ContinueCardTitle>{post.title}</ContinueCardTitle>
-                      {post.desc ? (
-                        <ContinueCardCopy>{post.desc}</ContinueCardCopy>
-                      ) : undefined}
-                    </ContinueCard>
-                  ))}
-                </ContinueGrid>
-              </ContinueSection>
+              {continuePosts.length > 0 && (
+                <ContinueSection aria-labelledby="continue-heading">
+                  <ContinueHeader>
+                    <ContinueEyebrow>Continue Learning</ContinueEyebrow>
+                    <ContinueHeading id="continue-heading">
+                      이 글 다음으로 이어서 보기
+                    </ContinueHeading>
+                  </ContinueHeader>
+                  <ContinueGrid>
+                    {continuePosts.map(post => (
+                      <ContinueCard key={post.id} to={post.slug as string}>
+                        {post.thumbnail ? (
+                          <ContinueCardMedia>
+                            <ContinueCardMediaGlow
+                              aria-hidden="true"
+                              alt=""
+                              decoding="async"
+                              loading="lazy"
+                              src={post.thumbnail}
+                            />
+                            <ContinueCardImage
+                              alt={post.alt || post.title || ""}
+                              decoding="async"
+                              loading="lazy"
+                              src={post.thumbnail}
+                            />
+                          </ContinueCardMedia>
+                        ) : (
+                          <ContinueCardMediaFallback aria-hidden="true" />
+                        )}
+                        <ContinueCardCategory>
+                          {post.category}
+                        </ContinueCardCategory>
+                        <ContinueCardTitle>{post.title}</ContinueCardTitle>
+                        {post.desc ? (
+                          <ContinueCardCopy>{post.desc}</ContinueCardCopy>
+                        ) : undefined}
+                      </ContinueCard>
+                    ))}
+                  </ContinueGrid>
+                </ContinueSection>
+              )}
             </InnerWrapper>
           </OuterWrapper>
         </article>
-        <PostNavigator prevPost={prevPost} nextPost={nextPost} />
       </main>
     </Layout>
   )
@@ -446,6 +459,8 @@ const startsWithHeroImage = (html?: string | null, imagePath?: string) => {
 
   return Boolean(leadingImage?.[0]?.includes(imagePath))
 }
+
+const isDefinedPost = Boolean
 
 const mapPostNodeToPost = ({
   id,
@@ -795,13 +810,6 @@ const ContinueHeading = styled.h2`
   }
 `
 
-const ContinueDescription = styled.p`
-  margin-top: 10px;
-  color: var(--color-text-2);
-  font-size: 0.975rem;
-  line-height: 1.7;
-`
-
 const ContinueGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -815,7 +823,7 @@ const ContinueGrid = styled.div`
 const ContinueCardBase = styled(Link)`
   display: block;
   min-width: 0;
-  padding: 20px;
+  overflow: hidden;
   border: 1px solid var(--color-gray-2);
   border-radius: 18px;
   background: linear-gradient(
@@ -836,46 +844,53 @@ const ContinueCardBase = styled(Link)`
   }
 `
 
-const CategoryArchiveCard = styled(ContinueCardBase)`
+const ContinueCard = styled(ContinueCardBase)``
+
+const ContinueCardMedia = styled.div`
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(
+    180deg,
+    var(--color-gray-1) 0%,
+    var(--color-gray-2) 100%
+  );
+  overflow: hidden;
+`
+
+const ContinueCardMediaGlow = styled.img`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(16px);
+  transform: scale(1.08);
+  opacity: 0.35;
+`
+
+const ContinueCardImage = styled.img`
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+`
+
+const ContinueCardMediaFallback = styled.div`
+  aspect-ratio: 16 / 9;
   background:
     radial-gradient(
       circle at top left,
       rgba(10, 132, 255, 0.18),
       transparent 55%
     ),
-    linear-gradient(180deg, var(--color-card) 0%, var(--color-gray-1) 100%);
+    linear-gradient(180deg, var(--color-gray-1) 0%, var(--color-gray-2) 100%);
 `
-
-const CategoryArchiveLabel = styled.span`
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.75rem;
-  padding: 0 10px;
-  border-radius: 999px;
-  background-color: var(--color-post-background);
-  color: var(--color-text-3);
-  font-size: 0.75rem;
-  font-weight: var(--font-weight-bold);
-`
-
-const CategoryArchiveTitle = styled.h3`
-  margin-top: 14px;
-  font-size: 1.2rem;
-  font-weight: var(--font-weight-bold);
-  line-height: 1.4;
-`
-
-const CategoryArchiveCopy = styled.p`
-  margin-top: 10px;
-  color: var(--color-text-2);
-  font-size: 0.9375rem;
-  line-height: 1.7;
-`
-
-const ContinueCard = styled(ContinueCardBase)``
 
 const ContinueCardCategory = styled.span`
   display: block;
+  padding: 18px 20px 0;
   color: var(--color-text-3);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
@@ -885,6 +900,7 @@ const ContinueCardCategory = styled.span`
 
 const ContinueCardTitle = styled.h3`
   margin-top: 10px;
+  padding: 0 20px;
   font-size: 1.1rem;
   font-weight: var(--font-weight-bold);
   line-height: 1.45;
@@ -892,6 +908,7 @@ const ContinueCardTitle = styled.h3`
 
 const ContinueCardCopy = styled.p`
   margin-top: 10px;
+  padding: 0 20px 20px;
   color: var(--color-text-2);
   font-size: 0.9375rem;
   line-height: 1.7;

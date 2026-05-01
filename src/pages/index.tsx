@@ -59,9 +59,6 @@ const Home = ({
 
   const site = useSiteMetadata()
   const postTitle = currentCategory || site.postTitle
-  const pageDescription = currentCategory
-    ? `${currentCategory} 카테고리의 글을 한곳에서 둘러보고, 관련 표현으로 자연스럽게 이동할 수 있게 구성한 아카이브입니다.`
-    : "최신 글과 카테고리 허브를 함께 배치해, 포스트 유입 이후에도 다른 표현과 주제로 이어서 탐색할 수 있게 구성했습니다."
   const pagePath = currentCategory
     ? `/category/${kebabCase(currentCategory)}/`
     : "/"
@@ -112,7 +109,6 @@ const Home = ({
                 {currentCategory ? "Category Archive" : "Explore Engple"}
               </HeroEyebrow>
               <PostTitle>{postTitle}</PostTitle>
-              <HeroDescription>{pageDescription}</HeroDescription>
             </HeroCopy>
             <CategoryShelf aria-label="카테고리 탐색">
               <CategoryPill $isActive={!currentCategory} to="/">
@@ -197,13 +193,6 @@ const PostTitle = styled.h1`
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     font-size: 1.75rem;
   }
-`
-
-const HeroDescription = styled.p`
-  margin-top: 12px;
-  color: var(--color-text-2);
-  font-size: 1rem;
-  line-height: 1.7;
 `
 
 const CategoryShelf = styled.nav`

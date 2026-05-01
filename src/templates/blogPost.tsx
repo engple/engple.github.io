@@ -17,10 +17,10 @@ import Layout from "~/src/layouts/layout"
 import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
+import type Post from "~/src/types/Post"
 
 import Pronunciation from "../components/Pronunciation"
 import Adsense from "../components/adsense"
-import PostNavigator from "../components/postNavigator"
 import TableOfContents from "../components/tableOfContents"
 import { HORIZONTAL_AD_SLOT, VERTICAL_AD_SLOT } from "../constants"
 import { useInteractiveList } from "../hooks/useInteractiveList"
@@ -50,21 +50,16 @@ interface DataProps {
       lastmod: string
     }
   }
-  next?: {
-    id: string
-    excerpt: string
-    frontmatter: Queries.MarkdownRemarkFrontmatter
-    fields: {
-      slug: string
-    }
-  }
-  prev?: {
-    id: string
-    excerpt: string
-    frontmatter: Queries.MarkdownRemarkFrontmatter
-    fields: {
-      slug: string
-    }
+  allPosts: {
+    edges: {
+      node: {
+        id: string
+        frontmatter: Queries.MarkdownRemarkFrontmatter
+        fields: {
+          slug: string
+        }
+      }
+    }[]
   }
 }
 
@@ -76,7 +71,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     headings,
     fields: { slug, lastmod },
   } = data.current!
-  const { title, desc, thumbnail, date, category, faqs } = frontmatter!
+  const { title, desc, thumbnail, date, category, alt, faqs } = frontmatter!
   const site = useSiteMetadata()
   const articleRef = React.useRef<HTMLElement | null>(null)
   const htmlWithInlineAd =
@@ -86,7 +81,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
           adClient: site.googleAdsense,
           adSlot: HORIZONTAL_AD_SLOT,
         })
-      : html ?? ""
+      : (html ?? "")
 
   useInteractiveList([html], { initialState: "first-expanded" })
   React.useEffect(() => {
@@ -99,26 +94,10 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     return initializeInlineAdsenseSlots(article, HORIZONTAL_AD_SLOT)
   }, [site.googleAdsense, slug, htmlWithInlineAd])
 
-  const nextPost = data.next
-    ? {
-        id: data.next.id,
-        ...data.next.frontmatter,
-        slug: data.next.fields.slug,
-        thumbnail:
-          data.next.frontmatter.thumbnail?.childImageSharp?.gatsbyImageData
-            ?.images?.fallback?.src,
-      }
-    : undefined
-  const prevPost = data.prev
-    ? {
-        id: data.prev.id,
-        ...data.prev.frontmatter,
-        slug: data.prev.fields.slug,
-        thumbnail:
-          data.prev.frontmatter.thumbnail?.childImageSharp?.gatsbyImageData
-            ?.images?.fallback?.src,
-      }
-    : undefined
+  const allPosts = sortPostsForContinue(
+    data.allPosts.edges.map(({ node }) => mapPostNodeToPost(node)),
+  )
+  const continuePosts = selectContinuePosts(allPosts, slug)
 
   const ogImagePath =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -132,6 +111,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const articleId = `${pageUrl}#article`
   const definedTermId = `${pageUrl}#definedterm`
   const expression = getExpressionTerm({ category, title, faqs })
+  const exploreSearchTerm = expression || title || ""
   const tocHeadings =
     faqItems.length > 0
       ? [
@@ -139,6 +119,17 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
           { id: "faq-heading", depth: 2, value: "❓ 자주 묻는 질문" },
         ]
       : headings
+  const compactTocHeadings = tocHeadings.filter(heading => heading.depth === 2)
+  const hideLeadVisualOnDesktop = startsWithHeroImage(html, ogImagePath)
+
+  const featureImageAlt = alt || title || ""
+
+  const desktopFeatureImage =
+    hideLeadVisualOnDesktop && ogImagePath ? (
+      <FeatureMedia>
+        <FeatureMediaImage src={ogImagePath} alt={featureImageAlt} />
+      </FeatureMedia>
+    ) : undefined
 
   const articleJsonLd = {
     "@type": "BlogPosting",
@@ -306,10 +297,21 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   </BreadcrumbList>
                 </BreadcrumbNav>
                 <Title>{title}</Title>
+                <ExploreActions aria-label="탐색 바로가기">
+                  <ExploreAction to={categoryPath}>
+                    {category} 전체 보기
+                  </ExploreAction>
+                  <ExploreAction
+                    to={`/search/?q=${encodeURIComponent(exploreSearchTerm)}`}
+                  >
+                    이 표현 더 찾기
+                  </ExploreAction>
+                </ExploreActions>
               </ContentHeader>
               <Divider />
               <ContentWrapper>
                 <LeftAd>
+                  {desktopFeatureImage}
                   <Adsense
                     adClient={site.googleAdsense ?? ""}
                     adSlot={VERTICAL_AD_SLOT}
@@ -324,11 +326,29 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   <Markdown
                     dangerouslySetInnerHTML={{ __html: htmlWithInlineAd }}
                     rhythm={rhythm}
+                    $hideLeadVisualOnDesktop={hideLeadVisualOnDesktop}
                   />
                 </CenterWrapper>
                 <Pronunciation />
                 <RightWrapper>
-                  <TableOfContents headings={tocHeadings} />
+                  <TableOfContents headings={compactTocHeadings} />
+                  <AsidePanel aria-labelledby="explore-panel-heading">
+                    <AsideHeading id="explore-panel-heading">
+                      Keep Exploring
+                    </AsideHeading>
+                    <AsidePostList>
+                      {continuePosts.map(post => (
+                        <AsidePostItem key={post.id}>
+                          <AsidePostLink to={post.slug as string}>
+                            <AsidePostCategory>
+                              {post.direction}
+                            </AsidePostCategory>
+                            <AsidePostTitle>{post.title}</AsidePostTitle>
+                          </AsidePostLink>
+                        </AsidePostItem>
+                      ))}
+                    </AsidePostList>
+                  </AsidePanel>
                 </RightWrapper>
               </ContentWrapper>
               {faqItems.length > 0 && (
@@ -356,13 +376,121 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   </FaqList>
                 </FaqSection>
               )}
+              {continuePosts.length > 0 && (
+                <ContinueSection aria-labelledby="continue-heading">
+                  <ContinueHeader>
+                    <ContinueEyebrow>Continue Learning</ContinueEyebrow>
+                    <ContinueHeading id="continue-heading">
+                      이 글 다음으로 이어서 보기
+                    </ContinueHeading>
+                  </ContinueHeader>
+                  <ContinueGrid>
+                    {continuePosts.map(post => (
+                      <ContinueCard key={post.id} to={post.slug as string}>
+                        {post.thumbnail ? (
+                          <ContinueCardMedia>
+                            <ContinueCardMediaGlow
+                              aria-hidden="true"
+                              alt=""
+                              decoding="async"
+                              loading="lazy"
+                              src={post.thumbnail}
+                            />
+                            <ContinueCardImage
+                              alt={post.alt || post.title || ""}
+                              decoding="async"
+                              loading="lazy"
+                              src={post.thumbnail}
+                            />
+                          </ContinueCardMedia>
+                        ) : (
+                          <ContinueCardMediaFallback aria-hidden="true" />
+                        )}
+                        <ContinueCardBody>
+                          <ContinueCardMetaRow>
+                            <ContinueCardCategory>
+                              {post.direction}
+                            </ContinueCardCategory>
+                            {post.category ? (
+                              <ContinueCardContext>
+                                {post.category}
+                              </ContinueCardContext>
+                            ) : undefined}
+                          </ContinueCardMetaRow>
+                          <ContinueCardTitle>{post.title}</ContinueCardTitle>
+                        </ContinueCardBody>
+                      </ContinueCard>
+                    ))}
+                  </ContinueGrid>
+                </ContinueSection>
+              )}
             </InnerWrapper>
           </OuterWrapper>
         </article>
-        <PostNavigator prevPost={prevPost} nextPost={nextPost} />
       </main>
     </Layout>
   )
+}
+
+const startsWithHeroImage = (html?: string | null, imagePath?: string) => {
+  if (!html || !imagePath) return false
+
+  const leadingImage = html
+    .trimStart()
+    .match(
+      /^<p>\s*<span class="gatsby-resp-image-wrapper"[\S\s]*?<\/span>\s*<\/p>/,
+    )
+
+  return Boolean(leadingImage?.[0]?.includes(imagePath))
+}
+
+const selectContinuePosts = (posts: Post[], currentSlug: string) => {
+  const currentIndex = posts.findIndex(post => post.slug === currentSlug)
+
+  if (currentIndex === -1) return []
+
+  return [
+    ...posts
+      .slice(currentIndex + 1, currentIndex + 3)
+      .map(post => ({ ...post, direction: "이전 글" })),
+    ...posts
+      .slice(Math.max(0, currentIndex - 2), currentIndex)
+      .reverse()
+      .map(post => ({ ...post, direction: "다음 글" })),
+  ]
+}
+
+const sortPostsForContinue = (posts: Post[]) => {
+  return [...posts].sort((left, right) => {
+    const dateCompare = (right.date ?? "").localeCompare(left.date ?? "")
+
+    if (dateCompare !== 0) return dateCompare
+
+    return (right.slug as string).localeCompare(left.slug as string)
+  })
+}
+
+const mapPostNodeToPost = ({
+  id,
+  frontmatter,
+  fields,
+}: {
+  id: string
+  frontmatter: Queries.MarkdownRemarkFrontmatter
+  fields: {
+    slug: string
+  }
+}): Post => {
+  return {
+    id,
+    ...frontmatter,
+    desc: frontmatter.desc || undefined,
+    slug: fields.slug,
+    thumbnail:
+      frontmatter.thumbnail?.publicURL ||
+      frontmatter.thumbnail?.childImageSharp?.gatsbyImageData?.images?.fallback
+        ?.src,
+  }
 }
 
 const OuterWrapper = styled.div`
@@ -493,16 +621,78 @@ const Title = styled.h1`
   }
 `
 
+const ExploreActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: var(--sizing-md);
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    margin-top: var(--sizing-sm);
+  }
+`
+
+const ExploreAction = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 16px;
+  border: 1px solid var(--color-gray-2);
+  border-radius: 999px;
+  background-color: var(--color-card);
+  color: var(--color-text-2);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    color: var(--color-text);
+    border-color: var(--color-gray-3);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+  }
+`
+
 const LeftAd = styled.div`
   min-width: 300px;
   width: 300px;
-  height: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-sm);
+  align-self: flex-start;
   position: sticky;
   top: 124px;
+  max-height: calc(100vh - 148px);
+  padding-right: 4px;
+  overflow: hidden auto;
 
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
   }
+`
+
+const FeatureMedia = styled.div`
+  width: 100%;
+  border: 1px solid var(--color-gray-2);
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(
+    180deg,
+    var(--color-card) 0%,
+    var(--color-gray-1) 100%
+  );
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+`
+
+const FeatureMediaImage = styled.img`
+  width: 100%;
+  height: auto;
+  display: block;
 `
 
 const RightWrapper = styled.div`
@@ -512,10 +702,232 @@ const RightWrapper = styled.div`
   flex-direction: column;
   gap: var(--sizing-lg);
   align-items: center;
+  align-self: flex-start;
+  position: sticky;
+  top: 124px;
+  max-height: calc(100vh - 148px);
+  padding-right: 4px;
+  overflow: hidden auto;
 
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
   }
+`
+
+const AsidePanel = styled.aside`
+  width: 100%;
+  padding: 18px;
+  border: 1px solid var(--color-gray-2);
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(
+    180deg,
+    var(--color-card) 0%,
+    var(--color-gray-1) 100%
+  );
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+`
+
+const AsideHeading = styled.h2`
+  color: var(--color-text-3);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.45;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+`
+
+const AsidePostList = styled.ul`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+`
+
+const AsidePostItem = styled.li`
+  margin: 0;
+`
+
+const AsidePostLink = styled(Link)`
+  display: block;
+  padding: 12px 14px;
+  border: 1px solid var(--color-gray-2);
+  border-radius: 12px;
+  background-color: transparent;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-post-background);
+    border-color: var(--color-gray-3);
+    transform: translateX(2px);
+  }
+`
+
+const AsidePostCategory = styled.span`
+  display: block;
+  color: var(--color-text-3);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+`
+
+const AsidePostTitle = styled.span`
+  display: block;
+  margin-top: 6px;
+  color: var(--color-text-2);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1.5;
+`
+
+const ContinueSection = styled.section`
+  width: var(--post-width);
+  margin: var(--sizing-xl) auto 0;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    margin-top: var(--sizing-lg);
+  }
+`
+
+const ContinueHeader = styled.div`
+  margin-bottom: var(--sizing-md);
+`
+
+const ContinueEyebrow = styled.p`
+  margin-bottom: 6px;
+  color: var(--color-text-3);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+`
+
+const ContinueHeading = styled.h2`
+  font-size: 1.75rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    font-size: 1.4rem;
+  }
+`
+
+const ContinueGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--padding-sm);
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    grid-template-columns: 1fr;
+  }
+`
+
+const ContinueCardBase = styled(Link)`
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-gray-2);
+  border-radius: 18px;
+  background: linear-gradient(
+    180deg,
+    var(--color-card) 0%,
+    var(--color-gray-1) 100%
+  );
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-gray-3);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+  }
+`
+
+const ContinueCard = styled(ContinueCardBase)``
+
+const ContinueCardMedia = styled.div`
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(
+    180deg,
+    var(--color-gray-1) 0%,
+    var(--color-gray-2) 100%
+  );
+  overflow: hidden;
+`
+
+const ContinueCardMediaGlow = styled.img`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(16px);
+  transform: scale(1.08);
+  opacity: 0.35;
+`
+
+const ContinueCardImage = styled.img`
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+`
+
+const ContinueCardMediaFallback = styled.div`
+  aspect-ratio: 16 / 9;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(10, 132, 255, 0.18),
+      transparent 55%
+    ),
+    linear-gradient(180deg, var(--color-gray-1) 0%, var(--color-gray-2) 100%);
+`
+
+const ContinueCardBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px 20px;
+`
+
+const ContinueCardMetaRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+`
+
+const ContinueCardCategory = styled.span`
+  color: var(--color-text-3);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+`
+
+const ContinueCardContext = styled.span`
+  color: var(--color-text-3);
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+`
+
+const ContinueCardTitle = styled.h3`
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.45;
 `
 
 const CenterWrapper = styled.div`
@@ -649,7 +1061,7 @@ const FaqAnswer = styled.p`
 `
 
 export const query = graphql`
-  query BlogPostPage($slug: String, $nextSlug: String, $prevSlug: String) {
+  query BlogPostPage($slug: String) {
     current: markdownRemark(fields: { slug: { eq: $slug } }) {
       id
       html
@@ -669,6 +1081,7 @@ export const query = graphql`
         }
         date(formatString: "YYYY-MM-DDTHH:MM:SSZ")
         category
+        alt
         faqs {
           question
           answer
@@ -680,41 +1093,27 @@ export const query = graphql`
       }
     }
 
-    next: markdownRemark(fields: { slug: { eq: $nextSlug } }) {
-      id
-      excerpt(format: PLAIN)
-      frontmatter {
-        title
-        desc
-        thumbnail {
-          childImageSharp {
-            gatsbyImageData(placeholder: BLURRED, layout: FIXED)
+    allPosts: allMarkdownRemark(
+      filter: { fileAbsolutePath: { regex: "/(posts/blog)/" } }
+      sort: { frontmatter: { date: DESC } }
+      limit: 2000
+    ) {
+      edges {
+        node {
+          id
+          frontmatter {
+            title
+            date(formatString: "YYYY-MM-DD")
+            category
+            alt
+            thumbnail {
+              publicURL
+            }
+          }
+          fields {
+            slug
           }
         }
-        date(formatString: "YYYY-MM-DD")
-        category
-      }
-      fields {
-        slug
-      }
-    }
-
-    prev: markdownRemark(fields: { slug: { eq: $prevSlug } }) {
-      id
-      excerpt(format: PLAIN)
-      frontmatter {
-        title
-        desc
-        thumbnail {
-          childImageSharp {
-            gatsbyImageData(placeholder: BLURRED, layout: FIXED)
-          }
-        }
-        date(formatString: "YYYY-MM-DD")
-        category
-      }
-      fields {
-        slug
       }
     }
   }

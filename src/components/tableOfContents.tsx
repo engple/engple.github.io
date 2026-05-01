@@ -3,16 +3,17 @@ import React, { useEffect, useState } from "react"
 import { Link } from "gatsby"
 import { styled } from "styled-components"
 
-const TableOfContents = ({
-  headings,
-}: {
+interface TableOfContentsProps {
   headings: {
     id: string
     depth: number
     value: string
   }[]
-}) => {
+}
+
+const TableOfContents: React.FC<TableOfContentsProps> = ({ headings }) => {
   const [activeId, setActiveId] = useState("")
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
@@ -36,6 +37,7 @@ const TableOfContents = ({
     return () => {
       for (const heading of headings) {
         const element = document.querySelector(`#${CSS.escape(heading.id)}`)
+
         if (element) {
           observer.unobserve(element)
         }
@@ -44,40 +46,105 @@ const TableOfContents = ({
   }, [headings])
 
   return (
-    <TocNav>
-      <ul>
+    <TocNav aria-label="이 글의 목차">
+      <Header>
+        <Title>On This Page</Title>
+      </Header>
+      <List>
         {headings.map(heading => (
-          <li
+          <Item
             key={heading.id}
-            style={{
-              marginLeft: `${(heading.depth - 2) * 1.5}rem`,
-              fontWeight: activeId === heading.id ? "bold" : "inherit",
-            }}
+            $depth={heading.depth}
+            $isActive={activeId === heading.id}
           >
-            <Link to={`#${heading.id}`}>{heading.value}</Link>
-          </li>
+            <StyledLink to={`#${heading.id}`}>{heading.value}</StyledLink>
+          </Item>
         ))}
-      </ul>
+      </List>
     </TocNav>
   )
 }
 
 const TocNav = styled.nav`
-  position: sticky;
-  top: 124px;
-  padding: var(--padding-xs);
-  border-radius: var(--border-radius-sm);
-  width: fit-content;
-  min-width: 20rem;
-  height: fit-content;
-  max-height: 29rem;
-  line-height: 1.8;
+  width: 100%;
+  max-height: min(23rem, calc(100vh - 420px));
+  padding: 12px;
+  border: 1px solid var(--color-gray-2);
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(
+    180deg,
+    var(--color-card) 0%,
+    var(--color-gray-1) 100%
+  );
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
   overflow: hidden auto;
-  background-color: var(--color-gray-1);
   display: none;
 
   @media (min-width: ${({ theme }) => theme.device.lg}) {
     display: block;
+  }
+`
+
+const Header = styled.div`
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--color-gray-2);
+`
+
+const Title = styled.h2`
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.4;
+  color: var(--color-text-3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+`
+
+const List = styled.ul`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+`
+
+const Item = styled.li<{ $depth: number; $isActive: boolean }>`
+  margin-left: ${({ $depth }) => `${Math.max($depth - 2, 0) * 0.65}rem`};
+
+  a {
+    color: ${({ $isActive }) =>
+      $isActive ? "var(--color-text)" : "var(--color-text-2)"};
+    background-color: ${({ $isActive }) =>
+      $isActive ? "var(--color-post-background)" : "transparent"};
+    border-color: ${({ $isActive }) =>
+      $isActive ? "var(--color-gray-2)" : "transparent"};
+    box-shadow: ${({ $isActive }) =>
+      $isActive ? "0 6px 18px rgba(15, 23, 42, 0.08)" : "none"};
+    font-weight: ${({ $isActive }) =>
+      $isActive ? "var(--font-weight-semi-bold)" : "var(--font-weight-medium)"};
+  }
+`
+
+const StyledLink = styled(Link)`
+  display: block;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    color: var(--color-text);
+    background-color: var(--color-post-background);
+    border-color: var(--color-gray-2);
+    transform: translateX(2px);
   }
 `
 

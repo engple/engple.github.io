@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useMemo, useState } from "react"
 
-import { type PageProps, graphql } from "gatsby"
+import { Link, type PageProps, graphql } from "gatsby"
 import kebabCase from "lodash/kebabCase"
 import styled from "styled-components"
 
@@ -30,6 +30,11 @@ const Home = ({
         )
       : postData
   }, [currentCategory, postData])
+  const categoryGroups = useMemo(() => {
+    return [...(data.allMarkdownRemark.group ?? [])]
+      .filter(group => group.fieldValue)
+      .sort((first, second) => second.totalCount - first.totalCount)
+  }, [data.allMarkdownRemark.group])
   useLayoutEffect(() => {
     setPosts(
       visiblePostData.map(({ node }) => {
@@ -98,7 +103,29 @@ const Home = ({
           />
         </LeftAd>
         <Content>
-          <PostTitle>{postTitle}</PostTitle>
+          <HeroSection>
+            <HeroCopy>
+              <HeroEyebrow>
+                {currentCategory ? "Category Archive" : "Explore Engple"}
+              </HeroEyebrow>
+              <PostTitle>{postTitle}</PostTitle>
+            </HeroCopy>
+            <CategoryShelf aria-label="카테고리 탐색">
+              <CategoryPill $isActive={!currentCategory} to="/">
+                전체
+              </CategoryPill>
+              {categoryGroups.map(group => (
+                <CategoryPill
+                  key={group.fieldValue}
+                  $isActive={group.fieldValue === currentCategory}
+                  to={`/category/${kebabCase(group.fieldValue ?? "")}/`}
+                >
+                  <span>{group.fieldValue}</span>
+                  <CategoryCount>{group.totalCount}</CategoryCount>
+                </CategoryPill>
+              ))}
+            </CategoryShelf>
+          </HeroSection>
           <PostGrid posts={posts} />
         </Content>
         <RightAd>
@@ -138,15 +165,86 @@ const Content = styled.div`
   }
 `
 
-const PostTitle = styled.h2`
+const HeroSection = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: var(--sizing-md);
+  margin-bottom: var(--sizing-lg);
+`
+
+const HeroCopy = styled.div`
+  max-width: 46rem;
+`
+
+const HeroEyebrow = styled.p`
+  margin-bottom: 6px;
+  color: var(--color-text-3);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+`
+
+const PostTitle = styled.h1`
   font-size: 2rem;
   font-weight: var(--font-weight-extra-bold);
-  margin-bottom: var(--sizing-md);
   line-height: 1.21875;
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     font-size: 1.75rem;
   }
+`
+
+const CategoryShelf = styled.nav`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+`
+
+const CategoryPill = styled(Link)<{ $isActive: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 2.75rem;
+  padding: 0 14px;
+  border: 1px solid
+    ${({ $isActive }) =>
+      $isActive ? "var(--color-gray-4)" : "var(--color-gray-2)"};
+  border-radius: 999px;
+  background-color: ${({ $isActive }) =>
+    $isActive ? "var(--color-card)" : "transparent"};
+  color: ${({ $isActive }) =>
+    $isActive ? "var(--color-text)" : "var(--color-text-2)"};
+  font-size: 0.9375rem;
+  font-weight: ${({ $isActive }) =>
+    $isActive ? "var(--font-weight-semi-bold)" : "var(--font-weight-medium)"};
+  line-height: 1;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: var(--color-gray-3);
+    background-color: var(--color-card);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  }
+`
+
+const CategoryCount = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 6px;
+  border-radius: 999px;
+  background-color: var(--color-post-background);
+  color: var(--color-text-3);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
 `
 
 const LeftAd = styled.div`

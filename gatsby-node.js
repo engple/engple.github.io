@@ -34,17 +34,6 @@ exports.createPages = async ({ graphql, actions }) => {
           node {
             fields {
               slug
-              lastmod
-            }
-          }
-          next {
-            fields {
-              slug
-            }
-          }
-          previous {
-            fields {
-              slug
             }
           }
         }
@@ -80,16 +69,12 @@ function createCategoryPages({ result, createPage }) {
 const createPostPages = ({ result, createPage }) => {
   const template = path.resolve(`./src/templates/blogPost.tsx`)
 
-  result.data.postsRemark.edges.forEach(({ node, next, previous }) => {
+  result.data.postsRemark.edges.forEach(({ node }) => {
     createPage({
       path: node.fields.slug,
       component: template,
       context: {
-        // additional data can be passed via context
         slug: node.fields.slug,
-        lastmod: node.fields.lastmod,
-        nextSlug: next?.fields.slug ?? "",
-        prevSlug: previous?.fields.slug ?? "",
       },
     })
   })

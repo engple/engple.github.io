@@ -1,8 +1,11 @@
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 
 import type typography from "./typography"
 
-const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
+const Markdown = styled.article<{
+  rhythm: (typeof typography)["rhythm"]
+  $hideLeadVisualOnDesktop?: boolean
+}>`
   width: 100%;
   min-width: 100%;
 
@@ -14,6 +17,24 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
   h6 {
     scroll-margin-top: var(--sizing-xl);
     font-weight: var(--font-weight-bold);
+
+    > a.anchor {
+      color: inherit;
+      text-decoration: none;
+      font-weight: inherit;
+      background: none;
+      background-image: none;
+      box-shadow: none;
+      transition: opacity 0.2s ease;
+
+      &:hover,
+      &:active {
+        color: inherit;
+        text-decoration: none;
+        background: none;
+        background-image: none;
+      }
+    }
   }
 
   td,
@@ -31,17 +52,51 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
   }
 
   a {
+    color: inherit;
     text-decoration: underline;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.18em;
     font-weight: var(--font-weight-semi-bold);
+    transition:
+      color 0.2s ease,
+      background-size 0.2s ease;
+    background-image: linear-gradient(
+      var(--color-inline-link-highlight),
+      var(--color-inline-link-highlight)
+    );
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% var(--size-inline-link-highlight);
+
     &:hover,
     &:active {
+      color: inherit;
       text-decoration: underline;
+      background-image: linear-gradient(
+        var(--color-inline-link-highlight-hover),
+        var(--color-inline-link-highlight-hover)
+      );
+      background-size: 100% var(--size-inline-link-highlight-hover);
     }
   }
 
   & > *:first-child {
     margin-top: 0;
   }
+
+  ${({ $hideLeadVisualOnDesktop, theme }) =>
+    $hideLeadVisualOnDesktop &&
+    css`
+      @media (min-width: ${theme.device.lg}) {
+        > p:first-of-type {
+          display: none;
+        }
+
+        > p:first-of-type + * {
+          margin-top: 0;
+        }
+      }
+    `}
 
   h1 {
     font-size: 2.5rem;

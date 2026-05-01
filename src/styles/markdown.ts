@@ -1,8 +1,11 @@
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 
 import type typography from "./typography"
 
-const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
+const Markdown = styled.article<{
+  rhythm: (typeof typography)["rhythm"]
+  $hideLeadVisualOnDesktop?: boolean
+}>`
   width: 100%;
   min-width: 100%;
 
@@ -63,7 +66,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
     );
     background-position: 0 100%;
     background-repeat: no-repeat;
-    background-size: 100% 0.3em;
+    background-size: 100% var(--size-inline-link-highlight);
 
     &:hover,
     &:active {
@@ -73,13 +76,27 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
         var(--color-inline-link-highlight-hover),
         var(--color-inline-link-highlight-hover)
       );
-      background-size: 100% 0.5em;
+      background-size: 100% var(--size-inline-link-highlight-hover);
     }
   }
 
   & > *:first-child {
     margin-top: 0;
   }
+
+  ${({ $hideLeadVisualOnDesktop, theme }) =>
+    $hideLeadVisualOnDesktop &&
+    css`
+      @media (min-width: ${theme.device.lg}) {
+        > p:first-of-type {
+          display: none;
+        }
+
+        > p:first-of-type + * {
+          margin-top: 0;
+        }
+      }
+    `}
 
   h1 {
     font-size: 2.5rem;

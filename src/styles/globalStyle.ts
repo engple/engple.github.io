@@ -87,6 +87,8 @@ const GlobalStyle = createGlobalStyle`
       --color-divider: rgba(0, 0, 0, 0.15);
       --color-inline-link-highlight: rgba(0, 102, 204, 0.12);
       --color-inline-link-highlight-hover: rgba(0, 102, 204, 0.18);
+      --size-inline-link-highlight: 0.3em;
+      --size-inline-link-highlight-hover: 0.5em;
       --color-dimmed: rgba(0, 0, 0, 0.15);
       --color-floating-button: rgba(255, 255, 255, 0.7);
       --color-floating-button-hover: rgba(50, 50, 50, 0.9);
@@ -122,8 +124,10 @@ const GlobalStyle = createGlobalStyle`
       --color-gray-5: #767676;
       --color-gray-6: #989898;
       --color-divider: rgba(255, 255, 255, 0.15);
-      --color-inline-link-highlight: rgba(10, 132, 255, 0.18);
-      --color-inline-link-highlight-hover: rgba(10, 132, 255, 0.26);
+      --color-inline-link-highlight: rgba(10, 132, 255, 0.24);
+      --color-inline-link-highlight-hover: rgba(10, 132, 255, 0.34);
+      --size-inline-link-highlight: 0.48em;
+      --size-inline-link-highlight-hover: 0.72em;
       --color-dimmed: rgba(0, 0, 0, 0.15);
       --color-floating-button: rgba(50, 50, 50, 0.7);
       --color-floating-button-hover: rgba(255, 255, 255, 0.9);

@@ -89,7 +89,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     headings,
     fields: { slug, lastmod },
   } = data.current!
-  const { title, desc, thumbnail, date, category, faqs } = frontmatter!
+  const { title, desc, thumbnail, date, category, alt, faqs } = frontmatter!
   const site = useSiteMetadata()
   const articleRef = React.useRef<HTMLElement | null>(null)
   const htmlWithInlineAd =
@@ -138,6 +138,17 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
           { id: "faq-heading", depth: 2, value: "❓ 자주 묻는 질문" },
         ]
       : headings
+  const compactTocHeadings = flattenRelatedExpressionHeadings(tocHeadings)
+  const hideLeadVisualOnDesktop = startsWithHeroImage(html, ogImagePath)
+
+  const featureImageAlt = alt || title || ""
+
+  const desktopFeatureImage =
+    hideLeadVisualOnDesktop && ogImagePath ? (
+      <FeatureMedia>
+        <FeatureMediaImage src={ogImagePath} alt={featureImageAlt} />
+      </FeatureMedia>
+    ) : undefined
 
   const articleJsonLd = {
     "@type": "BlogPosting",
@@ -319,6 +330,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
               <Divider />
               <ContentWrapper>
                 <LeftAd>
+                  {desktopFeatureImage}
                   <Adsense
                     adClient={site.googleAdsense ?? ""}
                     adSlot={VERTICAL_AD_SLOT}
@@ -333,15 +345,15 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   <Markdown
                     dangerouslySetInnerHTML={{ __html: htmlWithInlineAd }}
                     rhythm={rhythm}
+                    $hideLeadVisualOnDesktop={hideLeadVisualOnDesktop}
                   />
                 </CenterWrapper>
                 <Pronunciation />
                 <RightWrapper>
-                  <TableOfContents headings={tocHeadings} />
+                  <TableOfContents headings={compactTocHeadings} />
                   <AsidePanel aria-labelledby="explore-panel-heading">
-                    <AsideEyebrow>Keep Exploring</AsideEyebrow>
                     <AsideHeading id="explore-panel-heading">
-                      이 글 다음으로 보기
+                      Keep Exploring
                     </AsideHeading>
                     <AsidePostList>
                       {relatedPosts.map(post => (
@@ -425,6 +437,65 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
       </main>
     </Layout>
   )
+}
+
+const flattenRelatedExpressionHeadings = (
+  headings: {
+    id: string
+    depth: number
+    value: string
+  }[],
+) => {
+  const compactHeadings: typeof headings = []
+  let relatedHeadingDepth: number | undefined
+
+  for (const [index, heading] of headings.entries()) {
+    if (heading.value.includes("함께 알아두면 좋은 표현들")) {
+      let hasNestedExpressionHeading = false
+
+      for (const nextHeading of headings.slice(index + 1)) {
+        if (nextHeading.depth <= heading.depth) {
+          break
+        }
+
+        hasNestedExpressionHeading = true
+        break
+      }
+
+      if (!hasNestedExpressionHeading) {
+        compactHeadings.push(heading)
+        continue
+      }
+
+      relatedHeadingDepth = heading.depth
+      continue
+    }
+
+    if (relatedHeadingDepth !== undefined) {
+      if (heading.depth > relatedHeadingDepth) {
+        compactHeadings.push({ ...heading, depth: relatedHeadingDepth })
+        continue
+      }
+
+      relatedHeadingDepth = undefined
+    }
+
+    compactHeadings.push(heading)
+  }
+
+  return compactHeadings
+}
+
+const startsWithHeroImage = (html?: string | null, imagePath?: string) => {
+  if (!html || !imagePath) return false
+
+  const leadingImage = html
+    .trimStart()
+    .match(
+      /^<p>\s*<span class="gatsby-resp-image-wrapper"[\S\s]*?<\/span>\s*<\/p>/,
+    )
+
+  return Boolean(leadingImage?.[0]?.includes(imagePath))
 }
 
 const mapPostNodeToPost = ({
@@ -619,13 +690,38 @@ const ExploreAction = styled(Link)`
 const LeftAd = styled.div`
   min-width: 300px;
   width: 300px;
-  height: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-sm);
+  align-self: flex-start;
   position: sticky;
   top: 124px;
+  max-height: calc(100vh - 148px);
+  padding-right: 4px;
+  overflow: hidden auto;
 
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
   }
+`
+
+const FeatureMedia = styled.div`
+  width: 100%;
+  border: 1px solid var(--color-gray-2);
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(
+    180deg,
+    var(--color-card) 0%,
+    var(--color-gray-1) 100%
+  );
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+`
+
+const FeatureMediaImage = styled.img`
+  width: 100%;
+  height: auto;
+  display: block;
 `
 
 const RightWrapper = styled.div`
@@ -660,19 +756,13 @@ const AsidePanel = styled.aside`
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
 `
 
-const AsideEyebrow = styled.p`
-  margin-bottom: 6px;
-  color: var(--color-text-3);
-  font-size: 0.6875rem;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-`
-
 const AsideHeading = styled.h2`
-  font-size: 1rem;
+  color: var(--color-text-3);
+  font-size: 0.9375rem;
   font-weight: var(--font-weight-bold);
   line-height: 1.45;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 `
 
 const AsidePostList = styled.ul`

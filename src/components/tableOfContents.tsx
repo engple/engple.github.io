@@ -48,8 +48,7 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ headings }) => {
   return (
     <TocNav aria-label="이 글의 목차">
       <Header>
-        <Eyebrow>On This Page</Eyebrow>
-        <Title>이 글에서 바로 보기</Title>
+        <Title>On This Page</Title>
       </Header>
       <List>
         {headings.map(heading => (
@@ -92,19 +91,13 @@ const Header = styled.div`
   border-bottom: 1px solid var(--color-gray-2);
 `
 
-const Eyebrow = styled.p`
-  margin-bottom: 4px;
-  color: var(--color-text-3);
-  font-size: 0.6875rem;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-`
-
 const Title = styled.h2`
   font-size: 0.9375rem;
   font-weight: var(--font-weight-bold);
   line-height: 1.4;
+  color: var(--color-text-3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 `
 
 const List = styled.ul`

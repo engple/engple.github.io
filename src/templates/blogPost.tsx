@@ -343,9 +343,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                     <AsideHeading id="explore-panel-heading">
                       이 글 다음으로 보기
                     </AsideHeading>
-                    <AsideCategoryLink to={categoryPath}>
-                      {category} 카테고리 전체 보기
-                    </AsideCategoryLink>
                     <AsidePostList>
                       {relatedPosts.map(post => (
                         <AsidePostItem key={post.id}>
@@ -676,26 +673,6 @@ const AsideHeading = styled.h2`
   font-size: 1rem;
   font-weight: var(--font-weight-bold);
   line-height: 1.45;
-`
-
-const AsideCategoryLink = styled(Link)`
-  display: block;
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background-color: var(--color-post-background);
-  color: var(--color-text-2);
-  font-size: 0.9375rem;
-  font-weight: var(--font-weight-semi-bold);
-  line-height: 1.5;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
-  }
 `
 
 const AsidePostList = styled.ul`

@@ -68,7 +68,8 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ headings }) => {
 
 const TocNav = styled.nav`
   width: 100%;
-  padding: var(--padding-sm);
+  max-height: min(23rem, calc(100vh - 420px));
+  padding: 12px;
   border: 1px solid var(--color-gray-2);
   border-radius: var(--border-radius-md);
   background: linear-gradient(
@@ -77,6 +78,7 @@ const TocNav = styled.nav`
     var(--color-gray-1) 100%
   );
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  overflow: hidden auto;
   display: none;
 
   @media (min-width: ${({ theme }) => theme.device.lg}) {
@@ -85,8 +87,8 @@ const TocNav = styled.nav`
 `
 
 const Header = styled.div`
-  padding-bottom: var(--padding-sm);
-  margin-bottom: var(--padding-sm);
+  padding-bottom: 10px;
+  margin-bottom: 10px;
   border-bottom: 1px solid var(--color-gray-2);
 `
 
@@ -100,7 +102,7 @@ const Eyebrow = styled.p`
 `
 
 const Title = styled.h2`
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: var(--font-weight-bold);
   line-height: 1.4;
 `
@@ -108,14 +110,14 @@ const Title = styled.h2`
 const List = styled.ul`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   margin: 0;
   padding: 0;
   list-style: none;
 `
 
 const Item = styled.li<{ $depth: number; $isActive: boolean }>`
-  margin-left: ${({ $depth }) => `${Math.max($depth - 2, 0) * 0.85}rem`};
+  margin-left: ${({ $depth }) => `${Math.max($depth - 2, 0) * 0.65}rem`};
 
   a {
     color: ${({ $isActive }) =>
@@ -133,11 +135,11 @@ const Item = styled.li<{ $depth: number; $isActive: boolean }>`
 
 const StyledLink = styled(Link)`
   display: block;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid transparent;
-  border-radius: 10px;
-  font-size: 0.9375rem;
-  line-height: 1.55;
+  border-radius: 9px;
+  font-size: 0.875rem;
+  line-height: 1.45;
   transition:
     color 0.2s ease,
     background-color 0.2s ease,

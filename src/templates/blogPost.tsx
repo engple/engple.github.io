@@ -138,7 +138,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
           { id: "faq-heading", depth: 2, value: "❓ 자주 묻는 질문" },
         ]
       : headings
-  const compactTocHeadings = flattenRelatedExpressionHeadings(tocHeadings)
+  const compactTocHeadings = tocHeadings.filter(heading => heading.depth === 2)
   const hideLeadVisualOnDesktop = startsWithHeroImage(html, ogImagePath)
 
   const featureImageAlt = alt || title || ""
@@ -401,10 +401,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   <ContinueHeading id="continue-heading">
                     같은 흐름으로 더 탐색해보세요
                   </ContinueHeading>
-                  <ContinueDescription>
-                    본문은 그대로 두고, 이 글과 가까운 주제의 글로 이어질 수
-                    있게 탐색 허브를 아래에 배치했습니다.
-                  </ContinueDescription>
                 </ContinueHeader>
                 <ContinueGrid>
                   <CategoryArchiveCard to={categoryPath}>
@@ -437,53 +433,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
       </main>
     </Layout>
   )
-}
-
-const flattenRelatedExpressionHeadings = (
-  headings: {
-    id: string
-    depth: number
-    value: string
-  }[],
-) => {
-  const compactHeadings: typeof headings = []
-  let relatedHeadingDepth: number | undefined
-
-  for (const [index, heading] of headings.entries()) {
-    if (heading.value.includes("함께 알아두면 좋은 표현들")) {
-      let hasNestedExpressionHeading = false
-
-      for (const nextHeading of headings.slice(index + 1)) {
-        if (nextHeading.depth <= heading.depth) {
-          break
-        }
-
-        hasNestedExpressionHeading = true
-        break
-      }
-
-      if (!hasNestedExpressionHeading) {
-        compactHeadings.push(heading)
-        continue
-      }
-
-      relatedHeadingDepth = heading.depth
-      continue
-    }
-
-    if (relatedHeadingDepth !== undefined) {
-      if (heading.depth > relatedHeadingDepth) {
-        compactHeadings.push({ ...heading, depth: relatedHeadingDepth })
-        continue
-      }
-
-      relatedHeadingDepth = undefined
-    }
-
-    compactHeadings.push(heading)
-  }
-
-  return compactHeadings
 }
 
 const startsWithHeroImage = (html?: string | null, imagePath?: string) => {

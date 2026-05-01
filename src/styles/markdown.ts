@@ -31,11 +31,27 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
   }
 
   a {
+    color: var(--color-blue);
     text-decoration: underline;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.18em;
     font-weight: var(--font-weight-semi-bold);
+    transition:
+      color 0.2s ease,
+      background-size 0.2s ease;
+    background-image: linear-gradient(
+      rgba(10, 132, 255, 0.14),
+      rgba(10, 132, 255, 0.14)
+    );
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 0.45em;
+
     &:hover,
     &:active {
+      color: var(--color-text);
       text-decoration: underline;
+      background-size: 100% 100%;
     }
   }
 

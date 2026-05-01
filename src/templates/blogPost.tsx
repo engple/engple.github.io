@@ -17,6 +17,7 @@ import Layout from "~/src/layouts/layout"
 import DateTime from "~/src/styles/dateTime"
 import Markdown from "~/src/styles/markdown"
 import { rhythm } from "~/src/styles/typography"
+import type Post from "~/src/types/Post"
 
 import Pronunciation from "../components/Pronunciation"
 import Adsense from "../components/adsense"
@@ -66,6 +67,18 @@ interface DataProps {
       slug: string
     }
   }
+  relatedPosts: {
+    edges: {
+      node: {
+        id: string
+        excerpt: string
+        frontmatter: Queries.MarkdownRemarkFrontmatter
+        fields: {
+          slug: string
+        }
+      }
+    }[]
+  }
 }
 
 const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
@@ -86,7 +99,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
           adClient: site.googleAdsense,
           adSlot: HORIZONTAL_AD_SLOT,
         })
-      : html ?? ""
+      : (html ?? "")
 
   useInteractiveList([html], { initialState: "first-expanded" })
   React.useEffect(() => {
@@ -99,26 +112,11 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     return initializeInlineAdsenseSlots(article, HORIZONTAL_AD_SLOT)
   }, [site.googleAdsense, slug, htmlWithInlineAd])
 
-  const nextPost = data.next
-    ? {
-        id: data.next.id,
-        ...data.next.frontmatter,
-        slug: data.next.fields.slug,
-        thumbnail:
-          data.next.frontmatter.thumbnail?.childImageSharp?.gatsbyImageData
-            ?.images?.fallback?.src,
-      }
-    : undefined
-  const prevPost = data.prev
-    ? {
-        id: data.prev.id,
-        ...data.prev.frontmatter,
-        slug: data.prev.fields.slug,
-        thumbnail:
-          data.prev.frontmatter.thumbnail?.childImageSharp?.gatsbyImageData
-            ?.images?.fallback?.src,
-      }
-    : undefined
+  const nextPost = data.next ? mapPostNodeToPost(data.next) : undefined
+  const prevPost = data.prev ? mapPostNodeToPost(data.prev) : undefined
+  const relatedPosts = data.relatedPosts.edges
+    .map(({ node }) => mapPostNodeToPost(node))
+    .slice(0, 4)
 
   const ogImagePath =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -132,6 +130,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const articleId = `${pageUrl}#article`
   const definedTermId = `${pageUrl}#definedterm`
   const expression = getExpressionTerm({ category, title, faqs })
+  const exploreSearchTerm = expression || title || ""
   const tocHeadings =
     faqItems.length > 0
       ? [
@@ -306,6 +305,16 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   </BreadcrumbList>
                 </BreadcrumbNav>
                 <Title>{title}</Title>
+                <ExploreActions aria-label="탐색 바로가기">
+                  <ExploreAction to={categoryPath}>
+                    {category} 전체 보기
+                  </ExploreAction>
+                  <ExploreAction
+                    to={`/search/?q=${encodeURIComponent(exploreSearchTerm)}`}
+                  >
+                    이 표현 더 찾기
+                  </ExploreAction>
+                </ExploreActions>
               </ContentHeader>
               <Divider />
               <ContentWrapper>
@@ -329,6 +338,27 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 <Pronunciation />
                 <RightWrapper>
                   <TableOfContents headings={tocHeadings} />
+                  <AsidePanel aria-labelledby="explore-panel-heading">
+                    <AsideEyebrow>Keep Exploring</AsideEyebrow>
+                    <AsideHeading id="explore-panel-heading">
+                      이 글 다음으로 보기
+                    </AsideHeading>
+                    <AsideCategoryLink to={categoryPath}>
+                      {category} 카테고리 전체 보기
+                    </AsideCategoryLink>
+                    <AsidePostList>
+                      {relatedPosts.map(post => (
+                        <AsidePostItem key={post.id}>
+                          <AsidePostLink to={post.slug as string}>
+                            <AsidePostCategory>
+                              {post.category}
+                            </AsidePostCategory>
+                            <AsidePostTitle>{post.title}</AsidePostTitle>
+                          </AsidePostLink>
+                        </AsidePostItem>
+                      ))}
+                    </AsidePostList>
+                  </AsidePanel>
                 </RightWrapper>
               </ContentWrapper>
               {faqItems.length > 0 && (
@@ -356,6 +386,41 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   </FaqList>
                 </FaqSection>
               )}
+              <ContinueSection aria-labelledby="continue-heading">
+                <ContinueHeader>
+                  <ContinueEyebrow>Continue Learning</ContinueEyebrow>
+                  <ContinueHeading id="continue-heading">
+                    같은 흐름으로 더 탐색해보세요
+                  </ContinueHeading>
+                  <ContinueDescription>
+                    본문은 그대로 두고, 이 글과 가까운 주제의 글로 이어질 수
+                    있게 탐색 허브를 아래에 배치했습니다.
+                  </ContinueDescription>
+                </ContinueHeader>
+                <ContinueGrid>
+                  <CategoryArchiveCard to={categoryPath}>
+                    <CategoryArchiveLabel>{category}</CategoryArchiveLabel>
+                    <CategoryArchiveTitle>
+                      {category} 카테고리 전체 보기
+                    </CategoryArchiveTitle>
+                    <CategoryArchiveCopy>
+                      같은 결의 표현을 한 번에 둘러볼 수 있는 아카이브로
+                      이동합니다.
+                    </CategoryArchiveCopy>
+                  </CategoryArchiveCard>
+                  {relatedPosts.map(post => (
+                    <ContinueCard key={post.id} to={post.slug as string}>
+                      <ContinueCardCategory>
+                        {post.category}
+                      </ContinueCardCategory>
+                      <ContinueCardTitle>{post.title}</ContinueCardTitle>
+                      {post.desc ? (
+                        <ContinueCardCopy>{post.desc}</ContinueCardCopy>
+                      ) : undefined}
+                    </ContinueCard>
+                  ))}
+                </ContinueGrid>
+              </ContinueSection>
             </InnerWrapper>
           </OuterWrapper>
         </article>
@@ -363,6 +428,30 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
       </main>
     </Layout>
   )
+}
+
+const mapPostNodeToPost = ({
+  id,
+  excerpt,
+  frontmatter,
+  fields,
+}: {
+  id: string
+  excerpt: string
+  frontmatter: Queries.MarkdownRemarkFrontmatter
+  fields: {
+    slug: string
+  }
+}): Post => {
+  return {
+    id,
+    ...frontmatter,
+    desc: frontmatter.desc || excerpt,
+    slug: fields.slug,
+    thumbnail:
+      frontmatter.thumbnail?.childImageSharp?.gatsbyImageData?.images?.fallback
+        ?.src,
+  }
 }
 
 const OuterWrapper = styled.div`
@@ -493,6 +582,43 @@ const Title = styled.h1`
   }
 `
 
+const ExploreActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: var(--sizing-md);
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    margin-top: var(--sizing-sm);
+  }
+`
+
+const ExploreAction = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 16px;
+  border: 1px solid var(--color-gray-2);
+  border-radius: 999px;
+  background-color: var(--color-card);
+  color: var(--color-text-2);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    color: var(--color-text);
+    border-color: var(--color-gray-3);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+  }
+`
+
 const LeftAd = styled.div`
   min-width: 300px;
   width: 300px;
@@ -516,6 +642,241 @@ const RightWrapper = styled.div`
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;
   }
+`
+
+const AsidePanel = styled.aside`
+  width: 100%;
+  padding: 18px;
+  border: 1px solid var(--color-gray-2);
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(
+    180deg,
+    var(--color-card) 0%,
+    var(--color-gray-1) 100%
+  );
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+`
+
+const AsideEyebrow = styled.p`
+  margin-bottom: 6px;
+  color: var(--color-text-3);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+`
+
+const AsideHeading = styled.h2`
+  font-size: 1rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.45;
+`
+
+const AsideCategoryLink = styled(Link)`
+  display: block;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background-color: var(--color-post-background);
+  color: var(--color-text-2);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1.5;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  }
+`
+
+const AsidePostList = styled.ul`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+`
+
+const AsidePostItem = styled.li`
+  margin: 0;
+`
+
+const AsidePostLink = styled(Link)`
+  display: block;
+  padding: 12px 14px;
+  border: 1px solid var(--color-gray-2);
+  border-radius: 12px;
+  background-color: transparent;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-post-background);
+    border-color: var(--color-gray-3);
+    transform: translateX(2px);
+  }
+`
+
+const AsidePostCategory = styled.span`
+  display: block;
+  color: var(--color-text-3);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+`
+
+const AsidePostTitle = styled.span`
+  display: block;
+  margin-top: 6px;
+  color: var(--color-text-2);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1.5;
+`
+
+const ContinueSection = styled.section`
+  width: var(--post-width);
+  margin: var(--sizing-xl) auto 0;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    margin-top: var(--sizing-lg);
+  }
+`
+
+const ContinueHeader = styled.div`
+  margin-bottom: var(--sizing-md);
+`
+
+const ContinueEyebrow = styled.p`
+  margin-bottom: 6px;
+  color: var(--color-text-3);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+`
+
+const ContinueHeading = styled.h2`
+  font-size: 1.75rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    font-size: 1.4rem;
+  }
+`
+
+const ContinueDescription = styled.p`
+  margin-top: 10px;
+  color: var(--color-text-2);
+  font-size: 0.975rem;
+  line-height: 1.7;
+`
+
+const ContinueGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--padding-sm);
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    grid-template-columns: 1fr;
+  }
+`
+
+const ContinueCardBase = styled(Link)`
+  display: block;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--color-gray-2);
+  border-radius: 18px;
+  background: linear-gradient(
+    180deg,
+    var(--color-card) 0%,
+    var(--color-gray-1) 100%
+  );
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-gray-3);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+  }
+`
+
+const CategoryArchiveCard = styled(ContinueCardBase)`
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(10, 132, 255, 0.18),
+      transparent 55%
+    ),
+    linear-gradient(180deg, var(--color-card) 0%, var(--color-gray-1) 100%);
+`
+
+const CategoryArchiveLabel = styled.span`
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0 10px;
+  border-radius: 999px;
+  background-color: var(--color-post-background);
+  color: var(--color-text-3);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+`
+
+const CategoryArchiveTitle = styled.h3`
+  margin-top: 14px;
+  font-size: 1.2rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.4;
+`
+
+const CategoryArchiveCopy = styled.p`
+  margin-top: 10px;
+  color: var(--color-text-2);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+`
+
+const ContinueCard = styled(ContinueCardBase)``
+
+const ContinueCardCategory = styled.span`
+  display: block;
+  color: var(--color-text-3);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+`
+
+const ContinueCardTitle = styled.h3`
+  margin-top: 10px;
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.45;
+`
+
+const ContinueCardCopy = styled.p`
+  margin-top: 10px;
+  color: var(--color-text-2);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `
 
 const CenterWrapper = styled.div`
@@ -649,7 +1010,12 @@ const FaqAnswer = styled.p`
 `
 
 export const query = graphql`
-  query BlogPostPage($slug: String, $nextSlug: String, $prevSlug: String) {
+  query BlogPostPage(
+    $slug: String
+    $nextSlug: String
+    $prevSlug: String
+    $category: String
+  ) {
     current: markdownRemark(fields: { slug: { eq: $slug } }) {
       id
       html
@@ -669,6 +1035,7 @@ export const query = graphql`
         }
         date(formatString: "YYYY-MM-DDTHH:MM:SSZ")
         category
+        alt
         faqs {
           question
           answer
@@ -693,6 +1060,7 @@ export const query = graphql`
         }
         date(formatString: "YYYY-MM-DD")
         category
+        alt
       }
       fields {
         slug
@@ -712,9 +1080,42 @@ export const query = graphql`
         }
         date(formatString: "YYYY-MM-DD")
         category
+        alt
       }
       fields {
         slug
+      }
+    }
+
+    relatedPosts: allMarkdownRemark(
+      filter: {
+        fileAbsolutePath: { regex: "/(posts/blog)/" }
+        frontmatter: { category: { eq: $category } }
+        fields: { slug: { ne: $slug } }
+      }
+      sort: { frontmatter: { date: DESC } }
+      limit: 4
+    ) {
+      edges {
+        node {
+          id
+          excerpt(format: PLAIN)
+          frontmatter {
+            title
+            desc
+            thumbnail {
+              childImageSharp {
+                gatsbyImageData(placeholder: BLURRED, layout: FIXED)
+              }
+            }
+            date(formatString: "YYYY-MM-DD")
+            category
+            alt
+          }
+          fields {
+            slug
+          }
+        }
       }
     }
   }

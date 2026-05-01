@@ -32,6 +32,9 @@ exports.createPages = async ({ graphql, actions }) => {
       ) {
         edges {
           node {
+            frontmatter {
+              category
+            }
             fields {
               slug
               lastmod
@@ -87,6 +90,7 @@ const createPostPages = ({ result, createPage }) => {
       context: {
         // additional data can be passed via context
         slug: node.fields.slug,
+        category: node.frontmatter?.category ?? "",
         lastmod: node.fields.lastmod,
         nextSlug: next?.fields.slug ?? "",
         prevSlug: previous?.fields.slug ?? "",

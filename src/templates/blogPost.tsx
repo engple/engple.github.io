@@ -638,6 +638,12 @@ const RightWrapper = styled.div`
   flex-direction: column;
   gap: var(--sizing-lg);
   align-items: center;
+  align-self: flex-start;
+  position: sticky;
+  top: 124px;
+  max-height: calc(100vh - 148px);
+  padding-right: 4px;
+  overflow: hidden auto;
 
   @media (max-width: ${({ theme }) => theme.device.lg}) {
     display: none;

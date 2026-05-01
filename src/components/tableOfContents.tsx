@@ -67,10 +67,7 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ headings }) => {
 }
 
 const TocNav = styled.nav`
-  position: sticky;
-  top: 124px;
-  width: min(100%, 20rem);
-  max-height: calc(100vh - 148px);
+  width: 100%;
   padding: var(--padding-sm);
   border: 1px solid var(--color-gray-2);
   border-radius: var(--border-radius-md);
@@ -80,7 +77,6 @@ const TocNav = styled.nav`
     var(--color-gray-1) 100%
   );
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
-  overflow: hidden auto;
   display: none;
 
   @media (min-width: ${({ theme }) => theme.device.lg}) {

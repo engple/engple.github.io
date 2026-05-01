@@ -14,6 +14,24 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
   h6 {
     scroll-margin-top: var(--sizing-xl);
     font-weight: var(--font-weight-bold);
+
+    > a.anchor {
+      color: inherit;
+      text-decoration: none;
+      font-weight: inherit;
+      background: none;
+      background-image: none;
+      box-shadow: none;
+      transition: opacity 0.2s ease;
+
+      &:hover,
+      &:active {
+        color: inherit;
+        text-decoration: none;
+        background: none;
+        background-image: none;
+      }
+    }
   }
 
   td,
@@ -31,7 +49,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
   }
 
   a {
-    color: var(--color-blue);
+    color: var(--color-inline-link);
     text-decoration: underline;
     text-decoration-thickness: 0.08em;
     text-underline-offset: 0.18em;
@@ -40,18 +58,22 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
       color 0.2s ease,
       background-size 0.2s ease;
     background-image: linear-gradient(
-      rgba(10, 132, 255, 0.14),
-      rgba(10, 132, 255, 0.14)
+      var(--color-inline-link-highlight),
+      var(--color-inline-link-highlight)
     );
     background-position: 0 100%;
     background-repeat: no-repeat;
-    background-size: 100% 0.45em;
+    background-size: 100% 0.3em;
 
     &:hover,
     &:active {
-      color: var(--color-text);
+      color: var(--color-inline-link-hover);
       text-decoration: underline;
-      background-size: 100% 100%;
+      background-image: linear-gradient(
+        var(--color-inline-link-highlight-hover),
+        var(--color-inline-link-highlight-hover)
+      );
+      background-size: 100% 0.5em;
     }
   }
 

@@ -49,7 +49,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
   }
 
   a {
-    color: var(--color-inline-link);
+    color: inherit;
     text-decoration: underline;
     text-decoration-thickness: 0.08em;
     text-underline-offset: 0.18em;
@@ -67,7 +67,7 @@ const Markdown = styled.article<{ rhythm: (typeof typography)["rhythm"] }>`
 
     &:hover,
     &:active {
-      color: var(--color-inline-link-hover);
+      color: inherit;
       text-decoration: underline;
       background-image: linear-gradient(
         var(--color-inline-link-highlight-hover),

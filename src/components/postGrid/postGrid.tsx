@@ -24,7 +24,7 @@ const PostGrid: React.FC<PostGridProperties> = ({ posts }) => {
 
   return (
     <Grid role="list">
-      {currentList.map(data => {
+      {currentList.map((data, index) => {
         const { id, slug, title, desc, date, category, thumbnail, alt } = data
         const ariaLabel = `${title} - ${category} - Posted on ${date}`
         return (
@@ -37,6 +37,7 @@ const PostGrid: React.FC<PostGridProperties> = ({ posts }) => {
                 title={title}
                 desc={desc}
                 date={date}
+                featured={index === 0}
               />
             </Link>
           </List>
@@ -49,18 +50,23 @@ const PostGrid: React.FC<PostGridProperties> = ({ posts }) => {
 
 const Grid = styled.ul`
   display: grid;
-
   grid-template-columns: repeat(2, 1fr);
-  grid-gap: var(--grid-gap-lg);
+  gap: 28px;
   list-style: none;
 
   & > li {
     margin-bottom: 0;
   }
 
+  @media (min-width: ${({ theme }) => theme.device.sm}) {
+    & > li:first-child {
+      grid-column: span 2;
+    }
+  }
+
   @media (min-width: ${({ theme }) => theme.device.xl}) {
     grid-template-columns: repeat(3, 1fr);
-    grid-gap: var(--grid-gap-xl);
+    gap: 32px;
   }
 `
 
@@ -85,6 +91,8 @@ const List = styled.li`
 
   a:hover,
   a:focus {
+    transform: translateY(-4px);
+
     .gatsby-image-wrapper {
       transform: scale(1.06);
     }

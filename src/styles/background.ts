@@ -10,6 +10,7 @@ const Background = styled.div`
   backdrop-filter: saturate(180%) blur(20px);
   background-color: var(--color-nav-bar);
   border-bottom: 1px solid var(--color-nav-border);
+  box-shadow: 0 18px 40px -32px var(--color-card-shadow);
 `
 
 export default Background

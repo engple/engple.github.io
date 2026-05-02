@@ -95,7 +95,7 @@ const Content = styled.div`
   position: relative;
   margin: 0 auto;
   max-width: var(--max-width);
-  padding: 0 var(--padding-lg);
+  padding: 0 var(--padding-xl);
   height: 100%;
   z-index: 2;
   display: flex;
@@ -117,8 +117,9 @@ const Title = styled.div`
   padding: 0;
   border: none;
   font-size: var(--text-title);
-  font-weight: var(--font-weight-semi-bold);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text);
+  letter-spacing: -0.03em;
 
   a {
     color: inherit;

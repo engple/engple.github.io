@@ -46,7 +46,9 @@ const Footer = styled.footer`
   justify-content: center;
   align-items: center;
   height: var(--footer-height);
-  background-color: var(--color-gray-1);
+  background-color: var(--color-card);
+  border-top: 1px solid var(--color-card-border);
+  box-shadow: 0 -18px 40px -36px var(--color-card-shadow);
 
   margin-top: var(--sizing-xxl);
   @media (min-width: ${({ theme }) => theme.device.sm}) {

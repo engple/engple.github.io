@@ -21,6 +21,12 @@ const CategoryFilter: React.FC<CategoryFilterProperties> = ({
   const categoryReference = useRef<HTMLUListElement>(null)
   const isActive: LinkPropertiesGetter = ({ isCurrent }) =>
     isCurrent ? { id: ACTIVE, tabIndex: -1 } : {}
+  const totalPostCount = useMemo(() => {
+    return categoryList.reduce(
+      (count, category) => count + category.totalCount,
+      0,
+    )
+  }, [categoryList])
 
   useScrollCenter({ ref: categoryReference, targetId: ACTIVE })
 
@@ -31,21 +37,24 @@ const CategoryFilter: React.FC<CategoryFilterProperties> = ({
 
   return (
     <Nav aria-label="Category Filter">
-      <CategoryTitle>Category</CategoryTitle>
-      <CategoryButton getProps={isActive} to="/">
-        {ALL_CATEGORY_NAME}
-      </CategoryButton>
-      <Divider />
+      <CategoryTitle>Browse Categories</CategoryTitle>
       <CategoryUl ref={categoryReference} className="invisible-scrollbar">
+        <li>
+          <CategoryButton getProps={isActive} to="/">
+            <span>{ALL_CATEGORY_NAME}</span>
+            <CategoryCount>{totalPostCount}</CategoryCount>
+          </CategoryButton>
+        </li>
         {sortedCategoryList.map(category => {
-          const { fieldValue } = category
+          const { fieldValue, totalCount } = category
           return (
             <li key={fieldValue}>
               <CategoryButton
                 getProps={isActive}
                 to={`/category/${kebabCase(fieldValue!)}/`}
               >
-                {fieldValue}
+                <span>{fieldValue}</span>
+                <CategoryCount>{totalCount}</CategoryCount>
               </CategoryButton>
             </li>
           )
@@ -56,54 +65,48 @@ const CategoryFilter: React.FC<CategoryFilterProperties> = ({
 }
 
 const Nav = styled.nav`
-  display: flex;
-  align-items: center;
+  display: grid;
+  gap: var(--sizing-sm);
   background-color: var(--color-card);
-  margin-bottom: 48px;
-  padding: 12px var(--sizing-md);
-  border-radius: var(--border-radius-base);
+  margin-bottom: 40px;
+  padding: var(--sizing-base);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 18px 50px -40px var(--color-card-shadow);
 
   a#active {
     color: var(--color-white);
     background-color: var(--color-blue);
+    border-color: transparent;
   }
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
-    padding: 12px;
+    margin-bottom: 28px;
+    padding: 14px;
   }
 `
 
 const CategoryTitle = styled.em`
-  position: static;
-  width: auto;
-  height: auto;
-  clip: auto;
-  white-space: auto;
-
-  flex-shrink: 0;
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   font-weight: var(--font-weight-semi-bold);
-  font-style: initial;
-  margin-right: var(--sizing-lg);
-
-  @media (max-width: ${({ theme }) => theme.device.sm}) {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(1px, 1px, 1px, 1px);
-    white-space: no-wrap;
-  }
+  font-style: normal;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-3);
 `
 
 const CategoryButton = styled(Link)`
   cursor: pointer;
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   background-color: var(--color-category-button);
-  padding: var(--sizing-sm) var(--sizing-base);
-  border-radius: var(--border-radius-base);
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
   font-size: 0.875rem;
   font-weight: var(--font-weight-semi-bold);
+  white-space: nowrap;
 
   :focus {
     outline: none;
@@ -120,12 +123,16 @@ const CategoryButton = styled(Link)`
   }
 `
 
-const Divider = styled.div`
-  width: 1px;
-  height: 32px;
-  margin: 0 var(--sizing-sm);
-  transform: translateX(-50%);
-  background-color: var(--color-divider);
+const CategoryCount = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: inherit;
+  background-color: rgba(255, 255, 255, 0.18);
 `
 
 const CategoryUl = styled.ul`
@@ -136,7 +143,7 @@ const CategoryUl = styled.ul`
   scrollbar-width: none;
 
   li + li {
-    margin-left: 6px;
+    margin-left: 8px;
   }
 `
 

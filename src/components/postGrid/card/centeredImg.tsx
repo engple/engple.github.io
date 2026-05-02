@@ -7,12 +7,17 @@ import styled from "styled-components"
 import type Post from "~/src/types/Post"
 
 interface CenteredImgProperties extends Pick<Post, "alt"> {
+  featured?: boolean
   src: Post["thumbnail"]
 }
 
 const DEFAULT_ALT = "Thumbnail Image"
 
-const CenteredImg: React.FC<CenteredImgProperties> = ({ src, alt }) => {
+const CenteredImg: React.FC<CenteredImgProperties> = ({
+  src,
+  alt,
+  featured = false,
+}) => {
   const data = useStaticQuery<Queries.Query>(graphql`
     query CenteredImg {
       allImageSharp {
@@ -38,22 +43,29 @@ const CenteredImg: React.FC<CenteredImgProperties> = ({ src, alt }) => {
   }, [src, data.allImageSharp.edges])
 
   return (
-    <ThumbnailWrapper>
+    <ThumbnailWrapper $featured={featured}>
       <InnerWrapper>
         <GatsbyImage
           image={image}
           loading="eager"
           alt={alt ?? DEFAULT_ALT}
-          imgStyle={{ aspectRatio: "16 / 9", width: "100%" }}
+          imgStyle={{
+            aspectRatio: "16 / 9",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
         />
       </InnerWrapper>
     </ThumbnailWrapper>
   )
 }
 
-export const ThumbnailWrapper = styled.div`
+export const ThumbnailWrapper = styled.div<{ $featured?: boolean }>`
   position: relative;
   width: 100%;
+  min-height: ${({ $featured }) => ($featured ? "280px" : "220px")};
+
   &::after {
     content: "";
     display: block;
@@ -69,7 +81,12 @@ export const ThumbnailWrapper = styled.div`
 `
 
 const InnerWrapper = styled.div`
+  height: 100%;
   overflow: hidden;
+
+  .gatsby-image-wrapper {
+    height: 100%;
+  }
 `
 
 export default React.memo(CenteredImg)

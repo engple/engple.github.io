@@ -63,7 +63,7 @@ jobs:
             .cache
           key: ${{ runner.os }}-gatsby-build-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./public
 

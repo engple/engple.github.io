@@ -157,6 +157,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
       category: node.frontmatter?.category || "최근 글",
     }))
   }, [data.allMarkdownRemark.edges])
+  const quickSearchItems = useMemo(() => {
+    return recentCommandItems.slice(0, 5)
+  }, [recentCommandItems])
   const commandItems = useMemo(() => {
     const baseItems = (
       suggestions.length > 0 ? suggestions : fallbackSuggestions
@@ -337,6 +340,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
         </OverlayCloseButton>
         <SearchTitle id="search-dialog-title">검색</SearchTitle>
         <SearchForm role="search" onSubmit={handleSubmit}>
+          <SearchIntro>
+            <SearchLead>표현, 상황, 단어로 바로 찾아보세요.</SearchLead>
+            <SearchDescription>
+              예문에 나온 표현, 떠오르는 뉘앙스, 한국어 설명으로도 검색할 수
+              있습니다.
+            </SearchDescription>
+          </SearchIntro>
           <SearchBarRow>
             <SearchField>
               <SearchFieldIcon aria-hidden="true">
@@ -386,6 +396,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
               )}
             </SearchField>
           </SearchBarRow>
+          {!searchTerm.trim() && quickSearchItems.length > 0 && (
+            <QuickSearchSection aria-label="빠른 검색">
+              <QuickSearchLabel>바로 찾아보기</QuickSearchLabel>
+              <QuickSearchList>
+                {quickSearchItems.map(item => (
+                  <QuickSearchButton
+                    key={item.id}
+                    type="button"
+                    onClick={() => onSearch(item.label)}
+                  >
+                    {item.label}
+                  </QuickSearchButton>
+                ))}
+              </QuickSearchList>
+            </QuickSearchSection>
+          )}
           {!errorMessage && commandItems.length > 0 && (
             <SearchResultSection>
               <SearchResultHeading>
@@ -430,6 +456,29 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 </SearchHintItem>
               </SearchHintBar>
             </SearchResultSection>
+          )}
+          {!errorMessage && searchTerm.trim() && commandItems.length === 0 && (
+            <EmptySearchState>
+              <EmptySearchTitle>
+                검색어와 딱 맞는 표현이 아직 없습니다.
+              </EmptySearchTitle>
+              <EmptySearchBody>
+                비슷한 말이나 더 짧은 핵심 단어로 다시 시도해보세요.
+              </EmptySearchBody>
+              {quickSearchItems.length > 0 && (
+                <QuickSearchList>
+                  {quickSearchItems.map(item => (
+                    <QuickSearchButton
+                      key={item.id}
+                      type="button"
+                      onClick={() => onSearch(item.label)}
+                    >
+                      {item.label}
+                    </QuickSearchButton>
+                  ))}
+                </QuickSearchList>
+              )}
+            </EmptySearchState>
           )}
           {errorMessage && (
             <SearchError id="search-error-message" role="alert">
@@ -516,6 +565,24 @@ const SearchForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: 12px;
+`
+
+const SearchIntro = styled.div`
+  display: grid;
+  gap: 6px;
+  padding: 6px 4px 2px;
+`
+
+const SearchLead = styled.p`
+  font-size: 1.05rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1.45;
+`
+
+const SearchDescription = styled.p`
+  color: var(--color-text-3);
+  font-size: var(--text-sm);
+  line-height: 1.6;
 `
 
 const SearchBarRow = styled.div`
@@ -644,6 +711,66 @@ const SearchError = styled.p`
   color: #b42318;
   font-size: var(--text-sm);
   font-weight: var(--font-weight-medium);
+`
+
+const QuickSearchSection = styled.div`
+  display: grid;
+  gap: 10px;
+`
+
+const QuickSearchLabel = styled.span`
+  padding-left: 2px;
+  color: var(--color-text-3);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semi-bold);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+`
+
+const QuickSearchList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+`
+
+const QuickSearchButton = styled.button`
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 999px;
+  background-color: var(--color-surface-elevated);
+  color: var(--color-text-2);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-blue);
+    border-color: color-mix(in srgb, var(--color-blue) 28%, white);
+    background-color: var(--color-accent-soft);
+  }
+`
+
+const EmptySearchState = styled.div`
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid color-mix(in srgb, var(--color-gray-2) 82%, white);
+  border-radius: 18px;
+  background-color: color-mix(in srgb, var(--color-card) 94%, white 6%);
+`
+
+const EmptySearchTitle = styled.h3`
+  font-size: 1rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1.45;
+`
+
+const EmptySearchBody = styled.p`
+  color: var(--color-text-3);
+  font-size: var(--text-sm);
+  line-height: 1.6;
 `
 
 const SearchResultButton = styled.button<{ $active: boolean }>`

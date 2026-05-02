@@ -75,6 +75,13 @@ const Home = ({
   const latestPost = visiblePostData[0]?.node
   const totalPostCount = visiblePostData.length
   const totalCategoryCount = data.allMarkdownRemark.group.length
+  const featuredCategories = useMemo(() => {
+    return [...data.allMarkdownRemark.group]
+      .sort((firstCategory, secondCategory) => {
+        return secondCategory.totalCount - firstCategory.totalCount
+      })
+      .slice(0, 3)
+  }, [data.allMarkdownRemark.group])
   const heroTitle = currentCategory
     ? `${postTitle} 표현을 감각적으로 익히는 큐레이션`
     : "실전에서 바로 쓰는 영어 표현 아카이브"
@@ -116,6 +123,17 @@ const Home = ({
               </HeroEyebrow>
               <HeroTitle>{heroTitle}</HeroTitle>
               <HeroDescription>{heroDescription}</HeroDescription>
+              <HeroActions>
+                {latestPost && (
+                  <PrimaryAction to={latestPost.fields?.slug ?? "/"}>
+                    최신 글 바로 보기
+                  </PrimaryAction>
+                )}
+                <SectionAction href="#browse-categories">
+                  카테고리 둘러보기
+                </SectionAction>
+                <SecondaryAction to="/search/">표현 검색하기</SecondaryAction>
+              </HeroActions>
               <HeroStats>
                 <StatItem>
                   <StatValue>{totalPostCount}</StatValue>
@@ -152,8 +170,36 @@ const Home = ({
               </HeroFeature>
             )}
           </HeroSection>
-          <CategoryFilter categoryList={data.allMarkdownRemark.group} />
-          <SectionHeader>
+          {!currentCategory && featuredCategories.length > 0 && (
+            <HighlightSection aria-labelledby="highlight-category-heading">
+              <HighlightHeader>
+                <HighlightEyebrow>Popular Paths</HighlightEyebrow>
+                <HighlightTitle id="highlight-category-heading">
+                  많이 보는 카테고리부터 시작해보세요
+                </HighlightTitle>
+              </HighlightHeader>
+              <HighlightGrid>
+                {featuredCategories.map(category => (
+                  <HighlightCard
+                    key={category.fieldValue}
+                    to={`/category/${kebabCase(category.fieldValue!)}/`}
+                  >
+                    <HighlightCardCount>
+                      {category.totalCount}
+                    </HighlightCardCount>
+                    <HighlightCardTitle>
+                      {category.fieldValue}
+                    </HighlightCardTitle>
+                    <HighlightCardMeta>표현 모아보기</HighlightCardMeta>
+                  </HighlightCard>
+                ))}
+              </HighlightGrid>
+            </HighlightSection>
+          )}
+          <CategoryFilterSection id="browse-categories">
+            <CategoryFilter categoryList={data.allMarkdownRemark.group} />
+          </CategoryFilterSection>
+          <SectionHeader id="latest-posts">
             <PostTitle>{postTitle}</PostTitle>
             <SectionDescription>
               {currentCategory
@@ -252,6 +298,62 @@ const HeroDescription = styled.p`
   color: var(--color-text-2);
 `
 
+const HeroActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+`
+
+const ActionLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-semi-bold);
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-2px);
+  }
+`
+
+const ActionAnchor = styled.a`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-semi-bold);
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-2px);
+  }
+`
+
+const PrimaryAction = styled(ActionLink)`
+  color: var(--color-white);
+  background-color: var(--color-blue);
+  box-shadow: 0 18px 36px -28px var(--color-card-shadow);
+`
+
+const SecondaryAction = styled(ActionLink)`
+  color: var(--color-text);
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-card-border);
+`
+
+const SectionAction = styled(ActionAnchor)`
+  color: var(--color-text);
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-card-border);
+`
+
 const HeroStats = styled.div`
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -342,10 +444,85 @@ const HeroFeatureMeta = styled.div`
   }
 `
 
+const HighlightSection = styled.section`
+  display: grid;
+  gap: 18px;
+  margin-bottom: 32px;
+`
+
+const HighlightHeader = styled.div`
+  display: grid;
+  gap: 8px;
+`
+
+const HighlightEyebrow = styled.span`
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semi-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-3);
+`
+
+const HighlightTitle = styled.h2`
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  line-height: 1.2;
+`
+
+const HighlightGrid = styled.div`
+  display: grid;
+  gap: 16px;
+
+  @media (min-width: ${({ theme }) => theme.device.sm}) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+`
+
+const HighlightCard = styled(Link)`
+  display: grid;
+  gap: 10px;
+  padding: 22px 20px;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(
+    180deg,
+    var(--color-surface-elevated) 0%,
+    var(--color-card) 100%
+  );
+  box-shadow: 0 22px 44px -40px var(--color-card-shadow);
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 28px 50px -42px var(--color-card-shadow);
+  }
+`
+
+const HighlightCardCount = styled.span`
+  font-size: clamp(1.6rem, 2vw, 2rem);
+  font-weight: var(--font-weight-extra-bold);
+  color: var(--color-blue);
+`
+
+const HighlightCardTitle = styled.h3`
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.28;
+`
+
+const HighlightCardMeta = styled.span`
+  color: var(--color-text-3);
+  font-size: var(--text-sm);
+`
+
+const CategoryFilterSection = styled.section`
+  scroll-margin-top: calc(var(--nav-height) + 24px);
+`
+
 const SectionHeader = styled.div`
   display: grid;
   gap: 10px;
   margin-bottom: var(--sizing-md);
+  scroll-margin-top: calc(var(--nav-height) + 24px);
 `
 
 const PostTitle = styled.h2`

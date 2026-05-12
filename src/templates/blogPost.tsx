@@ -120,7 +120,10 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         ]
       : headings
   const compactTocHeadings = tocHeadings.filter(heading => heading.depth === 2)
-  const hideLeadVisualOnDesktop = startsWithHeroImage(html, ogImagePath)
+  const hideLeadVisualOnDesktop = startsWithHeroImage(
+    html,
+    ogImagePath ?? undefined,
+  )
 
   const featureImageAlt = alt || title || ""
 

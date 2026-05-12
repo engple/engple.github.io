@@ -103,12 +103,17 @@ const Home = ({
           />
         </LeftAd>
         <Content>
-          <HeroSection>
+          <HeroSection aria-labelledby="home-heading">
             <HeroCopy>
               <HeroEyebrow>
                 {currentCategory ? "Category Archive" : "Explore Engple"}
               </HeroEyebrow>
-              <PostTitle>{postTitle}</PostTitle>
+              <PostTitle id="home-heading">{postTitle}</PostTitle>
+              <HeroDescription>
+                {currentCategory
+                  ? `${postTitle} 카테고리의 영어 표현과 학습 글을 최신순으로 확인해보세요.`
+                  : site.description}
+              </HeroDescription>
             </HeroCopy>
             <CategoryShelf aria-label="카테고리 탐색">
               <CategoryPill $isActive={!currentCategory} to="/">
@@ -193,6 +198,14 @@ const PostTitle = styled.h1`
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     font-size: 1.75rem;
   }
+`
+
+const HeroDescription = styled.p`
+  max-width: 40rem;
+  margin-top: 10px;
+  color: var(--color-text-2);
+  font-size: 1rem;
+  line-height: 1.7;
 `
 
 const CategoryShelf = styled.nav`

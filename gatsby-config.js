@@ -12,7 +12,7 @@ const siteMetadata = {
   gtagTrackingId: meta.gtagTrackingId,
   googleAdsense: meta.googleAdsense,
   naverSiteVerification: meta.naverSiteVerification,
-  postTitle: "전체",
+  postTitle: "패턴으로 배우는 실전 영어 표현",
   menuLinks: [
     {
       link: "/",

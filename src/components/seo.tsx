@@ -112,7 +112,6 @@ const SEO: React.FC<SEOProperties> = ({
     <Helmet
       htmlAttributes={{ lang: site.lang ?? DEFAULT_LANG }}
       title={displayTitle}
-      titleTemplate={displayTitle.replace(" 🍎", "")}
       meta={
         [
           {
@@ -124,8 +123,12 @@ const SEO: React.FC<SEOProperties> = ({
             content: description?.slice(0, 160),
           },
           {
-            property: "naver-site-verification",
+            name: "naver-site-verification",
             content: site.naverSiteVerification,
+          },
+          {
+            property: "og:locale",
+            content: (site.lang ?? DEFAULT_LANG).replace("-", "_"),
           },
           {
             property: "og:description",
@@ -138,6 +141,10 @@ const SEO: React.FC<SEOProperties> = ({
           {
             property: "og:title",
             content: displayTitle,
+          },
+          {
+            property: "og:site_name",
+            content: site.title,
           },
           {
             property: "og:type",

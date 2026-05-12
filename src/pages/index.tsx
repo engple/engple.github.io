@@ -115,23 +115,31 @@ const Home = ({
                   : site.description}
               </HeroDescription>
             </HeroCopy>
-            <CategoryShelf aria-label="카테고리 탐색">
-              <CategoryPill $isActive={!currentCategory} to="/">
-                전체
-              </CategoryPill>
-              {categoryGroups.map(group => (
-                <CategoryPill
-                  key={group.fieldValue}
-                  $isActive={group.fieldValue === currentCategory}
-                  to={`/category/${kebabCase(group.fieldValue ?? "")}/`}
-                >
-                  <span>{group.fieldValue}</span>
-                  <CategoryCount>{group.totalCount}</CategoryCount>
+            <CategorySection aria-labelledby="category-heading">
+              <SectionHeading id="category-heading">카테고리</SectionHeading>
+              <CategoryShelf>
+                <CategoryPill $isActive={!currentCategory} to="/">
+                  전체
                 </CategoryPill>
-              ))}
-            </CategoryShelf>
+                {categoryGroups.map(group => (
+                  <CategoryPill
+                    key={group.fieldValue}
+                    $isActive={group.fieldValue === currentCategory}
+                    to={`/category/${kebabCase(group.fieldValue ?? "")}/`}
+                  >
+                    <span>{group.fieldValue}</span>
+                    <CategoryCount>{group.totalCount}</CategoryCount>
+                  </CategoryPill>
+                ))}
+              </CategoryShelf>
+            </CategorySection>
           </HeroSection>
-          <PostGrid posts={posts} />
+          <PostListSection aria-labelledby="post-list-heading">
+            <SectionHeading id="post-list-heading">
+              {currentCategory ? `${postTitle} 최신 글` : "최신 영어 표현 글"}
+            </SectionHeading>
+            <PostGrid posts={posts} />
+          </PostListSection>
         </Content>
         <RightAd>
           <Adsense
@@ -208,10 +216,30 @@ const HeroDescription = styled.p`
   line-height: 1.7;
 `
 
+const CategorySection = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: var(--sizing-sm);
+`
+
+const SectionHeading = styled.h2`
+  margin-bottom: 0;
+  color: var(--color-text);
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+`
+
 const CategoryShelf = styled.nav`
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+`
+
+const PostListSection = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: var(--sizing-md);
 `
 
 const CategoryPill = styled(Link)<{ $isActive: boolean }>`

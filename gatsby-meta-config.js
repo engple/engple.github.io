@@ -22,7 +22,7 @@
 const metaConfig = {
   title: "잉플 | 패턴으로 배우는 영어 공부",
   description:
-    "잉플은 한국어 예문으로 영어 패턴과 실전 표현을 배우는 영어 공부 사이트입니다. 상황별 표현, 발음, 연습 문제를 글 목록에서 바로 확인하세요.",
+    "잉플에서는 한국어 예문으로 영어 패턴과 실전 표현을 배울 수 있습니다. 상황별 표현, 발음, 연습 문제를 글 목록에서 바로 확인하세요.",
   author: "solaqua",
   siteUrl: "https://engple.github.io",
   lang: "ko-KR",

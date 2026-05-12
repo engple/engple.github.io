@@ -84,7 +84,7 @@ const SEO: React.FC<SEOProperties> = ({
           url: `${site.siteUrl}${defaultOpenGraphImage}`,
         },
         description:
-          "영어 패턴 학습으로 자연스러운 영어 실력 향상을 돕는 교육 사이트",
+          "영어 패턴 학습으로 자연스러운 영어 실력 향상을 돕는 학습 콘텐츠",
         sameAs: ["https://github.com/engple"],
       } as EducationalOrganization,
       {

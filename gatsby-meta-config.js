@@ -20,8 +20,9 @@
 
 /** @type {MetaConfig} */
 const metaConfig = {
-  title: "잉플 | 패턴으로 배우는 영어 공부 🍎",
-  description: `영어 패턴 학습으로 자연스러운 영어 실력 향상! 🚀 잉플과 함께하는 효과적인 영어 공부법. 실용적인 영어 표현과, 즉각적인 연습 기회. 꾸준한 학습으로 영어가 술술 나오는 놀라운 경험을 해보세요. 지금 시작하세요! 😎`,
+  title: "잉플 | 패턴으로 배우는 영어 공부",
+  description:
+    "잉플에서는 한국어 예문으로 영어 패턴과 실전 표현을 배울 수 있습니다. 상황별 표현, 발음, 연습 문제를 글 목록에서 바로 확인하세요.",
   author: "solaqua",
   siteUrl: "https://engple.github.io",
   lang: "ko-KR",

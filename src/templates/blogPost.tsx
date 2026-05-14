@@ -29,6 +29,7 @@ import {
   withInlineAdsense,
 } from "../utils/adsense"
 import {
+  createAboutThingJsonLd,
   createDefinedTermJsonLd,
   createPracticeQuizJsonLd,
   getExpressionTerm,
@@ -216,7 +217,14 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     isAccessibleForFree: true,
     teaches: title,
     assesses: title,
-    ...(expression ? { about: { "@id": definedTermId } } : {}),
+    ...(expression
+      ? {
+          about: createAboutThingJsonLd({
+            id: definedTermId,
+            name: expression,
+          }),
+        }
+      : {}),
     audience: {
       "@type": "EducationalAudience",
       educationalRole: "student",

@@ -44,12 +44,13 @@ interface SearchSuggestionItem {
 }
 
 interface SearchCommandItem {
+  body?: string
+  category: string
+  desc?: string
   id: string
-  title: string
   label: string
   normalizedLabel: string
-  normalizedSearchText: string
-  category: string
+  title: string
 }
 
 const NO_ACTIVE_INDEX = -1
@@ -109,13 +110,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
       return {
         id: item.id,
         title: item.title,
+        desc: item.desc,
+        body: item.body,
         label,
         normalizedLabel,
-        normalizedSearchText: normalizeSearchTerm(
-          [item.title, item.desc, item.category, item.body]
-            .filter(Boolean)
-            .join(" "),
-        ),
         category: item.category || "추천 검색어",
       } satisfies SearchCommandItem
     })
@@ -150,7 +148,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
       item.normalizedLabel.includes(debouncedSearchTerm),
     )
     const directMatches = searchCommandItems.filter(item =>
-      item.normalizedSearchText.includes(debouncedSearchTerm),
+      [item.title, item.desc, item.category, item.body].some(field =>
+        normalizeSearchTerm(field ?? "").includes(debouncedSearchTerm),
+      ),
     )
     const suggestionTitles = [
       ...labelMatches.map(item => item.title),
@@ -188,11 +188,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
         title,
         label,
         normalizedLabel: normalizeSearchTerm(label),
-        normalizedSearchText: normalizeSearchTerm(
-          [node.frontmatter?.title, node.frontmatter?.category]
-            .filter(Boolean)
-            .join(" "),
-        ),
         category: node.frontmatter?.category || "최근 글",
       } satisfies SearchCommandItem
     })
@@ -200,10 +195,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const commandItems = useMemo(() => {
     if (!hasSearchTerm) {
       return recentCommandItems.slice(0, 6)
-    }
-
-    if (isSearchSettling) {
-      return []
     }
 
     const baseItems = (
@@ -231,7 +222,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
     fallbackSuggestions,
     hasSearchTerm,
     indexedCommandItems,
-    isSearchSettling,
     recentCommandItems,
     suggestions,
   ])
@@ -441,7 +431,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
               <SearchResultHeading>
                 {searchTerm.trim() ? "추천 검색어" : "최근 표현"}
               </SearchResultHeading>
-              <SearchResultList id={resultListId} role="listbox">
+              <SearchResultList
+                id={resultListId}
+                role="listbox"
+                aria-busy={isSearchSettling}
+              >
                 {commandItems.map((item, index) => (
                   <SearchResultItem key={item.id}>
                     <SearchResultButton

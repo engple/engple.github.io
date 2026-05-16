@@ -7,7 +7,6 @@ import styled from "styled-components"
 
 import {
   collectSearchSuggestionLabels,
-  matchesSearchRecord,
   normalizeSearchTerm,
 } from "../../utils/search"
 import CloseIcon from "../icons/CloseIcon"
@@ -44,7 +43,17 @@ interface SearchSuggestionItem {
   body: string
 }
 
+interface SearchCommandItem {
+  id: string
+  title: string
+  label: string
+  normalizedLabel: string
+  normalizedSearchText: string
+  category: string
+}
+
 const NO_ACTIVE_INDEX = -1
+const SEARCH_DEBOUNCE_DELAY_MS = 180
 
 const SearchBar: React.FC<SearchBarProps> = ({
   onClickOutside = () => {},
@@ -57,6 +66,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [searchTerm, setSearchTerm] = useState("")
   const [activeIndex, setActiveIndex] = useState(NO_ACTIVE_INDEX)
   const [errorMessage, setErrorMessage] = useState("")
+  const normalizedSearchTerm = useMemo(
+    () => normalizeSearchTerm(searchTerm),
+    [searchTerm],
+  )
+  const debouncedSearchTerm = useDebouncedValue(
+    normalizedSearchTerm,
+    SEARCH_DEBOUNCE_DELAY_MS,
+  )
+  const hasSearchTerm = normalizedSearchTerm.length > 0
+  const isSearchSettling =
+    hasSearchTerm && debouncedSearchTerm !== normalizedSearchTerm
   const data = useStaticQuery<SearchBarQueryData>(graphql`
     query SearchBar {
       fusejs {
@@ -80,33 +100,39 @@ const SearchBar: React.FC<SearchBarProps> = ({
       }
     }
   `)
+  const searchCommandItems = useMemo(() => {
+    return (data.fusejs?.data ?? []).map(item => {
+      const label =
+        collectSearchSuggestionLabels([item.title], "", 1)[0] || item.title
+      const normalizedLabel = normalizeSearchTerm(label)
+
+      return {
+        id: item.id,
+        title: item.title,
+        label,
+        normalizedLabel,
+        normalizedSearchText: normalizeSearchTerm(
+          [item.title, item.desc, item.category, item.body]
+            .filter(Boolean)
+            .join(" "),
+        ),
+        category: item.category || "추천 검색어",
+      } satisfies SearchCommandItem
+    })
+  }, [data.fusejs?.data])
   const indexedCommandItems = useMemo(() => {
     const seenLabels = new Set<string>()
 
-    return (data.fusejs?.data ?? [])
-      .map(item => {
-        const label =
-          collectSearchSuggestionLabels([item.title], "", 1)[0] || item.title
+    return searchCommandItems.filter(item => {
+      if (!item.normalizedLabel) return false
+      if (seenLabels.has(item.normalizedLabel)) return false
 
-        return {
-          id: item.id,
-          title: item.title,
-          label,
-          category: item.category || "추천 검색어",
-        }
-      })
-      .filter(item => {
-        const normalizedLabel = normalizeSearchTerm(item.label)
-
-        if (!normalizedLabel) return false
-        if (seenLabels.has(normalizedLabel)) return false
-
-        seenLabels.add(normalizedLabel)
-        return true
-      })
-  }, [data.fusejs?.data])
+      seenLabels.add(item.normalizedLabel)
+      return true
+    })
+  }, [searchCommandItems])
   const suggestionResults = useGatsbyPluginFusejs(
-    searchTerm.trim(),
+    debouncedSearchTerm.length >= 2 ? debouncedSearchTerm : "",
     data.fusejs,
     {
       includeScore: true,
@@ -118,21 +144,31 @@ const SearchBar: React.FC<SearchBarProps> = ({
     { limit: 5 },
   )
   const suggestions = useMemo(() => {
-    const normalizedQuery = normalizeSearchTerm(searchTerm)
+    if (!debouncedSearchTerm) return []
+
     const labelMatches = indexedCommandItems.filter(item =>
-      normalizeSearchTerm(item.label).includes(normalizedQuery),
+      item.normalizedLabel.includes(debouncedSearchTerm),
     )
-    const directMatches =
-      data.fusejs?.data.filter(item => matchesSearchRecord(item, searchTerm)) ??
-      []
+    const directMatches = searchCommandItems.filter(item =>
+      item.normalizedSearchText.includes(debouncedSearchTerm),
+    )
     const suggestionTitles = [
       ...labelMatches.map(item => item.title),
       ...directMatches.map(item => item.title),
       ...suggestionResults.map(result => result.item.title),
     ]
 
-    return collectSearchSuggestionLabels(suggestionTitles, searchTerm, 6)
-  }, [data.fusejs?.data, indexedCommandItems, searchTerm, suggestionResults])
+    return collectSearchSuggestionLabels(
+      suggestionTitles,
+      debouncedSearchTerm,
+      6,
+    )
+  }, [
+    debouncedSearchTerm,
+    indexedCommandItems,
+    searchCommandItems,
+    suggestionResults,
+  ])
   const fallbackSuggestions = useMemo(() => {
     return collectSearchSuggestionLabels(
       data.allMarkdownRemark.edges.map(
@@ -143,27 +179,44 @@ const SearchBar: React.FC<SearchBarProps> = ({
     )
   }, [data.allMarkdownRemark.edges])
   const recentCommandItems = useMemo(() => {
-    return data.allMarkdownRemark.edges.map(({ node }) => ({
-      id: node.id,
-      title: node.frontmatter?.title || "",
-      label:
-        collectSearchSuggestionLabels(
-          [node.frontmatter?.title || ""],
-          "",
-          1,
-        )[0] ||
-        node.frontmatter?.title ||
-        "",
-      category: node.frontmatter?.category || "최근 글",
-    }))
+    return data.allMarkdownRemark.edges.map(({ node }) => {
+      const title = node.frontmatter?.title || ""
+      const label = collectSearchSuggestionLabels([title], "", 1)[0] || title
+
+      return {
+        id: node.id,
+        title,
+        label,
+        normalizedLabel: normalizeSearchTerm(label),
+        normalizedSearchText: normalizeSearchTerm(
+          [node.frontmatter?.title, node.frontmatter?.category]
+            .filter(Boolean)
+            .join(" "),
+        ),
+        category: node.frontmatter?.category || "최근 글",
+      } satisfies SearchCommandItem
+    })
   }, [data.allMarkdownRemark.edges])
   const commandItems = useMemo(() => {
+    if (!hasSearchTerm) {
+      return recentCommandItems.slice(0, 6)
+    }
+
+    if (isSearchSettling) {
+      return []
+    }
+
     const baseItems = (
       suggestions.length > 0 ? suggestions : fallbackSuggestions
     ).map((label, index) => {
+      const normalizedLabel = normalizeSearchTerm(label)
       const matchedPost =
-        indexedCommandItems.find(item => item.label === label) ??
-        recentCommandItems.find(item => item.label === label)
+        indexedCommandItems.find(
+          item => item.normalizedLabel === normalizedLabel,
+        ) ??
+        recentCommandItems.find(
+          item => item.normalizedLabel === normalizedLabel,
+        )
 
       return {
         id: matchedPost?.id || `search-command-${index}`,
@@ -173,16 +226,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
       }
     })
 
-    if (!searchTerm.trim()) {
-      return recentCommandItems.slice(0, 6)
-    }
-
     return baseItems
   }, [
     fallbackSuggestions,
+    hasSearchTerm,
     indexedCommandItems,
+    isSearchSettling,
     recentCommandItems,
-    searchTerm,
     suggestions,
   ])
 
@@ -440,6 +490,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
       </SearchContainer>
     </SearchOverlay>
   )
+}
+
+const useDebouncedValue = <T,>(value: T, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [delay, value])
+
+  return debouncedValue
 }
 
 const SearchOverlay = styled.div`

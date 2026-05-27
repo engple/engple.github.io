@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import type Post from "~/src/types/Post"
 
@@ -15,13 +15,15 @@ const useInfiniteScroll = ({
   maxPostNum: maxPostNumber = 10,
   offsetY = 400,
 }: UseInfiniteScrollProperties) => {
-  const [hasMore, setHasMore] = useState(false)
-  const [currentList, setCurrentList] = useState<Post[]>([])
+  const [hasMore, setHasMore] = useState(posts.length > maxPostNumber)
+  const [currentList, setCurrentList] = useState<Post[]>(() =>
+    posts.slice(0, maxPostNumber),
+  )
   const [observerLoading, setObserverLoading] = useState(false)
 
   const observer = useRef<IntersectionObserver>()
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setHasMore(posts.length > maxPostNumber)
     setCurrentList(posts.slice(0, maxPostNumber))
     setObserverLoading(false)

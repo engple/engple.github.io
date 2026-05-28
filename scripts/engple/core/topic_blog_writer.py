@@ -10,6 +10,17 @@ from pydantic_ai.settings import ModelSettings
 
 from engple.config import config
 from engple.constants import TOPIC_PROMPT
+from engple.core.topic_vocab import (
+    TopicVocabCandidate,
+    extract_topic_heading_lines,
+    flatten_topic_vocabs,
+    normalize_topic_vocab,
+)
+
+MIN_TOPIC_VOCAB_COUNT = 5
+VOCAB_CANDIDATE_BATCH_SIZE = 12
+MAX_TOPIC_VOCAB_ATTEMPTS = 5
+MAX_TOPIC_CONTENT_ATTEMPTS = 3
 
 
 class TopicFAQ(BaseModel):
@@ -59,6 +70,15 @@ class TopicBlogContent(BaseModel):
         return value.replace("\\n", "\n").strip()
 
 
+class TopicVocabCandidates(BaseModel):
+    vocabs: list[TopicVocabCandidate] = Field(
+        description=dedent("""\
+            Candidate vocabulary pairs for the topic.
+            Generate more than needed so duplicate filtering can keep enough items.
+            """),
+    )
+
+
 class GeneratedTopicBlog(BaseModel):
     topic: str
     vocabs: list[str]
@@ -80,7 +100,8 @@ class TopicBlogWriter:
         include_thumbnail: bool = True,
     ) -> GeneratedTopicBlog:
         """Write a topic vocabulary blog for the given topic."""
-        topic_content = await self._write_topic_content(topic, excludes or [])
+        selected_vocabs = await self._select_topic_vocabs(topic, excludes or [])
+        topic_content = await self._write_topic_content(topic, selected_vocabs)
         topic_meta = await self._write_topic_meta(topic, topic_content, topic_sequence)
         final_content = self._get_final_content(
             topic_content,
@@ -95,29 +116,196 @@ class TopicBlogWriter:
             content=final_content,
         )
 
-    async def _write_topic_content(
+    async def _select_topic_vocabs(
         self, topic: str, excludes: list[str]
+    ) -> list[TopicVocabCandidate]:
+        """Select unique vocabulary before writing the post body."""
+        accepted_vocabs: list[TopicVocabCandidate] = []
+        accepted_keys: set[str] = set()
+        retry_excludes = [*excludes]
+
+        for attempt in range(MAX_TOPIC_VOCAB_ATTEMPTS):
+            candidates = await self._write_topic_vocab_candidates(topic, retry_excludes)
+            duplicate_vocabs = self._append_unique_vocabs(
+                accepted_vocabs,
+                accepted_keys,
+                candidates.vocabs,
+                retry_excludes,
+            )
+            if duplicate_vocabs:
+                logger.warning(
+                    "Rejected duplicate topic vocab candidates for '{}' on "
+                    "attempt {}/{}: {}",
+                    topic,
+                    attempt + 1,
+                    MAX_TOPIC_VOCAB_ATTEMPTS,
+                    ", ".join(duplicate_vocabs),
+                )
+
+            if len(accepted_vocabs) >= MIN_TOPIC_VOCAB_COUNT:
+                return accepted_vocabs[:MIN_TOPIC_VOCAB_COUNT]
+
+            retry_excludes = self._dedupe_excludes(
+                [
+                    *retry_excludes,
+                    *duplicate_vocabs,
+                    *self._format_vocab_candidates(accepted_vocabs),
+                ]
+            )
+
+        raise RuntimeError(
+            "Unable to generate enough unique topic vocabulary for "
+            f"'{topic}'. Accepted {len(accepted_vocabs)} of "
+            f"{MIN_TOPIC_VOCAB_COUNT} required items."
+        )
+
+    async def _write_topic_vocab_candidates(
+        self, topic: str, excludes: list[str]
+    ) -> TopicVocabCandidates:
+        """Generate vocabulary candidates for the topic."""
+        logger.info("🧩 주제별 영어 단어 후보 생성 중...")
+        vocab_agent = Agent(
+            self.model_content,
+            output_type=TopicVocabCandidates,
+            system_prompt=self._build_vocab_prompt(excludes),
+            retries=2,
+            model_settings=ModelSettings(temperature=0.7),
+        )
+        result = await vocab_agent.run(
+            f"topic: '{topic}'\ncount: {VOCAB_CANDIDATE_BATCH_SIZE}"
+        )
+        return cast(TopicVocabCandidates, result.output)
+
+    def _append_unique_vocabs(
+        self,
+        accepted_vocabs: list[TopicVocabCandidate],
+        accepted_keys: set[str],
+        candidates: list[TopicVocabCandidate],
+        excludes: list[str],
+    ) -> list[str]:
+        excluded_keys = {self._normalize_vocab(item) for item in excludes}
+        duplicate_vocabs: list[str] = []
+
+        for candidate in candidates:
+            candidate_vocabs = [candidate.korean, candidate.english]
+            candidate_keys = {
+                self._normalize_vocab(item) for item in candidate_vocabs
+            }
+            if "" in candidate_keys:
+                continue
+
+            if candidate_keys & excluded_keys or candidate_keys & accepted_keys:
+                duplicate_vocabs.extend(candidate_vocabs)
+                continue
+
+            accepted_vocabs.append(candidate)
+            accepted_keys.update(candidate_keys)
+
+        return self._dedupe_excludes(duplicate_vocabs)
+
+    async def _write_topic_content(
+        self, topic: str, vocabs: list[TopicVocabCandidate]
     ) -> TopicBlogContent:
         """Write the topic vocabulary blog body."""
         logger.info("✍️ 주제별 영어 블로그 작성 중...")
         content_agent = Agent(
             self.model_content,
             output_type=TopicBlogContent,
-            system_prompt=self._build_topic_prompt(excludes),
+            system_prompt=self._build_topic_prompt(),
             retries=2,
-            model_settings=ModelSettings(temperature=0.7),
+            model_settings=ModelSettings(temperature=0.5),
         )
-        result = await content_agent.run(f"topic: '{topic}'")
-        return cast(TopicBlogContent, result.output)
 
-    def _build_topic_prompt(self, excludes: list[str]) -> str:
-        prompt = TOPIC_PROMPT["prompt"].format(
-            example=TOPIC_PROMPT["content"]["example"]
+        for attempt in range(MAX_TOPIC_CONTENT_ATTEMPTS):
+            result = await content_agent.run(
+                self._build_topic_content_input(topic, vocabs)
+            )
+            topic_content = cast(TopicBlogContent, result.output)
+            drift = self._find_content_vocab_drift(topic_content, vocabs)
+            if not drift:
+                return TopicBlogContent(
+                    vocabs=[vocab.english for vocab in vocabs],
+                    content=topic_content.content,
+                )
+
+            logger.warning(
+                "Rejected topic content vocab drift for '{}' on attempt {}/{}: {}",
+                topic,
+                attempt + 1,
+                MAX_TOPIC_CONTENT_ATTEMPTS,
+                ", ".join(drift),
+            )
+
+        raise RuntimeError(
+            "Generated topic content did not match selected vocabulary for "
+            f"'{topic}'. Selected vocabulary: {self._format_vocab_list(vocabs)}"
+        )
+
+    def _find_content_vocab_drift(
+        self, content: TopicBlogContent, expected_vocabs: list[TopicVocabCandidate]
+    ) -> list[str]:
+        expected_headings = self._format_vocab_lines(expected_vocabs).splitlines()
+        generated_headings = extract_topic_heading_lines(content.content)
+
+        if generated_headings == expected_headings:
+            return []
+
+        expected = " | ".join(expected_headings)
+        generated = " | ".join(generated_headings)
+        return [f"expected [{expected}], got [{generated}]"]
+
+    def _build_topic_content_input(
+        self, topic: str, vocabs: list[TopicVocabCandidate]
+    ) -> str:
+        return (
+            f"topic: '{topic}'\n\n"
+            "Use exactly these vocabulary items, in this order:\n"
+            f"{self._format_vocab_lines(vocabs)}"
+        )
+
+    def _format_vocab_candidates(
+        self, candidates: list[TopicVocabCandidate]
+    ) -> list[str]:
+        return flatten_topic_vocabs(candidates)
+
+    def _format_vocab_lines(self, vocabs: list[TopicVocabCandidate]) -> str:
+        return "\n".join(
+            f"## {idx}. {vocab.korean} ({vocab.english})"
+            for idx, vocab in enumerate(vocabs, start=1)
+        )
+
+    def _format_vocab_list(self, vocabs: list[TopicVocabCandidate]) -> str:
+        return ", ".join(f"{vocab.korean} ({vocab.english})" for vocab in vocabs)
+
+    def _dedupe_excludes(self, excludes: list[str]) -> list[str]:
+        deduped: list[str] = []
+        seen: set[str] = set()
+        for item in excludes:
+            key = self._normalize_vocab(item)
+            if not key or key in seen:
+                continue
+            deduped.append(item.strip())
+            seen.add(key)
+        return deduped
+
+    def _normalize_vocab(self, vocab: str) -> str:
+        return normalize_topic_vocab(vocab)
+
+    def _build_vocab_prompt(self, excludes: list[str]) -> str:
+        prompt = TOPIC_PROMPT["vocab_prompt"].format(
+            count=VOCAB_CANDIDATE_BATCH_SIZE
         )
         if excludes:
             prompt += "\n\n" + TOPIC_PROMPT["exclude_prompt"].format(
                 excludes=", ".join(excludes)
             )
+        return prompt
+
+    def _build_topic_prompt(self) -> str:
+        prompt = TOPIC_PROMPT["prompt"].format(
+            example=TOPIC_PROMPT["content"]["example"]
+        )
+        prompt += "\n\n" + TOPIC_PROMPT["selected_vocab_prompt"]
         return prompt
 
     async def _write_topic_meta(

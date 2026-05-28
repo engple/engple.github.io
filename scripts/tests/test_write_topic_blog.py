@@ -9,9 +9,12 @@ from engple.core.topic_blog_writer import (
     GeneratedTopicBlog,
     TopicBlogContent,
     TopicBlogMeta,
+    TopicVocabCandidates,
     TopicBlogWriter,
     TopicFAQ,
 )
+from engple.core.topic_vocab import TopicVocabCandidate
+from engple.core import topic_blog_writer as topic_blog_writer_module
 from engple.services import write_topic_blog as write_topic_blog_service
 
 
@@ -435,10 +438,27 @@ def test_topic_blog_writer_omits_image_references_without_thumbnail(monkeypatch)
     """`TopicBlogWriter` should omit thumbnail references when thumbnail generation is disabled."""
     writer = TopicBlogWriter()
 
-    async def write_topic_content(topic: str, excludes: list[str]):
+    async def select_topic_vocabs(topic: str, excludes: list[str]):
+        return [
+            TopicVocabCandidate(korean="토끼", english="Rabbit"),
+            TopicVocabCandidate(korean="소", english="Cow"),
+            TopicVocabCandidate(korean="말", english="Horse"),
+            TopicVocabCandidate(korean="양", english="Sheep"),
+            TopicVocabCandidate(korean="돼지", english="Pig"),
+        ]
+
+    async def write_topic_content(
+        topic: str, vocabs: list[TopicVocabCandidate]
+    ):
         return TopicBlogContent(
-            vocabs=["rabbit"],
-            content="## 1. 토끼 (Rabbit)\n\n토끼를 뜻해요.",
+            vocabs=["rabbit", "cow", "horse", "sheep", "pig"],
+            content=(
+                "## 1. 토끼 (Rabbit)\n\n토끼를 뜻해요.\n\n"
+                "## 2. 소 (Cow)\n\n소를 뜻해요.\n\n"
+                "## 3. 말 (Horse)\n\n말을 뜻해요.\n\n"
+                "## 4. 양 (Sheep)\n\n양을 뜻해요.\n\n"
+                "## 5. 돼지 (Pig)\n\n돼지를 뜻해요."
+            ),
         )
 
     async def write_topic_meta(
@@ -458,6 +478,7 @@ def test_topic_blog_writer_omits_image_references_without_thumbnail(monkeypatch)
             ],
         )
 
+    monkeypatch.setattr(writer, "_select_topic_vocabs", select_topic_vocabs)
     monkeypatch.setattr(writer, "_write_topic_content", write_topic_content)
     monkeypatch.setattr(writer, "_write_topic_meta", write_topic_meta)
 
@@ -479,3 +500,189 @@ def test_topic_blog_writer_omits_image_references_without_thumbnail(monkeypatch)
     assert 'thumbnail: "./003.png"' not in result.content
     assert "동물 영어 표현 썸네일" not in result.content
     assert "![동물 영어 표현 썸네일](./003.png)" not in result.content
+
+
+def test_topic_blog_writer_selects_unique_vocab_before_writing_content(monkeypatch):
+    """`TopicBlogWriter` should filter duplicate candidates before writing content."""
+    candidate_outputs = [
+        TopicVocabCandidates(
+            vocabs=[
+                TopicVocabCandidate(korean="개", english="Dog"),
+                TopicVocabCandidate(korean="토끼", english="Rabbit"),
+                TopicVocabCandidate(korean="소", english="Cow"),
+                TopicVocabCandidate(korean="말", english="Horse"),
+            ],
+        ),
+        TopicVocabCandidates(
+            vocabs=[
+                TopicVocabCandidate(korean="소", english="Cow"),
+                TopicVocabCandidate(korean="양", english="Sheep"),
+                TopicVocabCandidate(korean="돼지", english="Pig"),
+                TopicVocabCandidate(korean="닭", english="Chicken"),
+            ],
+        ),
+    ]
+    content_prompts: list[str] = []
+    generated_meta_prompt: dict[str, str] = {}
+
+    class FakeRunResult:
+        def __init__(self, output):
+            self.output = output
+
+    class FakeAgent:
+        def __init__(self, model, *, output_type, system_prompt, **kwargs):
+            self.output_type = output_type
+            self.system_prompt = system_prompt
+
+        async def run(self, prompt):
+            if self.output_type is TopicVocabCandidates:
+                return FakeRunResult(candidate_outputs.pop(0))
+
+            if self.output_type is TopicBlogContent:
+                content_prompts.append(prompt)
+                return FakeRunResult(
+                    TopicBlogContent(
+                        vocabs=["rabbit", "cow", "horse", "sheep", "pig"],
+                        content=(
+                            "동물 표현을 배워볼게요.\n\n"
+                            "## 1. 토끼 (Rabbit)\n\n토끼를 뜻해요.\n\n"
+                            "## 2. 소 (Cow)\n\n소를 뜻해요.\n\n"
+                            "## 3. 말 (Horse)\n\n말을 뜻해요.\n\n"
+                            "## 4. 양 (Sheep)\n\n양을 뜻해요.\n\n"
+                            "## 5. 돼지 (Pig)\n\n돼지를 뜻해요."
+                        ),
+                    )
+                )
+
+            generated_meta_prompt["prompt"] = prompt
+            return FakeRunResult(
+                TopicBlogMeta(
+                    title="동물 영어로 배우기 #2 - 토끼, 소, 말 영어로",
+                    alt="동물 영어 표현 썸네일",
+                    description="'토끼', '소', '말'을 영어로 배워요.",
+                    faqs=[
+                        TopicFAQ(
+                            question="토끼를 영어로 어떻게 표현할까요?",
+                            answer="토끼는 영어로 'rabbit'이라고 표현해요.",
+                        )
+                    ],
+                )
+            )
+
+    monkeypatch.setattr(topic_blog_writer_module, "Agent", FakeAgent)
+
+    # Given
+    writer = TopicBlogWriter()
+
+    # When
+    result = asyncio.run(
+        writer.generate(
+            "동물",
+            5,
+            excludes=["개", "Dog"],
+            topic_sequence=2,
+            include_thumbnail=False,
+        )
+    )
+
+    # Then
+    assert "## 1. 토끼 (Rabbit)" in result.content
+    assert "## 2. 소 (Cow)" in result.content
+    assert "## 3. 말 (Horse)" in result.content
+    assert "## 4. 양 (Sheep)" in result.content
+    assert "## 5. 돼지 (Pig)" in result.content
+    assert "개 (Dog)" not in result.content
+    assert "닭 (Chicken)" not in result.content
+    assert result.vocabs == ["Rabbit", "Cow", "Horse", "Sheep", "Pig"]
+    assert len(content_prompts) == 1
+    assert "1. 토끼 (Rabbit)" in content_prompts[0]
+    assert "5. 돼지 (Pig)" in content_prompts[0]
+    assert "닭 (Chicken)" not in generated_meta_prompt["prompt"]
+
+
+def test_topic_blog_writer_retries_content_when_heading_format_drifts(monkeypatch):
+    """`TopicBlogWriter` should retry content that changes selected heading text."""
+    content_outputs = [
+        TopicBlogContent(
+            vocabs=["rabbit", "cow", "horse", "sheep", "pig"],
+            content=(
+                "동물 표현을 배워볼게요.\n\n"
+                "## 9. 토끼 (rabbit)\n\n토끼를 뜻해요.\n\n"
+                "## 2. 소 (Cow)\n\n소를 뜻해요.\n\n"
+                "## 3. 말 (Horse)\n\n말을 뜻해요.\n\n"
+                "## 4. 양 (Sheep)\n\n양을 뜻해요.\n\n"
+                "## 5. 돼지 (Pig)\n\n돼지를 뜻해요."
+            ),
+        ),
+        TopicBlogContent(
+            vocabs=["rabbit", "cow", "horse", "sheep", "pig"],
+            content=(
+                "동물 표현을 배워볼게요.\n\n"
+                "## 1. 토끼 (Rabbit)\n\n토끼를 뜻해요.\n\n"
+                "## 2. 소 (Cow)\n\n소를 뜻해요.\n\n"
+                "## 3. 말 (Horse)\n\n말을 뜻해요.\n\n"
+                "## 4. 양 (Sheep)\n\n양을 뜻해요.\n\n"
+                "## 5. 돼지 (Pig)\n\n돼지를 뜻해요."
+            ),
+        ),
+    ]
+
+    class FakeRunResult:
+        def __init__(self, output):
+            self.output = output
+
+    class FakeAgent:
+        def __init__(self, model, *, output_type, **kwargs):
+            self.output_type = output_type
+
+        async def run(self, prompt):
+            if self.output_type is TopicVocabCandidates:
+                return FakeRunResult(
+                    TopicVocabCandidates(
+                        vocabs=[
+                            TopicVocabCandidate(korean="토끼", english="Rabbit"),
+                            TopicVocabCandidate(korean="소", english="Cow"),
+                            TopicVocabCandidate(korean="말", english="Horse"),
+                            TopicVocabCandidate(korean="양", english="Sheep"),
+                            TopicVocabCandidate(korean="돼지", english="Pig"),
+                        ],
+                    )
+                )
+
+            if self.output_type is TopicBlogContent:
+                return FakeRunResult(content_outputs.pop(0))
+
+            return FakeRunResult(
+                TopicBlogMeta(
+                    title="동물 영어로 배우기 #2 - 토끼, 소, 말 영어로",
+                    alt="동물 영어 표현 썸네일",
+                    description="'토끼', '소', '말'을 영어로 배워요.",
+                    faqs=[
+                        TopicFAQ(
+                            question="토끼를 영어로 어떻게 표현할까요?",
+                            answer="토끼는 영어로 'rabbit'이라고 표현해요.",
+                        )
+                    ],
+                )
+            )
+
+    monkeypatch.setattr(topic_blog_writer_module, "Agent", FakeAgent)
+
+    # Given
+    writer = TopicBlogWriter()
+
+    # When
+    result = asyncio.run(
+        writer.generate(
+            "동물",
+            5,
+            excludes=[],
+            topic_sequence=2,
+            include_thumbnail=False,
+        )
+    )
+
+    # Then
+    assert "## 1. 토끼 (Rabbit)" in result.content
+    assert "## 9. 토끼 (rabbit)" not in result.content
+    assert content_outputs == []

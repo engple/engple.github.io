@@ -5,10 +5,8 @@ from pathlib import Path
 from loguru import logger
 
 from engple.config import config
-from engple.core import BatchLinker
+from engple.core import BatchLinker, build_linkable_expressions
 from engple.models import Expression
-from engple.utils import generate_variations
-from engple.utils.expr_path import iter_expr_path
 
 
 @dataclass
@@ -55,13 +53,25 @@ def handle_link_topic_blogs(
 
 def _get_topic_paths(target_paths: list[Path] | None) -> list[Path]:
     if target_paths is not None:
-        return [path for path in target_paths if _is_topic_post(path)]
+        return _validate_topic_paths(target_paths)
 
     topic_dir = config.blog_dir / "topic"
     if not topic_dir.exists():
         return []
 
     return sorted(topic_dir.rglob("*.md"))
+
+
+def _validate_topic_paths(paths: list[Path]) -> list[Path]:
+    topic_paths: list[Path] = []
+    for path in paths:
+        if not path.exists():
+            raise ValueError(f"Topic blog not found: {path}")
+        if not _is_topic_post(path):
+            topic_dir = config.blog_dir / "topic"
+            raise ValueError(f"Expected topic blog path under {topic_dir}: {path}")
+        topic_paths.append(path)
+    return topic_paths
 
 
 def _is_topic_post(path: Path) -> bool:
@@ -73,16 +83,7 @@ def _is_topic_post(path: Path) -> bool:
 
 
 def _get_expression_targets() -> list[Expression]:
-    return [
-        Expression(
-            base_form=expr_path.expr,
-            url_path=expr_path.url_path,
-            file_path=expr_path.file_path,
-            variations=generate_variations(expr_path.expr),
-        )
-        for expr_path in iter_expr_path()
-        if not _is_topic_post(expr_path.file_path)
-    ]
+    return build_linkable_expressions(excluded_path=_is_topic_post)
 
 
 def _link_topic_paths(

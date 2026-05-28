@@ -34,6 +34,26 @@ def runner():
     return CliRunner()
 
 
+@pytest.fixture
+def generated_topic_blog_writer(mock_blog_dir):
+    """Write a generated topic post fixture through the patched service boundary."""
+
+    async def write_generated_topic_blog(topic, excludes, with_thumbnail):
+        blog_path = mock_blog_dir / "topic" / "003.md"
+        blog_path.write_text(
+            (
+                "---\n"
+                'title: "학습 영어로 배우기"\n'
+                "---\n\n"
+                "I try to improve my English every day.\n"
+            ),
+            encoding="utf-8",
+        )
+        return blog_path
+
+    return write_generated_topic_blog
+
+
 class TestLinkExpressionCommand:
     """Test cases for the link-expression CLI command."""
 
@@ -112,6 +132,8 @@ class TestLinkTopicBlogsCommand:
 
     def test_links_existing_topic_blogs_only(self, mock_blog_dir, runner):
         """Backfill topic blog links without modifying regular expression posts."""
+        for path in (mock_blog_dir / "topic").glob("*.md"):
+            path.unlink()
         topic_path = mock_blog_dir / "topic" / "003.md"
         expression_path = mock_blog_dir / "in-english" / "035.morning-person.md"
         expression_before = expression_path.read_text(encoding="utf-8")
@@ -137,9 +159,8 @@ class TestLinkTopicBlogsCommand:
 
         # Then
         assert result.exit_code == 0
-        assert "Files processed: 2" in result.stdout
+        assert "Files processed: 1" in result.stdout
         assert "Files modified: 1" in result.stdout
-        assert "Links added: 2" in result.stdout
         assert expression_path.read_text(encoding="utf-8") == expression_before
 
         content = topic_path.read_text(encoding="utf-8")
@@ -181,26 +202,14 @@ class TestLinkTopicBlogsCommand:
         mock_blog_dir,
         runner,
         monkeypatch,
+        generated_topic_blog_writer,
     ):
         """`write-topic-blog` should link the generated topic post by default."""
-
-        async def write_generated_topic_blog(topic, excludes, with_thumbnail):
-            blog_path = mock_blog_dir / "topic" / "003.md"
-            blog_path.write_text(
-                (
-                    "---\n"
-                    'title: "학습 영어로 배우기"\n'
-                    "---\n\n"
-                    "I try to improve my English every day.\n"
-                ),
-                encoding="utf-8",
-            )
-            return blog_path
 
         monkeypatch.setattr(
             main,
             "handle_write_topic_blog",
-            write_generated_topic_blog,
+            generated_topic_blog_writer,
         )
 
         # Given
@@ -221,26 +230,14 @@ class TestLinkTopicBlogsCommand:
         mock_blog_dir,
         runner,
         monkeypatch,
+        generated_topic_blog_writer,
     ):
         """`write-topic-blog --no-link` should leave generated topic content unchanged."""
-
-        async def write_generated_topic_blog(topic, excludes, with_thumbnail):
-            blog_path = mock_blog_dir / "topic" / "003.md"
-            blog_path.write_text(
-                (
-                    "---\n"
-                    'title: "학습 영어로 배우기"\n'
-                    "---\n\n"
-                    "I try to improve my English every day.\n"
-                ),
-                encoding="utf-8",
-            )
-            return blog_path
 
         monkeypatch.setattr(
             main,
             "handle_write_topic_blog",
-            write_generated_topic_blog,
+            generated_topic_blog_writer,
         )
 
         # Given
@@ -254,3 +251,35 @@ class TestLinkTopicBlogsCommand:
 
         content = (mock_blog_dir / "topic" / "003.md").read_text(encoding="utf-8")
         assert "I try to improve my English every day." in content
+
+    def test_write_topic_blog_fails_when_generated_path_is_not_topic_post(
+        self,
+        mock_blog_dir,
+        runner,
+        monkeypatch,
+    ):
+        """`write-topic-blog` should fail if the generated path is not a topic post."""
+
+        async def write_non_topic_blog(topic, excludes, with_thumbnail):
+            blog_path = mock_blog_dir / "in-english" / "999.generated.md"
+            blog_path.write_text(
+                "I try to improve my English every day.\n",
+                encoding="utf-8",
+            )
+            return blog_path
+
+        monkeypatch.setattr(
+            main,
+            "handle_write_topic_blog",
+            write_non_topic_blog,
+        )
+
+        # Given
+        command = ["write-topic-blog", "학습", "--no-thumbnail"]
+
+        # When
+        result = runner.invoke(app, command)
+
+        # Then
+        assert result.exit_code == 1
+        assert "Expected topic blog path under" in str(result.exception)

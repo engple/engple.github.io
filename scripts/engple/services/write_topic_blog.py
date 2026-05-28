@@ -9,13 +9,14 @@ from loguru import logger
 from engple.config import config
 from engple.constants import TOPIC_PROMPT
 from engple.core.image_searcher import search_image
+from engple.core.topic_vocab import (
+    extract_topic_heading_vocabs,
+    flatten_topic_vocabs,
+    normalize_topic_vocab,
+)
 from engple.core.topic_blog_writer import GeneratedTopicBlog, TopicBlogWriter
 from engple.utils import render_topic_thumbnail
 
-TOPIC_HEADING_RE = re.compile(
-    r"^##\s+\d+\.\s+(.+?)\s*\((.+?)\)\s*$",
-    re.MULTILINE,
-)
 TITLE_RE = re.compile(r'^title:\s*["\']?(.+?)["\']?\s*$', re.MULTILINE)
 TOPIC_TITLE_RE = re.compile(r"^(.+?)\s+영어(?:로)?\s+(?:표현하기|배우기|단어 배우기)")
 
@@ -98,7 +99,9 @@ def _reject_duplicate_vocabs(
         _normalize_vocab(item)
         for item in [
             *generated_blog.vocabs,
-            *_extract_topic_heading_vocabs(generated_blog.content),
+            *flatten_topic_vocabs(
+                extract_topic_heading_vocabs(generated_blog.content)
+            ),
         ]
     }
     duplicates = sorted(item for item in generated if item in excluded)
@@ -109,15 +112,8 @@ def _reject_duplicate_vocabs(
         )
 
 
-def _extract_topic_heading_vocabs(content: str) -> list[str]:
-    vocabs: list[str] = []
-    for korean, english in TOPIC_HEADING_RE.findall(content):
-        vocabs.extend([korean.strip(), english.strip()])
-    return vocabs
-
-
 def _normalize_vocab(vocab: str) -> str:
-    return vocab.strip().lower()
+    return normalize_topic_vocab(vocab)
 
 
 def _get_next_topic_sequence(topic: str) -> int:
@@ -157,7 +153,7 @@ def _get_existing_topic_vocabs() -> list[str]:
     vocabs: list[str] = []
     for path in sorted(topic_dir.rglob("*.md")):
         content = path.read_text(encoding="utf-8")
-        vocabs.extend(_extract_topic_heading_vocabs(content))
+        vocabs.extend(flatten_topic_vocabs(extract_topic_heading_vocabs(content)))
     return vocabs
 
 

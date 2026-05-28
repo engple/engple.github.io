@@ -32,6 +32,28 @@ Rules:
 ```
 """
 
+vocab_prompt = """Generate {count} Korean-English vocabulary candidate pairs for the given <TOPIC>.
+
+Rules:
+- The candidates are for Korean speakers learning practical English vocabulary.
+- Choose vocabulary items that belong to the same hierarchy level.
+- For a topic like "동물", use direct animal names such as "개", "고양이", "토끼", "소", "치타".
+- For a topic like "가구", use direct furniture names such as "소파", "의자", "테이블", "책상", "침대".
+- Do not mix parent/child levels in the same candidate list.
+- Prefer natural Korean terms that people actually use in daily life.
+- Prefer native Korean terms over loanwords when both are natural.
+- Return exactly {count} candidate pairs when possible.
+"""
+
+selected_vocab_prompt = """Use only the selected vocabulary items provided by the user message.
+
+Rules for selected vocabulary:
+- Use exactly the selected vocabulary items and no other vocabulary section headings.
+- Preserve the selected vocabulary order.
+- Each section heading must be formatted exactly as `## <NUMBER>. <KOREAN> (<ENGLISH>)`.
+- Do not replace, translate differently, merge, omit, or add selected vocabulary items.
+"""
+
 exclude_prompt = """Avoid these vocabulary items because they were already used for this topic:
 {excludes}
 """

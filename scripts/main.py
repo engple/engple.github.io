@@ -8,6 +8,7 @@ from engple.services.write_blog import handle_write_blog
 from engple.services.write_topic_blog import handle_write_topic_blog
 from engple.services.link_expression import handle_link_expression
 from engple.services.link_all_expressions import handle_link_all_expressions
+from engple.services.link_topic_blogs import handle_link_topic_blogs
 
 app = typer.Typer(help="Automated English Expression Linking System")
 
@@ -117,6 +118,12 @@ def write_topic_blog(
         "--no-thumbnail",
         help="Do not generate a thumbnail image",
     ),
+    no_link: bool = typer.Option(False, "--no-link", help="Do not link expressions"),
+    max_links: int = typer.Option(
+        8,
+        "--max-links",
+        help="Maximum links per post (omit for unlimited)",
+    ),
 ) -> None:
     """Generate a topic vocabulary blog post."""
 
@@ -126,9 +133,29 @@ def write_topic_blog(
             excludes=exclude,
             with_thumbnail=not no_thumbnail,
         )
+        if not no_link:
+            handle_link_topic_blogs(max_links=max_links, target_paths=[blog_path])
         logger.info(f"Generated topic blog: {blog_path}\n")
 
     asyncio.run(_write_topic_blog())
+
+
+@app.command()
+def link_topic_blogs(
+    max_links: int = typer.Option(
+        8,
+        "--max-links",
+        help="Maximum links per topic post (omit for unlimited)",
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Preview changes without applying them"
+    ),
+    verbose: bool = typer.Option(
+        False, "--verbose", "-v", help="Enable verbose logging"
+    ),
+) -> None:
+    """Link existing expression posts inside topic vocabulary blog posts."""
+    handle_link_topic_blogs(max_links=max_links, dry_run=dry_run, verbose=verbose)
 
 
 if __name__ == "__main__":

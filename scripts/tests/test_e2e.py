@@ -11,6 +11,7 @@ from pathlib import Path
 from unittest.mock import patch
 from typer.testing import CliRunner
 from engple.config import config
+import main
 from main import app
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -104,3 +105,152 @@ class TestLinkAllExpressionsCommand:
 
         # then
         assert result.exit_code == 1
+
+
+class TestLinkTopicBlogsCommand:
+    """Test cases for the link-topic-blogs CLI command."""
+
+    def test_links_existing_topic_blogs_only(self, mock_blog_dir, runner):
+        """Backfill topic blog links without modifying regular expression posts."""
+        topic_path = mock_blog_dir / "topic" / "003.md"
+        expression_path = mock_blog_dir / "in-english" / "035.morning-person.md"
+        expression_before = expression_path.read_text(encoding="utf-8")
+        topic_path.write_text(
+            (
+                "---\n"
+                'title: "try to improve 영어로 배우기"\n'
+                'desc: "try to improve should stay unlinked here"\n'
+                "---\n\n"
+                "## try to improve heading\n\n"
+                '<span data-answer="try to improve">Attribute stays untouched.</span>\n\n'
+                "Already linked: [try to](/blog/in-english/117.try-to/).\n\n"
+                "I try to improve my English every day.\n"
+            ),
+            encoding="utf-8",
+        )
+
+        # Given
+        command = ["link-topic-blogs"]
+
+        # When
+        result = runner.invoke(app, command)
+
+        # Then
+        assert result.exit_code == 0
+        assert "Files processed: 2" in result.stdout
+        assert "Files modified: 1" in result.stdout
+        assert "Links added: 2" in result.stdout
+        assert expression_path.read_text(encoding="utf-8") == expression_before
+
+        content = topic_path.read_text(encoding="utf-8")
+        assert 'title: "try to improve 영어로 배우기"' in content
+        assert 'desc: "try to improve should stay unlinked here"' in content
+        assert "## try to improve heading" in content
+        assert 'data-answer="try to improve"' in content
+        assert "Already linked: [try to](/blog/in-english/117.try-to/)." in content
+        assert "I [try to](/blog/in-english/117.try-to/) [improve](/blog/in-english/394.improve/) my English every day." in content
+
+    def test_link_topic_blogs_respects_max_links(self, mock_blog_dir, runner):
+        """Backfill topic blog links should stop once max links is reached."""
+        topic_path = mock_blog_dir / "topic" / "003.md"
+        topic_path.write_text(
+            (
+                "---\n"
+                'title: "학습 영어로 배우기"\n'
+                "---\n\n"
+                "I try to improve my English every day.\n"
+            ),
+            encoding="utf-8",
+        )
+
+        # Given
+        command = ["link-topic-blogs", "--max-links", "1"]
+
+        # When
+        result = runner.invoke(app, command)
+
+        # Then
+        assert result.exit_code == 0
+        assert "Links added: 1" in result.stdout
+
+        content = topic_path.read_text(encoding="utf-8")
+        assert content.count("](/blog/in-english/") == 1
+
+    def test_write_topic_blog_links_generated_topic_post(
+        self,
+        mock_blog_dir,
+        runner,
+        monkeypatch,
+    ):
+        """`write-topic-blog` should link the generated topic post by default."""
+
+        async def write_generated_topic_blog(topic, excludes, with_thumbnail):
+            blog_path = mock_blog_dir / "topic" / "003.md"
+            blog_path.write_text(
+                (
+                    "---\n"
+                    'title: "학습 영어로 배우기"\n'
+                    "---\n\n"
+                    "I try to improve my English every day.\n"
+                ),
+                encoding="utf-8",
+            )
+            return blog_path
+
+        monkeypatch.setattr(
+            main,
+            "handle_write_topic_blog",
+            write_generated_topic_blog,
+        )
+
+        # Given
+        command = ["write-topic-blog", "학습", "--no-thumbnail"]
+
+        # When
+        result = runner.invoke(app, command)
+
+        # Then
+        assert result.exit_code == 0
+        assert "Generated topic blog:" in result.stdout
+
+        content = (mock_blog_dir / "topic" / "003.md").read_text(encoding="utf-8")
+        assert "I [try to](/blog/in-english/117.try-to/) [improve](/blog/in-english/394.improve/) my English every day." in content
+
+    def test_write_topic_blog_respects_no_link(
+        self,
+        mock_blog_dir,
+        runner,
+        monkeypatch,
+    ):
+        """`write-topic-blog --no-link` should leave generated topic content unchanged."""
+
+        async def write_generated_topic_blog(topic, excludes, with_thumbnail):
+            blog_path = mock_blog_dir / "topic" / "003.md"
+            blog_path.write_text(
+                (
+                    "---\n"
+                    'title: "학습 영어로 배우기"\n'
+                    "---\n\n"
+                    "I try to improve my English every day.\n"
+                ),
+                encoding="utf-8",
+            )
+            return blog_path
+
+        monkeypatch.setattr(
+            main,
+            "handle_write_topic_blog",
+            write_generated_topic_blog,
+        )
+
+        # Given
+        command = ["write-topic-blog", "학습", "--no-thumbnail", "--no-link"]
+
+        # When
+        result = runner.invoke(app, command)
+
+        # Then
+        assert result.exit_code == 0
+
+        content = (mock_blog_dir / "topic" / "003.md").read_text(encoding="utf-8")
+        assert "I try to improve my English every day." in content

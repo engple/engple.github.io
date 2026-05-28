@@ -55,6 +55,8 @@ class BatchLinker:
             return result
 
         content = target_path.read_text(encoding="utf-8")
+        original_content = content
+        existing_links = 0
 
         if self.max_links is not None:
             existing_links = self.context_detector.count_existing_links(content)
@@ -65,10 +67,17 @@ class BatchLinker:
                 return result
 
         for expr in expressions:
+            if (
+                self.max_links is not None
+                and existing_links + result.total_links_added >= self.max_links
+            ):
+                break
+
             content, link_added = self.linker.apply_link(content, expr)
             result.total_links_added += link_added
 
-        self._write_file(target_path, content)
+        if content != original_content:
+            self._write_file(target_path, content)
 
         return result
 

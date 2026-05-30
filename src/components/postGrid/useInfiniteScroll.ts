@@ -4,7 +4,7 @@ import type Post from "~/src/types/Post"
 
 interface UseInfiniteScrollProperties {
   posts: Post[]
-  scrollEdgeRef: React.RefObject<HTMLDivElement>
+  scrollEdgeRef: React.RefObject<HTMLLIElement>
   maxPostNum: number
   offsetY: number
 }

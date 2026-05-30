@@ -9,12 +9,13 @@ import PostGrid from "~/src/components/postGrid"
 import SEO from "~/src/components/seo"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
-import type Post from "~/src/types/Post"
 import { createPostItemListJsonLd } from "~/src/utils/structuredData"
 
 import { VERTICAL_AD_SLOT } from "../constants"
 
 const STRUCTURED_POST_LIST_LIMIT = 10
+const HOME_HERO_DESCRIPTION =
+  "잉플에서는 한국어 예문으로 영어 패턴과 실전 표현을 배울 수 있습니다. 상황별 표현, 발음, 연습 문제를 최신 글에서 바로 확인하세요."
 
 const Home = ({
   pageContext,
@@ -110,7 +111,7 @@ const Home = ({
               <HeroDescription>
                 {currentCategory
                   ? `${postTitle} 카테고리의 영어 표현과 학습 글을 최신순으로 확인해보세요.`
-                  : site.description}
+                  : HOME_HERO_DESCRIPTION}
               </HeroDescription>
             </HeroCopy>
             <CategorySection aria-labelledby="category-heading">

@@ -9,7 +9,6 @@ import PostGrid from "~/src/components/postGrid"
 import SEO from "~/src/components/seo"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
-import type Post from "~/src/types/Post"
 import { createPostItemListJsonLd } from "~/src/utils/structuredData"
 
 import { VERTICAL_AD_SLOT } from "../constants"

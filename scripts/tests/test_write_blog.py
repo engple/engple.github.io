@@ -4,7 +4,15 @@ from pathlib import Path
 import pytest
 
 from engple.config import config
-from engple.core.blog_writer import BlogWriter, GeneratedBlog
+from engple.core import blog_writer as blog_writer_module
+from engple.core.blog_writer import (
+    BlogContent,
+    BlogMeta,
+    BlogWriter,
+    FAQ,
+    GeneratedBlog,
+    RelatedExpression,
+)
 from engple.core.candidate_meanings import CandidateMeaningCreator
 from engple.core.expression_candidates import ExpressionCandidateCreator
 from engple.services import write_blog as write_blog_service
@@ -336,6 +344,8 @@ def test_handle_write_blog_rejects_expression_drift_to_existing_post(
 
 
 def test_generate_candidate_expressions_and_annotation_are_separate(monkeypatch):
+    """Candidate generation should return plain expressions before annotation."""
+
     async def fake_generate(self, existing_expressions: list[str], count: int):
         assert existing_expressions == ["drop off(내려주다)"]
         assert count == 2
@@ -348,9 +358,80 @@ def test_generate_candidate_expressions_and_annotation_are_separate(monkeypatch)
     monkeypatch.setattr(ExpressionCandidateCreator, "generate", fake_generate)
     monkeypatch.setattr(CandidateMeaningCreator, "annotate", fake_annotate)
 
+    # given
     writer = BlogWriter()
+
+    # when
     generated = asyncio.run(writer.generate_candidate_expressions(["drop off(내려주다)"], 2))
     annotated = asyncio.run(writer.annotate_candidate_expressions(generated))
 
+    # then
     assert generated == ["like", "set up"]
     assert annotated == ["like(좋아하다)", "set up(설정하다)"]
+
+
+def test_blog_writer_removes_null_bytes_from_generated_markdown(monkeypatch):
+    """`BlogWriter.generate` should remove null bytes while keeping FAQ frontmatter."""
+
+    class FakeRunResult:
+        def __init__(self, output):
+            self.output = output
+
+    class FakeAgent:
+        def __init__(self, model, *, output_type, **kwargs):
+            self.model = model
+            self.output_type = output_type
+
+        async def run(self, prompt):
+            if self.output_type is BlogContent:
+                return FakeRunResult(
+                    BlogContent(
+                        expression="hit\x00",
+                        korean_meanings=["치다"],
+                        title="'치다' 영어로 어떻게 표현할까 🥊 - 때리다 영어로\x00",
+                        body="본문입니다.\x00",
+                    )
+                )
+
+            if self.output_type is BlogMeta:
+                return FakeRunResult(
+                    BlogMeta(
+                        description="'치다'를 영어로 배워요.\x00",
+                        faqs=[
+                            FAQ(
+                                question="'hit'은 무슨 뜻인가요?\x00",
+                                answer="'hit'은 '치다'라는 뜻이에요.\x00",
+                            )
+                        ],
+                    )
+                )
+
+            if self.output_type == list[str]:
+                if self.model == config.model_examples:
+                    return FakeRunResult(["I hit the ball.\x00"])
+
+                return FakeRunResult(["공을 쳤어요.\x00"])
+
+            return FakeRunResult(
+                [
+                    RelatedExpression(
+                        expression="tap\x00",
+                        explanation="가볍게 치다는 뜻이에요.\x00",
+                        example="Tap the screen.\x00",
+                        translation="화면을 톡 치세요.\x00",
+                    )
+                ]
+            )
+
+    monkeypatch.setattr(blog_writer_module, "Agent", FakeAgent)
+
+    # given
+    writer = BlogWriter(expression_count=1, recommendation_count=1)
+
+    # when
+    result = asyncio.run(writer.generate("hit", 1))
+
+    # then
+    assert "\x00" not in result.content
+    assert "faqs:" in result.content
+    assert "\"'hit'은 무슨 뜻인가요?\"" in result.content

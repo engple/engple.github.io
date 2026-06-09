@@ -61,7 +61,7 @@ const Text = styled.div`
   }
 `
 
-const Title = styled.p`
+const Title = styled.h3`
   margin-top: var(--sizing-xs);
   font-size: var(--text-md);
   font-weight: var(--font-weight-bold);

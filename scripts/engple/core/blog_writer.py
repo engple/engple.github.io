@@ -21,6 +21,7 @@ from engple.constants import (
 from engple.core.candidate_meanings import CandidateMeaningCreator
 from engple.core.expression_candidates import ExpressionCandidateCreator
 from engple.utils import normalize_expression
+from engple.utils.null_bytes import remove_null_bytes
 
 
 class BlogContent(BaseModel):
@@ -296,7 +297,9 @@ class BlogWriter:
         Get the final content for the given parameters
         """
         logger.info("💾 블로그 출력 저장 중...")
-        sanitized_expression = re.sub(r"\([^)]*\)", "", expression).strip()
+        sanitized_expression = remove_null_bytes(
+            re.sub(r"\([^)]*\)", "", expression).strip()
+        )
         try:
             content_body, content_footer = content.body.split("---\n\n")
         except ValueError:
@@ -306,8 +309,10 @@ class BlogWriter:
         # Build FAQ section
         faqs_section = ""
         for faq in blog_meta.faqs:
-            faqs_section += f'  - question: "{self._escape_text(faq.question)}"\n'
-            faqs_section += f'    answer: "{self._escape_text(faq.answer)}"\n'
+            question = self._escape_text(remove_null_bytes(faq.question))
+            answer = self._escape_text(remove_null_bytes(faq.answer))
+            faqs_section += f'  - question: "{question}"\n'
+            faqs_section += f'    answer: "{answer}"\n'
 
         # Build recommendations section
         recommendations_section = ""
@@ -331,9 +336,9 @@ class BlogWriter:
                 f'date: "{post_date}"\n'
                 f'thumbnail: "{blog_num:03d}.png"\n'
                 f"alt: \"'{sanitized_expression}' 영어표현 썸네일\"\n"
-                f'title: "{self._escape_text(content.title)}"\n'
+                f'title: "{self._escape_text(remove_null_bytes(content.title))}"\n'
                 f"desc: "
-                f'"{blog_meta.description} 다양한 예문을 통해서 연습하고 본인의 표현으로 만들어 보세요."\n'
+                f'"{self._escape_text(remove_null_bytes(blog_meta.description))} 다양한 예문을 통해서 연습하고 본인의 표현으로 만들어 보세요."\n'
                 f"faqs: \n"
                 f"{faqs_section}"
                 f"---\n\n"
@@ -354,10 +359,7 @@ class BlogWriter:
             .replace("~요", "")
         )
 
-        return self._remove_null_bytes(full_content)
-
-    def _remove_null_bytes(self, text: str) -> str:
-        return text.replace("\x00", "")
+        return remove_null_bytes(full_content)
 
     def _escape_text(self, text: str) -> str:
         """

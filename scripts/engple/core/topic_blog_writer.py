@@ -16,6 +16,7 @@ from engple.core.topic_vocab import (
     flatten_topic_vocabs,
     normalize_topic_vocab,
 )
+from engple.utils.null_bytes import remove_null_bytes
 
 MIN_TOPIC_VOCAB_COUNT = 5
 VOCAB_CANDIDATE_BATCH_SIZE = 12
@@ -343,9 +344,9 @@ class TopicBlogWriter:
             include_thumbnail,
         )
         thumbnail_body = self._format_thumbnail_body(meta, blog_num, include_thumbnail)
-        content = (
+        full_content = (
             "---\n"
-            f'title: "{self._escape_text(meta.title)}"\n'
+            f'title: "{self._escape_text(remove_null_bytes(meta.title))}"\n'
             'category: "주제별영어"\n'
             f'date: "{post_date}"\n'
             f"{thumbnail_frontmatter}"
@@ -357,10 +358,7 @@ class TopicBlogWriter:
             f"{content.content}\n"
         )
 
-        return self._remove_null_bytes(content)
-
-    def _remove_null_bytes(self, text: str) -> str:
-        return text.replace("\x00", "")
+        return remove_null_bytes(full_content)
 
     def _format_thumbnail_frontmatter(
         self, meta: TopicBlogMeta, blog_num: int, include_thumbnail: bool
@@ -369,7 +367,7 @@ class TopicBlogWriter:
             return ""
         return (
             f'thumbnail: "./{blog_num:03d}.png"\n'
-            f'alt: "{self._escape_text(meta.alt)}"\n'
+            f'alt: "{self._escape_text(remove_null_bytes(meta.alt))}"\n'
         )
 
     def _format_thumbnail_body(
@@ -386,7 +384,7 @@ class TopicBlogWriter:
         return date.isoformat(timespec="minutes")
 
     def _format_description(self, description: str) -> str:
-        escaped_description = self._escape_text(description)
+        escaped_description = self._escape_text(remove_null_bytes(description))
         return (
             f"{escaped_description} 다양한 예문을 통해서 연습하고 "
             "본인의 표현으로 만들어 보세요."
@@ -395,8 +393,10 @@ class TopicBlogWriter:
     def _format_faqs(self, faqs: list[TopicFAQ]) -> str:
         faqs_section = ""
         for faq in faqs:
-            faqs_section += f'  - question: "{self._escape_text(faq.question)}"\n'
-            faqs_section += f'    answer: "{self._escape_text(faq.answer)}"\n'
+            question = self._escape_text(remove_null_bytes(faq.question))
+            answer = self._escape_text(remove_null_bytes(faq.answer))
+            faqs_section += f'  - question: "{question}"\n'
+            faqs_section += f'    answer: "{answer}"\n'
         return faqs_section
 
     def _escape_text(self, text: str) -> str:

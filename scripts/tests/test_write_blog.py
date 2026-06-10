@@ -371,7 +371,7 @@ def test_generate_candidate_expressions_and_annotation_are_separate(monkeypatch)
 
 
 def test_blog_writer_removes_null_bytes_from_generated_markdown(monkeypatch):
-    """`BlogWriter.generate` should remove null bytes while keeping FAQ frontmatter."""
+    """`BlogWriter.generate` should remove null bytes while preserving HTML."""
 
     class FakeRunResult:
         def __init__(self, output):
@@ -388,8 +388,8 @@ def test_blog_writer_removes_null_bytes_from_generated_markdown(monkeypatch):
                     BlogContent(
                         expression="hit\x00",
                         korean_meanings=["치다"],
-                        title="'치다' 영어로 어떻게 표현할까 🥊 - 때리다 영어로\x00",
-                        body="본문입니다.\x00",
+                        title="'치다' 영어로 어떻게 표현할까 🥊\x00",
+                        body="본문 <strong>HTML\x00</strong>입니다.",
                     )
                 )
 
@@ -400,7 +400,10 @@ def test_blog_writer_removes_null_bytes_from_generated_markdown(monkeypatch):
                         faqs=[
                             FAQ(
                                 question="'hit'은 무슨 뜻인가요?\x00",
-                                answer="'hit'은 '치다'라는 뜻이에요.\x00",
+                                answer=(
+                                    "'hit'은 <strong>'치다'</strong>라는 "
+                                    "뜻이에요.\x00"
+                                ),
                             )
                         ],
                     )
@@ -434,4 +437,5 @@ def test_blog_writer_removes_null_bytes_from_generated_markdown(monkeypatch):
     # then
     assert "\x00" not in result.content
     assert "faqs:" in result.content
-    assert "\"'hit'은 무슨 뜻인가요?\"" in result.content
+    assert "<strong>'치다'</strong>" in result.content
+    assert "본문 <strong>HTML</strong>입니다." in result.content

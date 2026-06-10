@@ -354,7 +354,10 @@ class BlogWriter:
             .replace("~요", "")
         )
 
-        return full_content
+        return self._remove_null_bytes(full_content)
+
+    def _remove_null_bytes(self, text: str) -> str:
+        return text.replace("\x00", "")
 
     def _escape_text(self, text: str) -> str:
         """

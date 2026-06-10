@@ -502,6 +502,82 @@ def test_topic_blog_writer_omits_image_references_without_thumbnail(monkeypatch)
     assert "![동물 영어 표현 썸네일](./003.png)" not in result.content
 
 
+def test_topic_blog_writer_removes_null_bytes_from_generated_markdown(monkeypatch):
+    """`TopicBlogWriter.generate` should remove null bytes while keeping FAQ frontmatter."""
+
+    class FakeRunResult:
+        def __init__(self, output):
+            self.output = output
+
+    class FakeAgent:
+        def __init__(self, model, *, output_type, **kwargs):
+            self.output_type = output_type
+
+        async def run(self, prompt):
+            if self.output_type is TopicVocabCandidates:
+                return FakeRunResult(
+                    TopicVocabCandidates(
+                        vocabs=[
+                            TopicVocabCandidate(korean="토끼", english="Rabbit"),
+                            TopicVocabCandidate(korean="소", english="Cow"),
+                            TopicVocabCandidate(korean="말", english="Horse"),
+                            TopicVocabCandidate(korean="양", english="Sheep"),
+                            TopicVocabCandidate(korean="돼지", english="Pig"),
+                        ],
+                    )
+                )
+
+            if self.output_type is TopicBlogContent:
+                return FakeRunResult(
+                    TopicBlogContent(
+                        vocabs=["rabbit", "cow", "horse", "sheep", "pig"],
+                        content=(
+                            "## 1. 토끼 (Rabbit)\n\n토끼를 뜻해요.\x00\n\n"
+                            "## 2. 소 (Cow)\n\n소를 뜻해요.\n\n"
+                            "## 3. 말 (Horse)\n\n말을 뜻해요.\n\n"
+                            "## 4. 양 (Sheep)\n\n양을 뜻해요.\n\n"
+                            "## 5. 돼지 (Pig)\n\n돼지를 뜻해요."
+                        ),
+                    )
+                )
+
+            return FakeRunResult(
+                TopicBlogMeta(
+                    title="동물 영어로 배우기 #2 - 토끼 영어로\x00",
+                    alt="동물 영어 표현 썸네일\x00",
+                    description="'토끼'를 영어로 배워요.\x00",
+                    faqs=[
+                        TopicFAQ(
+                            question="토끼를 영어로 어떻게 표현할까요?\x00",
+                            answer="토끼는 영어로 'rabbit'이라고 표현해요.\x00",
+                        )
+                    ],
+                )
+            )
+
+    monkeypatch.setattr(topic_blog_writer_module, "Agent", FakeAgent)
+
+    # Given
+    writer = TopicBlogWriter()
+    include_thumbnail = False
+
+    # When
+    result = asyncio.run(
+        writer.generate(
+            "동물",
+            3,
+            excludes=[],
+            topic_sequence=2,
+            include_thumbnail=include_thumbnail,
+        )
+    )
+
+    # Then
+    assert "\x00" not in result.content
+    assert "faqs:" in result.content
+    assert '"토끼를 영어로 어떻게 표현할까요?"' in result.content
+
+
 def test_topic_blog_writer_selects_unique_vocab_before_writing_content(monkeypatch):
     """`TopicBlogWriter` should filter duplicate candidates before writing content."""
     candidate_outputs = [

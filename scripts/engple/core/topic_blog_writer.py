@@ -343,7 +343,7 @@ class TopicBlogWriter:
             include_thumbnail,
         )
         thumbnail_body = self._format_thumbnail_body(meta, blog_num, include_thumbnail)
-        return (
+        content = (
             "---\n"
             f'title: "{self._escape_text(meta.title)}"\n'
             'category: "주제별영어"\n'
@@ -356,6 +356,11 @@ class TopicBlogWriter:
             f"{thumbnail_body}"
             f"{content.content}\n"
         )
+
+        return self._remove_null_bytes(content)
+
+    def _remove_null_bytes(self, text: str) -> str:
+        return text.replace("\x00", "")
 
     def _format_thumbnail_frontmatter(
         self, meta: TopicBlogMeta, blog_num: int, include_thumbnail: bool

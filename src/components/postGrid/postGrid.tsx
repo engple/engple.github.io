@@ -18,7 +18,7 @@ const PostGrid: React.FC<PostGridProperties> = ({ posts }) => {
   const currentList = useInfiniteScroll({
     posts,
     scrollEdgeRef: scrollEdgeReference,
-    maxPostNum: 10,
+    maxPostNum: 24,
     offsetY: 200,
   })
 

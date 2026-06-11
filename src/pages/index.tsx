@@ -13,7 +13,7 @@ import { createPostItemListJsonLd } from "~/src/utils/structuredData"
 
 import { VERTICAL_AD_SLOT } from "../constants"
 
-const STRUCTURED_POST_LIST_LIMIT = 10
+const STRUCTURED_POST_LIST_LIMIT = 24
 
 const Home = ({
   pageContext,

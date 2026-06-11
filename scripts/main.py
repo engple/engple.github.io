@@ -9,6 +9,7 @@ from engple.services.write_topic_blog import handle_write_topic_blog
 from engple.services.link_expression import handle_link_expression
 from engple.services.link_all_expressions import handle_link_all_expressions
 from engple.services.link_topic_blogs import handle_link_topic_blogs
+from engple.services.sanitize_posts import handle_sanitize_posts
 
 app = typer.Typer(help="Automated English Expression Linking System")
 
@@ -156,6 +157,18 @@ def link_topic_blogs(
 ) -> None:
     """Link existing expression posts inside topic vocabulary blog posts."""
     handle_link_topic_blogs(max_links=max_links, dry_run=dry_run, verbose=verbose)
+
+
+@app.command()
+def sanitize_posts(
+    write: bool = typer.Option(
+        False,
+        "--write",
+        help="Apply changes. Omit to preview affected posts only.",
+    ),
+) -> None:
+    """Remove null bytes from generated markdown posts."""
+    handle_sanitize_posts(write=write)
 
 
 if __name__ == "__main__":

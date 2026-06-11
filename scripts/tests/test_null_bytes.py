@@ -1,4 +1,4 @@
-from engple.utils.null_bytes import (
+from engple.utils import (
     collect_markdown_posts,
     remove_null_bytes,
     remove_null_bytes_from_post_files,

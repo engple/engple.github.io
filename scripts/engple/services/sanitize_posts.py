@@ -3,7 +3,7 @@ from pathlib import Path
 from loguru import logger
 
 from engple.config import config
-from engple.utils.null_bytes import (
+from engple.utils import (
     NullByteRemovalResult,
     collect_markdown_posts,
     remove_null_bytes_from_post_files,

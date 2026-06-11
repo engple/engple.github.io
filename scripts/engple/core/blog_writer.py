@@ -20,8 +20,7 @@ from engple.constants import (
 )
 from engple.core.candidate_meanings import CandidateMeaningCreator
 from engple.core.expression_candidates import ExpressionCandidateCreator
-from engple.utils import normalize_expression
-from engple.utils.null_bytes import remove_null_bytes
+from engple.utils import normalize_expression, remove_null_bytes
 
 
 class BlogContent(BaseModel):

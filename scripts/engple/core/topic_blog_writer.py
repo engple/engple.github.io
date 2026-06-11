@@ -16,7 +16,7 @@ from engple.core.topic_vocab import (
     flatten_topic_vocabs,
     normalize_topic_vocab,
 )
-from engple.utils.null_bytes import remove_null_bytes
+from engple.utils import remove_null_bytes
 
 MIN_TOPIC_VOCAB_COUNT = 5
 VOCAB_CANDIDATE_BATCH_SIZE = 12

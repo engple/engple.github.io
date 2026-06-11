@@ -14,6 +14,7 @@ import { createPostItemListJsonLd } from "~/src/utils/structuredData"
 import { VERTICAL_AD_SLOT } from "../constants"
 
 const STRUCTURED_POST_LIST_LIMIT = 24
+const HERO_DESCRIPTION_SEGMENT_LENGTH = 30
 
 const Home = ({
   pageContext,
@@ -56,6 +57,9 @@ const Home = ({
 
   const site = useSiteMetadata()
   const postTitle = currentCategory || site.postTitle
+  const heroDescription = currentCategory
+    ? `${postTitle} 카테고리의 영어 표현과 학습 글을 최신순으로 확인해보세요.`
+    : site.description
   const pagePath = currentCategory
     ? `/category/${kebabCase(currentCategory)}/`
     : "/"
@@ -107,9 +111,7 @@ const Home = ({
               </HeroEyebrow>
               <PostTitle id="home-heading">{postTitle}</PostTitle>
               <HeroDescription>
-                {currentCategory
-                  ? `${postTitle} 카테고리의 영어 표현과 학습 글을 최신순으로 확인해보세요.`
-                  : site.description}
+                <SafeDescriptionText text={heroDescription} />
               </HeroDescription>
             </HeroCopy>
             <CategorySection aria-labelledby="category-heading">
@@ -153,6 +155,35 @@ const Home = ({
     </Layout>
   )
 }
+
+const SafeDescriptionText = ({ text }: { text?: string | null }) => {
+  return (
+    <>
+      {splitSafeDescriptionText(text).map((segment, index) => (
+        <span key={index}>{segment}</span>
+      ))}
+    </>
+  )
+}
+
+const splitSafeDescriptionText = (text?: string | null) => {
+  const characters = [...removeNullBytes(text ?? "")]
+  const segments: string[] = []
+
+  for (
+    let index = 0;
+    index < characters.length;
+    index += HERO_DESCRIPTION_SEGMENT_LENGTH
+  ) {
+    segments.push(
+      characters.slice(index, index + HERO_DESCRIPTION_SEGMENT_LENGTH).join(""),
+    )
+  }
+
+  return segments
+}
+
+const removeNullBytes = (text: string) => text.replaceAll("\u0000", "")
 
 const Main = styled.main`
   min-width: var(--min-width);

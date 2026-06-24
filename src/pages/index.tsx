@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { useLayoutEffect, useMemo, useState } from "react"
 
 import { Link, type PageProps, graphql } from "gatsby"
 import kebabCase from "lodash/kebabCase"
@@ -9,17 +9,18 @@ import PostGrid from "~/src/components/postGrid"
 import SEO from "~/src/components/seo"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
+import type Post from "~/src/types/Post"
 import { createPostItemListJsonLd } from "~/src/utils/structuredData"
 
 import { VERTICAL_AD_SLOT } from "../constants"
 
-const STRUCTURED_POST_LIST_LIMIT = 24
-const HERO_DESCRIPTION_SEGMENT_LENGTH = 30
+const STRUCTURED_POST_LIST_LIMIT = 10
 
 const Home = ({
   pageContext,
   data,
 }: PageProps<Queries.Query, Queries.MarkdownRemarkFrontmatter>) => {
+  const [posts, setPosts] = useState<Post[]>([])
   const currentCategory = pageContext.category
   const postData = data.allMarkdownRemark.edges
   const visiblePostData = useMemo(() => {
@@ -34,32 +35,30 @@ const Home = ({
       .filter(group => group.fieldValue)
       .sort((first, second) => second.totalCount - first.totalCount)
   }, [data.allMarkdownRemark.group])
+  useLayoutEffect(() => {
+    setPosts(
+      visiblePostData.map(({ node }) => {
+        const { id, fields, frontmatter } = node
+        const { slug } = fields!
+        const { title, desc, date, category, thumbnail, alt } = frontmatter!
+        const { childImageSharp } = thumbnail!
 
-  const posts = useMemo(() => {
-    return visiblePostData.map(({ node }) => {
-      const { id, fields, frontmatter } = node
-      const { slug } = fields!
-      const { title, desc, date, category, thumbnail, alt } = frontmatter!
-      const { childImageSharp } = thumbnail!
-
-      return {
-        id,
-        slug,
-        title,
-        desc,
-        date,
-        category,
-        thumbnail: childImageSharp?.id,
-        alt,
-      }
-    })
+        return {
+          id,
+          slug,
+          title,
+          desc,
+          date,
+          category,
+          thumbnail: childImageSharp?.id,
+          alt,
+        }
+      }),
+    )
   }, [visiblePostData])
 
   const site = useSiteMetadata()
   const postTitle = currentCategory || site.postTitle
-  const heroDescription = currentCategory
-    ? `${postTitle} 카테고리의 영어 표현과 학습 글을 최신순으로 확인해보세요.`
-    : site.description
   const pagePath = currentCategory
     ? `/category/${kebabCase(currentCategory)}/`
     : "/"
@@ -104,41 +103,30 @@ const Home = ({
           />
         </LeftAd>
         <Content>
-          <HeroSection aria-labelledby="home-heading">
+          <HeroSection>
             <HeroCopy>
               <HeroEyebrow>
                 {currentCategory ? "Category Archive" : "Explore Engple"}
               </HeroEyebrow>
-              <PostTitle id="home-heading">{postTitle}</PostTitle>
-              <HeroDescription>
-                <SafeDescriptionText text={heroDescription} />
-              </HeroDescription>
+              <PostTitle>{postTitle}</PostTitle>
             </HeroCopy>
-            <CategorySection aria-labelledby="category-heading">
-              <SectionHeading id="category-heading">카테고리</SectionHeading>
-              <CategoryShelf>
-                <CategoryPill $isActive={!currentCategory} to="/">
-                  전체
+            <CategoryShelf aria-label="카테고리 탐색">
+              <CategoryPill $isActive={!currentCategory} to="/">
+                전체
+              </CategoryPill>
+              {categoryGroups.map(group => (
+                <CategoryPill
+                  key={group.fieldValue}
+                  $isActive={group.fieldValue === currentCategory}
+                  to={`/category/${kebabCase(group.fieldValue ?? "")}/`}
+                >
+                  <span>{group.fieldValue}</span>
+                  <CategoryCount>{group.totalCount}</CategoryCount>
                 </CategoryPill>
-                {categoryGroups.map(group => (
-                  <CategoryPill
-                    key={group.fieldValue}
-                    $isActive={group.fieldValue === currentCategory}
-                    to={`/category/${kebabCase(group.fieldValue ?? "")}/`}
-                  >
-                    <span>{group.fieldValue}</span>
-                    <CategoryCount>{group.totalCount}</CategoryCount>
-                  </CategoryPill>
-                ))}
-              </CategoryShelf>
-            </CategorySection>
+              ))}
+            </CategoryShelf>
           </HeroSection>
-          <PostListSection aria-labelledby="post-list-heading">
-            <SectionHeading id="post-list-heading">
-              {currentCategory ? `${postTitle} 최신 글` : "최신 영어 표현 글"}
-            </SectionHeading>
-            <PostGrid posts={posts} />
-          </PostListSection>
+          <PostGrid posts={posts} />
         </Content>
         <RightAd>
           <Adsense
@@ -155,35 +143,6 @@ const Home = ({
     </Layout>
   )
 }
-
-const SafeDescriptionText = ({ text }: { text?: string | null }) => {
-  return (
-    <>
-      {splitSafeDescriptionText(text).map((segment, index) => (
-        <span key={index}>{segment}</span>
-      ))}
-    </>
-  )
-}
-
-const splitSafeDescriptionText = (text?: string | null) => {
-  const characters = [...removeNullBytes(text ?? "")]
-  const segments: string[] = []
-
-  for (
-    let index = 0;
-    index < characters.length;
-    index += HERO_DESCRIPTION_SEGMENT_LENGTH
-  ) {
-    segments.push(
-      characters.slice(index, index + HERO_DESCRIPTION_SEGMENT_LENGTH).join(""),
-    )
-  }
-
-  return segments
-}
-
-const removeNullBytes = (text: string) => text.replaceAll("\u0000", "")
 
 const Main = styled.main`
   min-width: var(--min-width);
@@ -236,38 +195,10 @@ const PostTitle = styled.h1`
   }
 `
 
-const HeroDescription = styled.p`
-  max-width: 40rem;
-  margin-top: 10px;
-  color: var(--color-text-2);
-  font-size: 1rem;
-  line-height: 1.7;
-`
-
-const CategorySection = styled.section`
-  display: flex;
-  flex-direction: column;
-  gap: var(--sizing-sm);
-`
-
-const SectionHeading = styled.h2`
-  margin-bottom: 0;
-  color: var(--color-text);
-  font-size: 1.125rem;
-  font-weight: var(--font-weight-bold);
-  line-height: 1.3;
-`
-
 const CategoryShelf = styled.nav`
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-`
-
-const PostListSection = styled.section`
-  display: flex;
-  flex-direction: column;
-  gap: var(--sizing-md);
 `
 
 const CategoryPill = styled(Link)<{ $isActive: boolean }>`

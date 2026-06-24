@@ -29,7 +29,6 @@ import {
   withInlineAdsense,
 } from "../utils/adsense"
 import {
-  createAboutThingJsonLd,
   createDefinedTermJsonLd,
   createPracticeQuizJsonLd,
   getExpressionTerm,
@@ -121,10 +120,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         ]
       : headings
   const compactTocHeadings = tocHeadings.filter(heading => heading.depth === 2)
-  const hideLeadVisualOnDesktop = startsWithHeroImage(
-    html,
-    ogImagePath ?? undefined,
-  )
+  const hideLeadVisualOnDesktop = startsWithHeroImage(html, ogImagePath)
 
   const featureImageAlt = alt || title || ""
 
@@ -220,14 +216,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     isAccessibleForFree: true,
     teaches: title,
     assesses: title,
-    ...(expression
-      ? {
-          about: createAboutThingJsonLd({
-            id: definedTermId,
-            name: expression,
-          }),
-        }
-      : {}),
+    ...(expression ? { about: { "@id": definedTermId } } : {}),
     audience: {
       "@type": "EducationalAudience",
       educationalRole: "student",

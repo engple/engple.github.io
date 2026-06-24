@@ -153,10 +153,9 @@ export function createPracticeQuizJsonLd({
     "@type": "Quiz",
     "@id": id,
     name: `${title} 연습 문제`,
-    about: createAboutThingJsonLd({
-      id: aboutId,
-      name: expression || title,
-    }),
+    about: aboutId
+      ? { "@id": aboutId }
+      : { "@type": "Thing", name: expression },
     educationalAlignment: {
       "@type": "AlignmentObject",
       alignmentType: "educationalSubject",
@@ -164,25 +163,6 @@ export function createPracticeQuizJsonLd({
     },
     hasPart: cards.map(card => createPracticeQuestion(card)),
   } as Quiz
-}
-
-export function createAboutThingJsonLd({
-  id,
-  name,
-}: {
-  id?: string
-  name: string
-}) {
-  return id
-    ? {
-        "@type": "DefinedTerm",
-        "@id": id,
-        name,
-      }
-    : {
-        "@type": "Thing",
-        name,
-      }
 }
 
 function getPracticeCards(html: string) {

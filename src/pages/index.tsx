@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useState } from "react"
+import React, { useMemo } from "react"
 
 import { Link, type PageProps, graphql } from "gatsby"
 import kebabCase from "lodash/kebabCase"
@@ -9,7 +9,6 @@ import PostGrid from "~/src/components/postGrid"
 import SEO from "~/src/components/seo"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
-import type Post from "~/src/types/Post"
 import { createPostItemListJsonLd } from "~/src/utils/structuredData"
 
 import { VERTICAL_AD_SLOT } from "../constants"
@@ -20,7 +19,6 @@ const Home = ({
   pageContext,
   data,
 }: PageProps<Queries.Query, Queries.MarkdownRemarkFrontmatter>) => {
-  const [posts, setPosts] = useState<Post[]>([])
   const currentCategory = pageContext.category
   const postData = data.allMarkdownRemark.edges
   const visiblePostData = useMemo(() => {
@@ -35,26 +33,24 @@ const Home = ({
       .filter(group => group.fieldValue)
       .sort((first, second) => second.totalCount - first.totalCount)
   }, [data.allMarkdownRemark.group])
-  useLayoutEffect(() => {
-    setPosts(
-      visiblePostData.map(({ node }) => {
-        const { id, fields, frontmatter } = node
-        const { slug } = fields!
-        const { title, desc, date, category, thumbnail, alt } = frontmatter!
-        const { childImageSharp } = thumbnail!
+  const posts = useMemo(() => {
+    return visiblePostData.map(({ node }) => {
+      const { id, fields, frontmatter } = node
+      const { slug } = fields!
+      const { title, desc, date, category, thumbnail, alt } = frontmatter!
+      const { childImageSharp } = thumbnail!
 
-        return {
-          id,
-          slug,
-          title,
-          desc,
-          date,
-          category,
-          thumbnail: childImageSharp?.id,
-          alt,
-        }
-      }),
-    )
+      return {
+        id,
+        slug,
+        title,
+        desc,
+        date,
+        category,
+        thumbnail: childImageSharp?.id,
+        alt,
+      }
+    })
   }, [visiblePostData])
 
   const site = useSiteMetadata()

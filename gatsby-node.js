@@ -94,25 +94,16 @@ const createSearchPage = ({ createPage }) => {
 }
 
 exports.onPostBuild = async ({ reporter }) => {
-  const result = await removeNullBytesFromPublicFiles(path.resolve("public"))
+  const changedFiles = await removeNullBytesFromPublicFiles(
+    path.resolve("public"),
+  )
 
-  if (result.changedFiles > 0) {
-    reporter.info(
-      `Removed null bytes from ${result.changedFiles} generated file(s).`,
-    )
+  if (changedFiles > 0) {
+    reporter.info(`Removed null bytes from ${changedFiles} generated file(s).`)
   }
 }
 
 async function removeNullBytesFromPublicFiles(root) {
-  const files = await collectGeneratedTextFiles(root)
-  const results = await Promise.all(files.map(removeNullBytesFromFile))
-
-  return {
-    changedFiles: results.filter(Boolean).length,
-  }
-}
-
-async function collectGeneratedTextFiles(root) {
   let entries
 
   try {
@@ -122,37 +113,31 @@ async function collectGeneratedTextFiles(root) {
     throw error
   }
 
-  const nestedFiles = await Promise.all(
-    entries.map(entry => collectGeneratedTextFilesFromEntry(root, entry)),
+  const results = await Promise.all(
+    entries.map(async entry => {
+      const entryPath = path.join(root, entry.name)
+
+      if (entry.isDirectory()) {
+        return removeNullBytesFromPublicFiles(entryPath)
+      }
+
+      if (
+        !entry.isFile() ||
+        !NULL_BYTE_TEXT_EXTENSIONS.has(path.extname(entry.name))
+      ) {
+        return 0
+      }
+
+      const original = await fs.readFile(entryPath, "utf8")
+
+      if (!original.includes(NULL_BYTE)) {
+        return 0
+      }
+
+      await fs.writeFile(entryPath, original.replaceAll(NULL_BYTE, ""), "utf8")
+      return 1
+    }),
   )
 
-  return nestedFiles.flat()
-}
-
-async function collectGeneratedTextFilesFromEntry(root, entry) {
-  const entryPath = path.join(root, entry.name)
-
-  if (entry.isDirectory()) {
-    return collectGeneratedTextFiles(entryPath)
-  }
-
-  if (
-    !entry.isFile() ||
-    !NULL_BYTE_TEXT_EXTENSIONS.has(path.extname(entry.name))
-  ) {
-    return []
-  }
-
-  return [entryPath]
-}
-
-async function removeNullBytesFromFile(filePath) {
-  const original = await fs.readFile(filePath, "utf8")
-
-  if (!original.includes(NULL_BYTE)) {
-    return false
-  }
-
-  await fs.writeFile(filePath, original.replaceAll(NULL_BYTE, ""), "utf8")
-  return true
+  return results.reduce((total, count) => total + count, 0)
 }

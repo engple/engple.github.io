@@ -101,8 +101,8 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
 
   const ogImagePath =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    thumbnail &&
-    thumbnail?.childImageSharp?.gatsbyImageData!.images!.fallback!.src
+    thumbnail?.childImageSharp?.gatsbyImageData!.images!.fallback!.src ??
+    undefined
 
   const description = desc || excerpt
   const faqItems = (faqs ?? []).filter(item => item?.question && item?.answer)
@@ -302,6 +302,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                     {category} 전체 보기
                   </ExploreAction>
                   <ExploreAction
+                    rel="nofollow"
                     to={`/search/?q=${encodeURIComponent(exploreSearchTerm)}`}
                   >
                     이 표현 더 찾기

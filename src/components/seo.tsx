@@ -16,20 +16,15 @@ import defaultOpenGraphImage from "../images/og-thumbnail.png"
 
 const DEFAULT_LANG = "en-US"
 
-type Meta = React.DetailedHTMLProps<
-  React.MetaHTMLAttributes<HTMLMetaElement>,
-  HTMLMetaElement
->[]
-
 interface SEOProperties {
   title?: Queries.Maybe<string>
   desc?: Queries.Maybe<string>
   image?: Queries.Maybe<string>
-  meta?: Meta
   jsonLds?: Thing[]
   url?: Queries.Maybe<string>
   ogType?: "website" | "article"
   noIndex?: boolean
+  noFollow?: boolean
   pageType?: "WebPage" | "CollectionPage"
   mainEntityId?: string
 }
@@ -42,18 +37,25 @@ const SEO: React.FC<SEOProperties> = ({
   jsonLds = [],
   ogType = "website",
   noIndex = false,
+  noFollow = false,
   pageType = "WebPage",
   mainEntityId,
 }) => {
   const site = useSiteMetadata()
+  const siteUrl = site.siteUrl || ""
+  const author = site.author || ""
+  const naverSiteVerification = site.naverSiteVerification || ""
   const displayTitle = title || site.title || ""
   const description = desc || site.description || ""
   const canonicalUrl = url || undefined
-  const pageUrl = canonicalUrl || site.siteUrl || ""
+  const pageUrl = canonicalUrl || siteUrl
   const ogImageUrl = getAbsoluteUrl(
     image || (defaultOpenGraphImage as string),
-    site.siteUrl || "",
+    siteUrl,
   )
+  const robotsContent = noIndex
+    ? `noindex,${noFollow ? "nofollow" : "follow"}`
+    : undefined
   const webPageJsonLd = canonicalUrl
     ? [
         createWebPageJsonLd({
@@ -62,7 +64,7 @@ const SEO: React.FC<SEOProperties> = ({
           language: site.lang ?? DEFAULT_LANG,
           mainEntityId,
           pageType,
-          siteUrl: site.siteUrl || "",
+          siteUrl,
           title: displayTitle,
           url: pageUrl,
         }),
@@ -75,13 +77,13 @@ const SEO: React.FC<SEOProperties> = ({
       ...jsonLds,
       {
         "@type": "EducationalOrganization",
-        "@id": `${site.siteUrl}/#organization`,
+        "@id": `${siteUrl}/#organization`,
         name: "잉플",
         alternateName: "Engple",
-        url: site.siteUrl,
+        url: siteUrl,
         logo: {
           "@type": "ImageObject",
-          url: `${site.siteUrl}${defaultOpenGraphImage}`,
+          url: `${siteUrl}${defaultOpenGraphImage}`,
         },
         description:
           "영어 패턴 학습으로 자연스러운 영어 실력 향상을 돕는 교육 사이트",
@@ -89,18 +91,18 @@ const SEO: React.FC<SEOProperties> = ({
       } as EducationalOrganization,
       {
         "@type": "WebSite",
-        "@id": `${site.siteUrl}/#website`,
+        "@id": `${siteUrl}/#website`,
         name: site.title,
         alternateName: "Engple",
-        url: site.siteUrl,
+        url: siteUrl,
         description: site.description,
         inLanguage: site.lang ?? DEFAULT_LANG,
-        publisher: { "@id": `${site.siteUrl}/#organization` },
+        publisher: { "@id": `${siteUrl}/#organization` },
         potentialAction: {
           "@type": "SearchAction",
           target: {
             "@type": "EntryPoint",
-            urlTemplate: `${site.siteUrl}/search?q={search_term_string}`,
+            urlTemplate: `${siteUrl}/search?q={search_term_string}`,
           },
           "query-input": "required name=search_term_string",
         },
@@ -113,66 +115,23 @@ const SEO: React.FC<SEOProperties> = ({
       htmlAttributes={{ lang: site.lang ?? DEFAULT_LANG }}
       title={displayTitle}
       titleTemplate={displayTitle.replace(" 🍎", "")}
-      meta={
-        [
-          {
-            property: "image",
-            content: ogImageUrl,
-          },
-          {
-            name: "description",
-            content: description?.slice(0, 160),
-          },
-          {
-            property: "naver-site-verification",
-            content: site.naverSiteVerification,
-          },
-          {
-            property: "og:description",
-            content: description,
-          },
-          {
-            property: "og:image",
-            content: ogImageUrl,
-          },
-          {
-            property: "og:title",
-            content: displayTitle,
-          },
-          {
-            property: "og:type",
-            content: ogType,
-          },
-          {
-            property: "og:url",
-            content: url || site.siteUrl,
-          },
-          {
-            property: "twitter:image",
-            content: ogImageUrl,
-          },
-          {
-            name: "twitter:card",
-            content: "summary_large_image",
-          },
-          {
-            name: "twitter:creator",
-            content: site.author,
-          },
-          {
-            name: "twitter:description",
-            content: description,
-          },
-          {
-            name: "twitter:title",
-            content: displayTitle,
-          },
-        ] as Meta
-      }
     >
+      <meta property="image" content={ogImageUrl} />
+      <meta name="description" content={description.slice(0, 160)} />
+      <meta name="naver-site-verification" content={naverSiteVerification} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={ogImageUrl} />
+      <meta property="og:title" content={displayTitle} />
+      <meta property="og:type" content={ogType} />
+      <meta property="og:url" content={url || siteUrl} />
+      <meta name="twitter:image" content={ogImageUrl} />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:creator" content={author} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:title" content={displayTitle} />
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-      {noIndex && <meta name="robots" content="noindex,follow" />}
-      {noIndex && <meta name="googlebot" content="noindex,follow" />}
+      {robotsContent && <meta name="robots" content={robotsContent} />}
+      {robotsContent && <meta name="googlebot" content={robotsContent} />}
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
     </Helmet>
   )

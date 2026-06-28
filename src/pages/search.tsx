@@ -174,6 +174,7 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
         }
         url={`${site.siteUrl}/search/`}
         noIndex
+        noFollow
       />
       <Main>
         <LeftAd>
@@ -199,74 +200,80 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
             </SearchMeta>
           </SearchHeader>
 
-          {searchQuery ? searchResults.length > 0 ? (
-            <>
-              {relatedSuggestionTitles.length > 0 && (
-                <SuggestionSection aria-labelledby="related-search-heading">
-                  <SuggestionHeading id="related-search-heading">
-                    비슷한 검색어
+          {searchQuery ? (
+            searchResults.length > 0 ? (
+              <>
+                {relatedSuggestionTitles.length > 0 && (
+                  <SuggestionSection aria-labelledby="related-search-heading">
+                    <SuggestionHeading id="related-search-heading">
+                      비슷한 검색어
+                    </SuggestionHeading>
+                    <SuggestionList>
+                      {relatedSuggestionTitles.map(title => (
+                        <SuggestionItem key={title}>
+                          <SuggestionLink
+                            rel="nofollow"
+                            to={`/search/?q=${encodeURIComponent(title)}`}
+                          >
+                            {title}
+                          </SuggestionLink>
+                        </SuggestionItem>
+                      ))}
+                    </SuggestionList>
+                  </SuggestionSection>
+                )}
+                <PostGrid posts={searchResults} />
+              </>
+            ) : (
+              <EmptyState>
+                <EmptyTitle>검색 결과가 없습니다</EmptyTitle>
+                <EmptyBody>
+                  다른 단어로 검색하거나 아래 추천 검색어를 시도해보세요.
+                </EmptyBody>
+                {(relatedSuggestionTitles.length > 0 ||
+                  fallbackSuggestionTitles.length > 0) && (
+                  <SuggestionSection aria-labelledby="search-suggestion-heading">
+                    <SuggestionHeading id="search-suggestion-heading">
+                      추천 검색어
+                    </SuggestionHeading>
+                    <SuggestionList>
+                      {(relatedSuggestionTitles.length > 0
+                        ? relatedSuggestionTitles
+                        : fallbackSuggestionTitles
+                      ).map(title => (
+                        <SuggestionItem key={title}>
+                          <SuggestionLink
+                            rel="nofollow"
+                            to={`/search/?q=${encodeURIComponent(title)}`}
+                          >
+                            {title}
+                          </SuggestionLink>
+                        </SuggestionItem>
+                      ))}
+                    </SuggestionList>
+                  </SuggestionSection>
+                )}
+                <RecommendationSection aria-labelledby="recommended-posts-heading">
+                  <SuggestionHeading id="recommended-posts-heading">
+                    최근 글
                   </SuggestionHeading>
-                  <SuggestionList>
-                    {relatedSuggestionTitles.map(title => (
-                      <SuggestionItem key={title}>
-                        <SuggestionLink
-                          to={`/search/?q=${encodeURIComponent(title)}`}
-                        >
-                          {title}
-                        </SuggestionLink>
-                      </SuggestionItem>
+                  <RecommendationList>
+                    {recommendedPosts.map(post => (
+                      <RecommendationItem key={post.id}>
+                        <RecommendationLink to={post.slug}>
+                          <RecommendationCategory>
+                            {post.category}
+                          </RecommendationCategory>
+                          <RecommendationTitle>
+                            {post.title}
+                          </RecommendationTitle>
+                        </RecommendationLink>
+                      </RecommendationItem>
                     ))}
-                  </SuggestionList>
-                </SuggestionSection>
-              )}
-              <PostGrid posts={searchResults} />
-            </>
-          ) : (
-            <EmptyState>
-              <EmptyTitle>검색 결과가 없습니다</EmptyTitle>
-              <EmptyBody>
-                다른 단어로 검색하거나 아래 추천 검색어를 시도해보세요.
-              </EmptyBody>
-              {(relatedSuggestionTitles.length > 0 ||
-                fallbackSuggestionTitles.length > 0) && (
-                <SuggestionSection aria-labelledby="search-suggestion-heading">
-                  <SuggestionHeading id="search-suggestion-heading">
-                    추천 검색어
-                  </SuggestionHeading>
-                  <SuggestionList>
-                    {(relatedSuggestionTitles.length > 0
-                      ? relatedSuggestionTitles
-                      : fallbackSuggestionTitles
-                    ).map(title => (
-                      <SuggestionItem key={title}>
-                        <SuggestionLink
-                          to={`/search/?q=${encodeURIComponent(title)}`}
-                        >
-                          {title}
-                        </SuggestionLink>
-                      </SuggestionItem>
-                    ))}
-                  </SuggestionList>
-                </SuggestionSection>
-              )}
-              <RecommendationSection aria-labelledby="recommended-posts-heading">
-                <SuggestionHeading id="recommended-posts-heading">
-                  최근 글
-                </SuggestionHeading>
-                <RecommendationList>
-                  {recommendedPosts.map(post => (
-                    <RecommendationItem key={post.id}>
-                      <RecommendationLink to={post.slug}>
-                        <RecommendationCategory>
-                          {post.category}
-                        </RecommendationCategory>
-                        <RecommendationTitle>{post.title}</RecommendationTitle>
-                      </RecommendationLink>
-                    </RecommendationItem>
-                  ))}
-                </RecommendationList>
-              </RecommendationSection>
-            </EmptyState>
+                  </RecommendationList>
+                </RecommendationSection>
+              </EmptyState>
+            )
           ) : (
             <EmptyState>
               <EmptyTitle>검색어를 입력해보세요</EmptyTitle>
@@ -282,6 +289,7 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
                     {fallbackSuggestionTitles.map(title => (
                       <SuggestionItem key={title}>
                         <SuggestionLink
+                          rel="nofollow"
                           to={`/search/?q=${encodeURIComponent(title)}`}
                         >
                           {title}

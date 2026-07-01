@@ -111,7 +111,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
   const articleId = `${pageUrl}#article`
   const definedTermId = `${pageUrl}#definedterm`
   const expression = getExpressionTerm({ category, title, faqs })
-  const exploreSearchTerm = expression || title || ""
   const tocHeadings =
     faqItems.length > 0
       ? [
@@ -300,12 +299,6 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                 <ExploreActions aria-label="탐색 바로가기">
                   <ExploreAction to={categoryPath}>
                     {category} 전체 보기
-                  </ExploreAction>
-                  <ExploreAction
-                    rel="nofollow"
-                    to={`/search/?q=${encodeURIComponent(exploreSearchTerm)}`}
-                  >
-                    이 표현 더 찾기
                   </ExploreAction>
                 </ExploreActions>
               </ContentHeader>

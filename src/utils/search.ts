@@ -56,3 +56,7 @@ export const collectSearchSuggestionLabels = (
     })
     .slice(0, limit)
 }
+
+export const createSearchPagePath = (searchTerm: string) => {
+  return `/search/${encodeURIComponent(normalizeSearchTerm(searchTerm))}/`
+}

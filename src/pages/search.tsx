@@ -12,6 +12,7 @@ import Layout from "~/src/layouts/layout"
 import type Post from "~/src/types/Post"
 import {
   collectSearchSuggestionLabels,
+  createSearchPagePath,
   matchesSearchRecord,
 } from "~/src/utils/search"
 
@@ -54,18 +55,27 @@ interface SearchPageData {
   }
 }
 
+interface SearchPageContext {
+  searchQuery?: string
+}
+
 const SUGGESTION_LIMIT = 6
 const RECOMMENDATION_LIMIT = 4
 
-const SearchPage: React.FC<PageProps<SearchPageData>> = ({
+const SearchPage: React.FC<PageProps<SearchPageData, SearchPageContext>> = ({
   location,
+  pageContext,
   data,
 }) => {
   const headingRef = useRef<HTMLHeadingElement>(null)
   const site = useSiteMetadata()
   const searchQuery = useMemo(() => {
-    return new URLSearchParams(location.search).get("q")?.trim() ?? ""
-  }, [location.search])
+    return (
+      pageContext.searchQuery?.trim() ||
+      new URLSearchParams(location.search).get("q")?.trim() ||
+      ""
+    )
+  }, [location.search, pageContext.searchQuery])
   const directMatches = useMemo(() => {
     return (
       data.fusejs?.data.filter(item =>
@@ -154,6 +164,9 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
       }))
   }, [data.allMarkdownRemark.edges])
   const totalResultCount = searchResults.length
+  const searchPagePath = searchQuery
+    ? createSearchPagePath(searchQuery)
+    : "/search/"
 
   useEffect(() => {
     headingRef.current?.focus()
@@ -172,7 +185,7 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
             ? `'${searchQuery}' 검색 결과와 추천 표현을 확인해보세요.`
             : "영어 표현과 글을 검색해보세요."
         }
-        url={`${site.siteUrl}/search/`}
+        url={`${site.siteUrl}${searchPagePath}`}
         noIndex
         noFollow
       />
@@ -213,7 +226,7 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
                         <SuggestionItem key={title}>
                           <SuggestionLink
                             rel="nofollow"
-                            to={`/search/?q=${encodeURIComponent(title)}`}
+                            href={createSearchPagePath(title)}
                           >
                             {title}
                           </SuggestionLink>
@@ -244,7 +257,7 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
                         <SuggestionItem key={title}>
                           <SuggestionLink
                             rel="nofollow"
-                            to={`/search/?q=${encodeURIComponent(title)}`}
+                            href={createSearchPagePath(title)}
                           >
                             {title}
                           </SuggestionLink>
@@ -290,7 +303,7 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
                       <SuggestionItem key={title}>
                         <SuggestionLink
                           rel="nofollow"
-                          to={`/search/?q=${encodeURIComponent(title)}`}
+                          href={createSearchPagePath(title)}
                         >
                           {title}
                         </SuggestionLink>
@@ -384,7 +397,7 @@ const SuggestionItem = styled.li`
   margin: 0;
 `
 
-const SuggestionLink = styled(Link)`
+const SuggestionLink = styled.a`
   display: inline-flex;
   align-items: center;
   min-height: 2.25rem;

@@ -28,6 +28,7 @@ import {
   initializeInlineAdsenseSlots,
   withInlineAdsense,
 } from "../utils/adsense"
+import { createSearchPagePath } from "../utils/search"
 import {
   createDefinedTermJsonLd,
   createPracticeQuizJsonLd,
@@ -301,12 +302,12 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
                   <ExploreAction to={categoryPath}>
                     {category} 전체 보기
                   </ExploreAction>
-                  <ExploreAction
+                  <ExploreSearchAction
                     rel="nofollow"
-                    to={`/search/?q=${encodeURIComponent(exploreSearchTerm)}`}
+                    href={createSearchPagePath(exploreSearchTerm)}
                   >
                     이 표현 더 찾기
-                  </ExploreAction>
+                  </ExploreSearchAction>
                 </ExploreActions>
               </ContentHeader>
               <Divider />
@@ -487,10 +488,7 @@ const mapPostNodeToPost = ({
     ...frontmatter,
     desc: frontmatter.desc || undefined,
     slug: fields.slug,
-    thumbnail:
-      frontmatter.thumbnail?.publicURL ||
-      frontmatter.thumbnail?.childImageSharp?.gatsbyImageData?.images?.fallback
-        ?.src,
+    thumbnail: undefined,
   }
 }
 
@@ -634,6 +632,32 @@ const ExploreActions = styled.div`
 `
 
 const ExploreAction = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 16px;
+  border: 1px solid var(--color-gray-2);
+  border-radius: 999px;
+  background-color: var(--color-card);
+  color: var(--color-text-2);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    color: var(--color-text);
+    border-color: var(--color-gray-3);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+  }
+`
+
+const ExploreSearchAction = styled.a`
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
@@ -1107,9 +1131,6 @@ export const query = graphql`
             date(formatString: "YYYY-MM-DD")
             category
             alt
-            thumbnail {
-              publicURL
-            }
           }
           fields {
             slug

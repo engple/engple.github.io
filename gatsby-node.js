@@ -1,7 +1,45 @@
 const path = require(`path`)
 const fs = require("fs/promises")
+const { execSync } = require("child_process")
 const _ = require("lodash")
 const { createFilePath } = require(`gatsby-source-filesystem`)
+
+// CI checks out a fresh copy on every build, so file mtimes are always
+// "now" instead of when the content actually last changed. Sitemap
+// lastmod/dateModified must reflect real change history or search
+// engines stop trusting the signal, so derive it from git instead.
+const GIT_LOG_DATE_MARKER = "\x01"
+let gitLastModifiedCache = null
+
+function getGitLastModifiedMap() {
+  if (gitLastModifiedCache) return gitLastModifiedCache
+
+  gitLastModifiedCache = new Map()
+
+  try {
+    const log = execSync(
+      `git log --name-only --no-renames --pretty=format:%x01%cI`,
+      { cwd: __dirname, maxBuffer: 1024 * 1024 * 500 },
+    ).toString("utf8")
+
+    let currentDate = null
+
+    for (const line of log.split("\n")) {
+      if (line.startsWith(GIT_LOG_DATE_MARKER)) {
+        currentDate = line.slice(1)
+      } else if (line.trim() && currentDate) {
+        if (!gitLastModifiedCache.has(line)) {
+          gitLastModifiedCache.set(line, currentDate)
+        }
+      }
+    }
+  } catch {
+    // Not a git checkout (or no history available) - callers fall back
+    // to file mtime.
+  }
+
+  return gitLastModifiedCache
+}
 
 const NULL_BYTE = "\u0000"
 const NULL_BYTE_TEXT_EXTENSIONS = new Set([".html", ".json", ".xml"])
@@ -16,10 +54,12 @@ exports.onCreateNode = ({ node, getNode, actions }) => {
       value: slug.replace("/season-1", ""),
     })
     const fileNode = getNode(node.parent)
+    const relativePath = path.relative(__dirname, fileNode.absolutePath)
+    const gitLastModified = getGitLastModifiedMap().get(relativePath)
     createNodeField({
       node,
       name: `lastmod`,
-      value: fileNode.modifiedTime,
+      value: gitLastModified || fileNode.modifiedTime,
     })
   }
 }
@@ -32,17 +72,27 @@ exports.createPages = async ({ graphql, actions }) => {
       postsRemark: allMarkdownRemark(
         filter: { fileAbsolutePath: { regex: "/(posts/blog)/" } }
         sort: { frontmatter: { date: DESC } }
-        limit: 2000
+        limit: 100000
       ) {
         edges {
           node {
+            id
+            frontmatter {
+              title
+              date(formatString: "YYYY-MM-DD")
+              category
+              alt
+              thumbnail {
+                publicURL
+              }
+            }
             fields {
               slug
             }
           }
         }
       }
-      categoriesGroup: allMarkdownRemark(limit: 2000) {
+      categoriesGroup: allMarkdownRemark(limit: 100000) {
         group(field: { frontmatter: { category: SELECT } }) {
           fieldValue
           totalCount
@@ -52,35 +102,144 @@ exports.createPages = async ({ graphql, actions }) => {
   `)
 
   createPostPages({ result, createPage })
-  createCategoryPages({ result, createPage })
+  createListPages({ result, createPage })
   createSearchPage({ createPage })
 }
 
-function createCategoryPages({ result, createPage }) {
+// Home/category pages used to render every post client-side via infinite
+// scroll, so crawlers (especially Naver's Yeti, which doesn't run the
+// scroll-triggered loader) only ever saw the first 24 posts in the static
+// HTML. Statically paginating gives every post a real, crawlable link path.
+const POSTS_PER_PAGE = 24
+
+function createListPages({ result, createPage }) {
   const template = path.resolve(`./src/pages/index.tsx`)
+  const totalPostCount = result.data.postsRemark.edges.length
+
+  createPaginatedPages({
+    createPage,
+    template,
+    basePath: `/`,
+    category: null,
+    totalCount: totalPostCount,
+  })
 
   result.data.categoriesGroup.group.forEach(category => {
+    createPaginatedPages({
+      createPage,
+      template,
+      basePath: `/category/${_.kebabCase(category.fieldValue)}/`,
+      category: category.fieldValue,
+      totalCount: category.totalCount,
+    })
+  })
+}
+
+function createPaginatedPages({
+  createPage,
+  template,
+  basePath,
+  category,
+  totalCount,
+}) {
+  const totalPages = Math.max(1, Math.ceil(totalCount / POSTS_PER_PAGE))
+
+  for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
     createPage({
-      path: `/category/${_.kebabCase(category.fieldValue)}/`,
+      path: paginatedPath(basePath, pageNumber),
       component: template,
       context: {
-        category: category.fieldValue,
+        category,
+        categoryRegex: category ? `/^${escapeRegex(category)}$/` : "/.*/",
+        limit: POSTS_PER_PAGE,
+        skip: (pageNumber - 1) * POSTS_PER_PAGE,
+        currentPage: pageNumber,
+        totalPages,
+        basePath,
+      },
+    })
+  }
+}
+
+function paginatedPath(basePath, pageNumber) {
+  return pageNumber === 1 ? basePath : `${basePath}page/${pageNumber}/`
+}
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
+const createPostPages = ({ result, createPage }) => {
+  const template = path.resolve(`./src/templates/blogPost.tsx`)
+  const posts = sortPostsForContinue(
+    result.data.postsRemark.edges.map(({ node }) => mapPostNodeToPost(node)),
+  )
+
+  posts.forEach(post => {
+    createPage({
+      path: post.slug,
+      component: template,
+      context: {
+        slug: post.slug,
+        continuePosts: selectContinuePosts(posts, post.slug, post.category),
       },
     })
   })
 }
 
-const createPostPages = ({ result, createPage }) => {
-  const template = path.resolve(`./src/templates/blogPost.tsx`)
+function mapPostNodeToPost(node) {
+  return {
+    id: node.id,
+    ...node.frontmatter,
+    desc: node.frontmatter.desc || undefined,
+    slug: node.fields.slug,
+    thumbnail: node.frontmatter.thumbnail?.publicURL,
+  }
+}
 
-  result.data.postsRemark.edges.forEach(({ node }) => {
-    createPage({
-      path: node.fields.slug,
-      component: template,
-      context: {
-        slug: node.fields.slug,
-      },
-    })
+const RELATED_POST_LIMIT = 6
+
+function selectContinuePosts(posts, currentSlug, currentCategory) {
+  const currentIndex = posts.findIndex(post => post.slug === currentSlug)
+
+  if (currentIndex === -1) return []
+
+  const relatedPosts = currentCategory
+    ? posts
+        .filter(
+          (post, index) =>
+            index !== currentIndex && post.category === currentCategory,
+        )
+        .slice(0, RELATED_POST_LIMIT)
+        .map(post => ({ ...post, direction: "관련 글" }))
+    : []
+
+  if (relatedPosts.length >= RELATED_POST_LIMIT) return relatedPosts
+
+  const usedSlugs = new Set([
+    currentSlug,
+    ...relatedPosts.map(post => post.slug),
+  ])
+  const dateAdjacentPosts = [
+    ...posts
+      .slice(currentIndex + 1)
+      .map(post => ({ ...post, direction: "이전 글" })),
+    ...posts
+      .slice(0, currentIndex)
+      .reverse()
+      .map(post => ({ ...post, direction: "다음 글" })),
+  ].filter(post => !usedSlugs.has(post.slug))
+
+  return [...relatedPosts, ...dateAdjacentPosts].slice(0, RELATED_POST_LIMIT)
+}
+
+function sortPostsForContinue(posts) {
+  return [...posts].sort((left, right) => {
+    const dateCompare = (right.date ?? "").localeCompare(left.date ?? "")
+
+    if (dateCompare !== 0) return dateCompare
+
+    return right.slug.localeCompare(left.slug)
   })
 }
 

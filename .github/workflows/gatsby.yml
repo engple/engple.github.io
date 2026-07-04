@@ -34,6 +34,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -78,3 +80,16 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "18"
+      - name: Ping IndexNow for changed posts
+        env:
+          BASE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: node .github/scripts/indexnow-ping.js

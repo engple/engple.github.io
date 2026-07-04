@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 
 import { Link, type PageProps, graphql } from "gatsby"
 import { useGatsbyPluginFusejs } from "react-use-fusejs"
@@ -27,8 +27,7 @@ interface SearchItem {
 
 interface SearchPageData {
   fusejs: {
-    index: string
-    data: SearchItem[]
+    publicUrl: string
   } | null
   allMarkdownRemark: {
     edges: {
@@ -54,6 +53,11 @@ interface SearchPageData {
   }
 }
 
+interface FusejsIndexData {
+  index: string
+  data: SearchItem[]
+}
+
 const SUGGESTION_LIMIT = 6
 const RECOMMENDATION_LIMIT = 4
 
@@ -63,16 +67,44 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
 }) => {
   const headingRef = useRef<HTMLHeadingElement>(null)
   const site = useSiteMetadata()
+  const [fusejsData, setFusejsData] = useState<FusejsIndexData | null>(null)
+  const [isIndexLoading, setIsIndexLoading] = useState(
+    Boolean(data.fusejs?.publicUrl),
+  )
   const searchQuery = useMemo(() => {
     return new URLSearchParams(location.search).get("q")?.trim() ?? ""
   }, [location.search])
+
+  useEffect(() => {
+    const publicUrl = data.fusejs?.publicUrl
+    if (!publicUrl) {
+      setIsIndexLoading(false)
+      return
+    }
+
+    let isCancelled = false
+
+    fetch(publicUrl)
+      .then(response => response.json())
+      .then((json: FusejsIndexData) => {
+        if (!isCancelled) setFusejsData(json)
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!isCancelled) setIsIndexLoading(false)
+      })
+
+    return () => {
+      isCancelled = true
+    }
+  }, [data.fusejs?.publicUrl])
+
   const directMatches = useMemo(() => {
     return (
-      data.fusejs?.data.filter(item =>
-        matchesSearchRecord(item, searchQuery),
-      ) ?? []
+      fusejsData?.data.filter(item => matchesSearchRecord(item, searchQuery)) ??
+      []
     )
-  }, [data.fusejs, searchQuery])
+  }, [fusejsData, searchQuery])
   const postMap = useMemo(() => {
     return new Map(
       data.allMarkdownRemark.edges.map(({ node }) => [
@@ -93,7 +125,7 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
   }, [data.allMarkdownRemark.edges])
   const fuzzyResults = useGatsbyPluginFusejs(
     searchQuery,
-    data.fusejs,
+    fusejsData,
     {
       includeScore: true,
       ignoreLocation: true,
@@ -162,11 +194,7 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
   return (
     <Layout>
       <SEO
-        title={
-          searchQuery
-            ? `'${searchQuery}'에 대한 검색 결과 - ${site.title}`
-            : `검색 - ${site.title}`
-        }
+        title={searchQuery ? `'${searchQuery}'에 대한 검색 결과` : "검색"}
         desc={
           searchQuery
             ? `'${searchQuery}' 검색 결과와 추천 표현을 확인해보세요.`
@@ -195,12 +223,14 @@ const SearchPage: React.FC<PageProps<SearchPageData>> = ({
             </SearchTitle>
             <SearchMeta aria-live="polite">
               {searchQuery
-                ? `${totalResultCount}개의 결과`
+                ? isIndexLoading
+                  ? "검색 결과를 불러오는 중입니다..."
+                  : `${totalResultCount}개의 결과`
                 : "검색어를 입력해 결과를 찾아보세요."}
             </SearchMeta>
           </SearchHeader>
 
-          {searchQuery ? (
+          {searchQuery && isIndexLoading ? null : searchQuery ? (
             searchResults.length > 0 ? (
               <>
                 {relatedSuggestionTitles.length > 0 && (
@@ -507,8 +537,7 @@ const RightAd = styled.div`
 export const query = graphql`
   query SearchPage {
     fusejs {
-      index
-      data
+      publicUrl
     }
     allMarkdownRemark(
       filter: { fileAbsolutePath: { regex: "/(posts/blog)/" } }

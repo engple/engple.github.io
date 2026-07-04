@@ -157,6 +157,7 @@ const searchPlugins = [
           }
         }
       `,
+      excludes: ["/search"],
       resolveSiteUrl: () => meta.siteUrl,
       resolvePages: ({
         allSitePage: { nodes: allPages },
@@ -263,7 +264,6 @@ const pwaPlugins = [
       },
     },
   },
-  "gatsby-plugin-offline",
 ]
 
 const gtagPlugins = [

@@ -50,20 +50,20 @@ interface DataProps {
       lastmod: string
     }
   }
-  allPosts: {
-    edges: {
-      node: {
-        id: string
-        frontmatter: Queries.MarkdownRemarkFrontmatter
-        fields: {
-          slug: string
-        }
-      }
-    }[]
-  }
 }
 
-const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
+interface PageContext {
+  continuePosts: ContinuePost[]
+}
+
+type ContinuePost = Post & {
+  direction: string
+}
+
+const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
+  data,
+  pageContext,
+}) => {
   const {
     frontmatter,
     html,
@@ -94,10 +94,7 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
     return initializeInlineAdsenseSlots(article, HORIZONTAL_AD_SLOT)
   }, [site.googleAdsense, slug, htmlWithInlineAd])
 
-  const allPosts = sortPostsForContinue(
-    data.allPosts.edges.map(({ node }) => mapPostNodeToPost(node)),
-  )
-  const continuePosts = selectContinuePosts(allPosts, slug)
+  const continuePosts = pageContext.continuePosts ?? []
 
   const ogImagePath =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -266,9 +263,12 @@ const BlogPost: React.FC<PageProps<DataProps>> = ({ data }) => {
         desc={description}
         url={pageUrl}
         image={ogImagePath}
+        imageAlt={featureImageAlt}
         jsonLds={jsonLds}
         ogType="article"
         mainEntityId={articleId}
+        publishedTime={date}
+        modifiedTime={lastmod || date}
       />
       <main>
         <article ref={articleRef}>
@@ -436,55 +436,6 @@ const startsWithHeroImage = (html?: string | null, imagePath?: string) => {
     )
 
   return Boolean(leadingImage?.[0]?.includes(imagePath))
-}
-
-const selectContinuePosts = (posts: Post[], currentSlug: string) => {
-  const currentIndex = posts.findIndex(post => post.slug === currentSlug)
-
-  if (currentIndex === -1) return []
-
-  return [
-    ...posts
-      .slice(currentIndex + 1, currentIndex + 3)
-      .map(post => ({ ...post, direction: "이전 글" })),
-    ...posts
-      .slice(Math.max(0, currentIndex - 2), currentIndex)
-      .reverse()
-      .map(post => ({ ...post, direction: "다음 글" })),
-  ]
-}
-
-const sortPostsForContinue = (posts: Post[]) => {
-  return [...posts].sort((left, right) => {
-    const dateCompare = (right.date ?? "").localeCompare(left.date ?? "")
-
-    if (dateCompare !== 0) return dateCompare
-
-    return (right.slug as string).localeCompare(left.slug as string)
-  })
-}
-
-const mapPostNodeToPost = ({
-  id,
-  frontmatter,
-  fields,
-}: {
-  id: string
-  frontmatter: Queries.MarkdownRemarkFrontmatter
-  fields: {
-    slug: string
-  }
-}): Post => {
-  return {
-    id,
-    ...frontmatter,
-    desc: frontmatter.desc || undefined,
-    slug: fields.slug,
-    thumbnail:
-      frontmatter.thumbnail?.publicURL ||
-      frontmatter.thumbnail?.childImageSharp?.gatsbyImageData?.images?.fallback
-        ?.src,
-  }
 }
 
 const OuterWrapper = styled.div`
@@ -1084,30 +1035,6 @@ export const query = graphql`
       fields {
         slug
         lastmod
-      }
-    }
-
-    allPosts: allMarkdownRemark(
-      filter: { fileAbsolutePath: { regex: "/(posts/blog)/" } }
-      sort: { frontmatter: { date: DESC } }
-      limit: 2000
-    ) {
-      edges {
-        node {
-          id
-          frontmatter {
-            title
-            date(formatString: "YYYY-MM-DD")
-            category
-            alt
-            thumbnail {
-              publicURL
-            }
-          }
-          fields {
-            slug
-          }
-        }
       }
     }
   }

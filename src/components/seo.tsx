@@ -15,11 +15,19 @@ import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import defaultOpenGraphImage from "../images/og-thumbnail.png"
 
 const DEFAULT_LANG = "en-US"
+const BRAND_NAME = "잉플"
+const MAX_META_DESCRIPTION_LENGTH = 80
+// Actual pixel dimensions of ../images/og-thumbnail.png - only safe to
+// assert og:image:width/height when that exact asset is being used, since
+// per-post thumbnails render at whatever size gatsby-plugin-sharp produced.
+const DEFAULT_OG_IMAGE_WIDTH = 1280
+const DEFAULT_OG_IMAGE_HEIGHT = 720
 
 interface SEOProperties {
   title?: Queries.Maybe<string>
   desc?: Queries.Maybe<string>
   image?: Queries.Maybe<string>
+  imageAlt?: Queries.Maybe<string>
   jsonLds?: Thing[]
   url?: Queries.Maybe<string>
   ogType?: "website" | "article"
@@ -27,6 +35,10 @@ interface SEOProperties {
   noFollow?: boolean
   pageType?: "WebPage" | "CollectionPage"
   mainEntityId?: string
+  publishedTime?: Queries.Maybe<string>
+  modifiedTime?: Queries.Maybe<string>
+  prevUrl?: Queries.Maybe<string>
+  nextUrl?: Queries.Maybe<string>
 }
 
 const SEO: React.FC<SEOProperties> = ({
@@ -34,25 +46,41 @@ const SEO: React.FC<SEOProperties> = ({
   desc = "",
   url = "",
   image,
+  imageAlt,
   jsonLds = [],
   ogType = "website",
   noIndex = false,
   noFollow = false,
   pageType = "WebPage",
   mainEntityId,
+  publishedTime,
+  modifiedTime,
+  prevUrl,
+  nextUrl,
 }) => {
   const site = useSiteMetadata()
   const siteUrl = site.siteUrl || ""
   const author = site.author || ""
   const naverSiteVerification = site.naverSiteVerification || ""
+  const hasCustomTitle = Boolean(title)
   const displayTitle = title || site.title || ""
+  const pageTitle = hasCustomTitle
+    ? `${displayTitle} | ${BRAND_NAME}`
+    : displayTitle
   const description = desc || site.description || ""
+  const metaDescription = truncateDescription(
+    description,
+    MAX_META_DESCRIPTION_LENGTH,
+  )
   const canonicalUrl = url || undefined
   const pageUrl = canonicalUrl || siteUrl
+  const isDefaultOgImage = !image
   const ogImageUrl = getAbsoluteUrl(
     image || (defaultOpenGraphImage as string),
     siteUrl,
   )
+  const ogImageAlt = imageAlt || displayTitle
+  const ogLocale = (site.lang ?? DEFAULT_LANG).replace("-", "_")
   const robotsContent = noIndex
     ? `noindex,${noFollow ? "nofollow" : "follow"}`
     : undefined
@@ -113,23 +141,49 @@ const SEO: React.FC<SEOProperties> = ({
   return (
     <Helmet
       htmlAttributes={{ lang: site.lang ?? DEFAULT_LANG }}
-      title={displayTitle}
-      titleTemplate={displayTitle.replace(" 🍎", "")}
+      title={pageTitle}
     >
       <meta property="image" content={ogImageUrl} />
-      <meta name="description" content={description.slice(0, 160)} />
+      <meta name="description" content={metaDescription} />
       <meta name="naver-site-verification" content={naverSiteVerification} />
+      <meta property="og:site_name" content={BRAND_NAME} />
+      <meta property="og:locale" content={ogLocale} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImageUrl} />
+      <meta property="og:image:alt" content={ogImageAlt} />
+      {isDefaultOgImage && (
+        <meta
+          property="og:image:width"
+          content={String(DEFAULT_OG_IMAGE_WIDTH)}
+        />
+      )}
+      {isDefaultOgImage && (
+        <meta
+          property="og:image:height"
+          content={String(DEFAULT_OG_IMAGE_HEIGHT)}
+        />
+      )}
       <meta property="og:title" content={displayTitle} />
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={url || siteUrl} />
+      {ogType === "article" && publishedTime && (
+        <meta property="article:published_time" content={publishedTime} />
+      )}
+      {ogType === "article" && (modifiedTime || publishedTime) && (
+        <meta
+          property="article:modified_time"
+          content={modifiedTime || publishedTime || ""}
+        />
+      )}
       <meta name="twitter:image" content={ogImageUrl} />
+      <meta name="twitter:image:alt" content={ogImageAlt} />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:creator" content={author} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:title" content={displayTitle} />
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+      {prevUrl && <link rel="prev" href={prevUrl} />}
+      {nextUrl && <link rel="next" href={nextUrl} />}
       {robotsContent && <meta name="robots" content={robotsContent} />}
       {robotsContent && <meta name="googlebot" content={robotsContent} />}
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
@@ -173,6 +227,22 @@ function createWebPageJsonLd({
   }
 
   return pageJsonLd as CollectionPage | WebPage
+}
+
+function truncateDescription(text: string, maxLength: number) {
+  if (text.length <= maxLength) return text
+
+  const truncated = text.slice(0, maxLength)
+  const lastBoundary = Math.max(
+    truncated.lastIndexOf(" "),
+    truncated.lastIndexOf(". "),
+  )
+  const safeCut =
+    lastBoundary > maxLength * 0.6
+      ? truncated.slice(0, lastBoundary)
+      : truncated
+
+  return `${safeCut.trimEnd()}...`
 }
 
 function getAbsoluteUrl(pathOrUrl: string, siteUrl: string) {

@@ -19,8 +19,7 @@ interface SearchBarProps {
 
 interface SearchBarQueryData {
   fusejs: {
-    index: string
-    data: SearchSuggestionItem[]
+    publicUrl: string
   } | null
   allMarkdownRemark: {
     edges: {
@@ -41,6 +40,11 @@ interface SearchSuggestionItem {
   desc?: string
   category?: string
   body: string
+}
+
+interface FusejsIndexData {
+  index: string
+  data: SearchSuggestionItem[]
 }
 
 interface SearchCommandItem {
@@ -67,6 +71,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [searchTerm, setSearchTerm] = useState("")
   const [activeIndex, setActiveIndex] = useState(NO_ACTIVE_INDEX)
   const [errorMessage, setErrorMessage] = useState("")
+  const [fusejsData, setFusejsData] = useState<FusejsIndexData | null>(null)
   const normalizedSearchTerm = useMemo(
     () => normalizeSearchTerm(searchTerm),
     [searchTerm],
@@ -81,8 +86,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const data = useStaticQuery<SearchBarQueryData>(graphql`
     query SearchBar {
       fusejs {
-        index
-        data
+        publicUrl
       }
       allMarkdownRemark(
         filter: { fileAbsolutePath: { regex: "/(posts/blog)/" } }
@@ -101,8 +105,25 @@ const SearchBar: React.FC<SearchBarProps> = ({
       }
     }
   `)
+  useEffect(() => {
+    const publicUrl = data.fusejs?.publicUrl
+    if (!publicUrl) return
+
+    let isCancelled = false
+
+    fetch(publicUrl)
+      .then(response => response.json())
+      .then((json: FusejsIndexData) => {
+        if (!isCancelled) setFusejsData(json)
+      })
+      .catch(() => {})
+
+    return () => {
+      isCancelled = true
+    }
+  }, [data.fusejs?.publicUrl])
   const searchCommandItems = useMemo(() => {
-    return (data.fusejs?.data ?? []).map(item => {
+    return (fusejsData?.data ?? []).map(item => {
       const label =
         collectSearchSuggestionLabels([item.title], "", 1)[0] || item.title
       const normalizedLabel = normalizeSearchTerm(label)
@@ -117,7 +138,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         category: item.category || "추천 검색어",
       } satisfies SearchCommandItem
     })
-  }, [data.fusejs?.data])
+  }, [fusejsData?.data])
   const indexedCommandItems = useMemo(() => {
     const seenLabels = new Set<string>()
 
@@ -131,7 +152,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   }, [searchCommandItems])
   const suggestionResults = useGatsbyPluginFusejs(
     debouncedSearchTerm.length >= 2 ? debouncedSearchTerm : "",
-    data.fusejs,
+    fusejsData,
     {
       includeScore: true,
       ignoreLocation: true,

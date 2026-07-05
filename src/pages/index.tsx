@@ -14,27 +14,79 @@ import { createPostItemListJsonLd } from "~/src/utils/structuredData"
 import { VERTICAL_AD_SLOT } from "../constants"
 
 const STRUCTURED_POST_LIST_LIMIT = 10
+const POSTS_PER_PAGE = 24
 
-const Home = ({
-  pageContext,
-  data,
-}: PageProps<Queries.Query, Queries.MarkdownRemarkFrontmatter>) => {
-  const currentCategory = pageContext.category
-  const postData = data.allMarkdownRemark.edges
-  const visiblePostData = useMemo(() => {
-    return currentCategory
-      ? postData.filter(
-          ({ node }) => node?.frontmatter?.category === currentCategory,
-        )
-      : postData
-  }, [currentCategory, postData])
+interface PageContext {
+  category?: string | null
+  categoryRegex?: string
+  currentPage?: number
+  totalPages?: number
+  basePath?: string
+}
+
+interface DataProps {
+  categoryGroups: {
+    group: {
+      fieldValue: Queries.Maybe<string>
+      totalCount: number
+    }[]
+  }
+  posts: {
+    totalCount: number
+    edges: {
+      node: {
+        id: string
+        frontmatter: Queries.MarkdownRemarkFrontmatter
+        fields: {
+          slug: string
+        }
+      }
+    }[]
+  }
+}
+
+const paginatedPath = (basePath: string, pageNumber: number) =>
+  pageNumber === 1 ? basePath : `${basePath}page/${pageNumber}/`
+
+type PaginationItem = number | "ellipsis"
+
+const getPaginationItems = (
+  currentPage: number,
+  totalPages: number,
+): PaginationItem[] => {
+  if (totalPages <= 1) return []
+
+  const sortedPages = [
+    ...new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]),
+  ]
+    .filter(pageNumber => pageNumber >= 1 && pageNumber <= totalPages)
+    .sort((first, second) => first - second)
+
+  return sortedPages.flatMap((pageNumber, index) => {
+    const previousPage = sortedPages[index - 1]
+    const needsEllipsis = index > 0 && pageNumber - previousPage > 1
+
+    return needsEllipsis
+      ? (["ellipsis", pageNumber] as PaginationItem[])
+      : [pageNumber]
+  })
+}
+
+const Home = ({ pageContext, data }: PageProps<DataProps, PageContext>) => {
+  const currentCategory = pageContext.category ?? undefined
+  const currentPage = pageContext.currentPage ?? 1
+  const totalPages =
+    pageContext.totalPages ??
+    Math.max(1, Math.ceil(data.posts.totalCount / POSTS_PER_PAGE))
+  const basePath = pageContext.basePath ?? "/"
+  const postData = data.posts.edges
   const categoryGroups = useMemo(() => {
-    return [...(data.allMarkdownRemark.group ?? [])]
+    return [...(data.categoryGroups.group ?? [])]
       .filter(group => group.fieldValue)
       .sort((first, second) => second.totalCount - first.totalCount)
-  }, [data.allMarkdownRemark.group])
+  }, [data.categoryGroups.group])
   const posts = useMemo(() => {
-    return visiblePostData.map(({ node }) => {
+    return postData.map(({ node }) => {
       const { id, fields, frontmatter } = node
       const { slug } = fields!
       const { title, desc, date, category, thumbnail, alt } = frontmatter!
@@ -51,40 +103,58 @@ const Home = ({
         alt,
       }
     })
-  }, [visiblePostData])
+  }, [postData])
 
   const site = useSiteMetadata()
   const postTitle = currentCategory || site.postTitle
-  const pagePath = currentCategory
-    ? `/category/${kebabCase(currentCategory)}/`
-    : "/"
+  const pagePath = paginatedPath(basePath, currentPage)
   const pageUrl = `${site.siteUrl}${pagePath}`
   const itemListId = `${pageUrl}#itemlist`
   const itemListJsonLd = createPostItemListJsonLd({
     id: itemListId,
     name: `${postTitle} 글 목록`,
-    posts: visiblePostData
-      .slice(0, STRUCTURED_POST_LIST_LIMIT)
-      .map(({ node }) => ({
-        slug: node.fields?.slug,
-        title: node.frontmatter?.title,
-      })),
+    posts: postData.slice(0, STRUCTURED_POST_LIST_LIMIT).map(({ node }) => ({
+      slug: node.fields?.slug,
+      title: node.frontmatter?.title,
+    })),
     siteUrl: site.siteUrl || "",
   })
+  const paginationSuffix = currentPage > 1 ? ` - ${currentPage}페이지` : ""
+  const seoTitle =
+    currentPage > 1
+      ? `${postTitle}${paginationSuffix}`
+      : currentCategory
+        ? postTitle
+        : undefined
+  const seoDesc = currentCategory
+    ? `${postTitle} 카테고리의 영어 표현 학습 글을 확인해보세요.${paginationSuffix}`
+    : currentPage > 1
+      ? `${site.description}${paginationSuffix}`
+      : undefined
+  const prevUrl =
+    currentPage > 1
+      ? `${site.siteUrl}${paginatedPath(basePath, currentPage - 1)}`
+      : undefined
+  const nextUrl =
+    currentPage < totalPages
+      ? `${site.siteUrl}${paginatedPath(basePath, currentPage + 1)}`
+      : undefined
+  const paginationItems = useMemo(
+    () => getPaginationItems(currentPage, totalPages),
+    [currentPage, totalPages],
+  )
 
   return (
     <Layout>
       <SEO
-        title={currentCategory ? `${postTitle} - ${site.title}` : undefined}
-        desc={
-          currentCategory
-            ? `${postTitle} 카테고리의 영어 표현 학습 글을 확인해보세요.`
-            : undefined
-        }
+        title={seoTitle}
+        desc={seoDesc}
         url={pageUrl}
         pageType="CollectionPage"
         mainEntityId={itemListId}
         jsonLds={[itemListJsonLd]}
+        prevUrl={prevUrl}
+        nextUrl={nextUrl}
       />
       <Main>
         <LeftAd>
@@ -123,6 +193,37 @@ const Home = ({
             </CategoryShelf>
           </HeroSection>
           <PostGrid posts={posts} />
+          {paginationItems.length > 0 && (
+            <PaginationNav aria-label="페이지 네비게이션">
+              {currentPage > 1 && (
+                <PaginationLink to={paginatedPath(basePath, currentPage - 1)}>
+                  이전
+                </PaginationLink>
+              )}
+              {paginationItems.map((item, index) =>
+                item === "ellipsis" ? (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <PaginationEllipsis key={`ellipsis-${index}`}>
+                    …
+                  </PaginationEllipsis>
+                ) : (
+                  <PaginationLink
+                    key={item}
+                    to={paginatedPath(basePath, item)}
+                    aria-current={item === currentPage ? "page" : undefined}
+                    $isActive={item === currentPage}
+                  >
+                    {item}
+                  </PaginationLink>
+                ),
+              )}
+              {currentPage < totalPages && (
+                <PaginationLink to={paginatedPath(basePath, currentPage + 1)}>
+                  다음
+                </PaginationLink>
+              )}
+            </PaginationNav>
+          )}
         </Content>
         <RightAd>
           <Adsense
@@ -243,6 +344,54 @@ const CategoryCount = styled.span`
   font-weight: var(--font-weight-bold);
 `
 
+const PaginationNav = styled.nav`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: var(--sizing-xl);
+`
+
+const PaginationLink = styled(Link)<{ $isActive?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0 12px;
+  border: 1px solid
+    ${({ $isActive }) =>
+      $isActive ? "var(--color-gray-4)" : "var(--color-gray-2)"};
+  border-radius: 999px;
+  background-color: ${({ $isActive }) =>
+    $isActive ? "var(--color-card)" : "transparent"};
+  color: ${({ $isActive }) =>
+    $isActive ? "var(--color-text)" : "var(--color-text-2)"};
+  font-size: 0.9375rem;
+  font-weight: ${({ $isActive }) =>
+    $isActive ? "var(--font-weight-semi-bold)" : "var(--font-weight-medium)"};
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: var(--color-gray-3);
+    background-color: var(--color-card);
+  }
+`
+
+const PaginationEllipsis = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  color: var(--color-text-3);
+  font-size: 0.9375rem;
+`
+
 const LeftAd = styled.div`
   position: fixed;
   top: calc(var(--nav-height) + 400px);
@@ -276,16 +425,29 @@ const RightAd = styled.div`
 `
 
 export const query = graphql`
-  query Home {
-    allMarkdownRemark(
+  query Home(
+    $categoryRegex: String = "/.*/"
+    $limit: Int = 24
+    $skip: Int = 0
+  ) {
+    categoryGroups: allMarkdownRemark(
       filter: { fileAbsolutePath: { regex: "/(posts/blog)/" } }
-      limit: 2000
-      sort: { frontmatter: { date: DESC } }
+      limit: 100000
     ) {
       group(field: { frontmatter: { category: SELECT } }) {
         fieldValue
         totalCount
       }
+    }
+    posts: allMarkdownRemark(
+      filter: {
+        fileAbsolutePath: { regex: "/(posts/blog)/" }
+        frontmatter: { category: { regex: $categoryRegex } }
+      }
+      sort: { frontmatter: { date: DESC } }
+      limit: $limit
+      skip: $skip
+    ) {
       totalCount
       edges {
         node {

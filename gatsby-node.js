@@ -181,7 +181,7 @@ const createPostPages = ({ result, createPage }) => {
       component: template,
       context: {
         slug: post.slug,
-        continuePosts: selectContinuePosts(posts, post.slug, post.category),
+        continuePosts: selectContinuePosts(posts, post.slug),
       },
     })
   })
@@ -197,40 +197,20 @@ function mapPostNodeToPost(node) {
   }
 }
 
-const RELATED_POST_LIMIT = 6
-
-function selectContinuePosts(posts, currentSlug, currentCategory) {
+function selectContinuePosts(posts, currentSlug) {
   const currentIndex = posts.findIndex(post => post.slug === currentSlug)
 
   if (currentIndex === -1) return []
 
-  const relatedPosts = currentCategory
-    ? posts
-        .filter(
-          (post, index) =>
-            index !== currentIndex && post.category === currentCategory,
-        )
-        .slice(0, RELATED_POST_LIMIT)
-        .map(post => ({ ...post, direction: "관련 글" }))
-    : []
-
-  if (relatedPosts.length >= RELATED_POST_LIMIT) return relatedPosts
-
-  const usedSlugs = new Set([
-    currentSlug,
-    ...relatedPosts.map(post => post.slug),
-  ])
-  const dateAdjacentPosts = [
+  return [
     ...posts
-      .slice(currentIndex + 1)
+      .slice(currentIndex + 1, currentIndex + 3)
       .map(post => ({ ...post, direction: "이전 글" })),
     ...posts
-      .slice(0, currentIndex)
+      .slice(Math.max(0, currentIndex - 2), currentIndex)
       .reverse()
       .map(post => ({ ...post, direction: "다음 글" })),
-  ].filter(post => !usedSlugs.has(post.slug))
-
-  return [...relatedPosts, ...dateAdjacentPosts].slice(0, RELATED_POST_LIMIT)
+  ]
 }
 
 function sortPostsForContinue(posts) {

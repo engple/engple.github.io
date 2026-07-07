@@ -35,34 +35,20 @@ const AboutPageTemplate = () => {
           </Header>
 
           <Section>
-            <SectionTitle>운영 주체</SectionTitle>
+            <SectionTitle>잉플 소개</SectionTitle>
             <Paragraph>
-              잉플은 solaqua가 운영하는 개인 영어 학습 프로젝트입니다. 사이트의
-              목표는 한국어 사용자가 영어 표현을 검색하고, 문맥 안에서 이해하고,
-              직접 말해볼 수 있도록 짧고 반복 가능한 학습 자료를 제공하는
-              것입니다.
-            </Paragraph>
-            <Paragraph>
-              개발과 콘텐츠 관리 이력은{" "}
-              <ExternalLink href="https://github.com/engple" rel="noreferrer">
-                GitHub의 Engple 조직
-              </ExternalLink>
-              에서 확인할 수 있습니다.
+              잉플은 일상에서 바로 써볼 수 있는 영어 표현을 한국어 설명과 함께
+              모아두는 학습 공간입니다. 짧은 글 안에서 뜻, 쓰임, 예문을 빠르게
+              확인할 수 있게 정리합니다.
             </Paragraph>
           </Section>
 
           <Section>
-            <SectionTitle>콘텐츠 제작 방식</SectionTitle>
+            <SectionTitle>학습 방식</SectionTitle>
             <Paragraph>
-              각 글은 하나의 영어 표현, 패턴, 어휘, 또는 주제를 중심으로
-              구성됩니다. 한국어 설명, 영어 예문, 발음 정보, 연습 카드, 관련
-              표현을 함께 배치해 학습자가 같은 표현을 여러 상황에서 확인할 수
-              있게 합니다.
-            </Paragraph>
-            <Paragraph>
-              일부 초안 작성과 예문 후보 수집에는 자동화 도구를 사용합니다. 게시
-              전에는 표현의 자연스러움, 한국어 설명의 정확성, 내부 링크, 중복
-              여부를 점검하며, 발견한 오류는 이후 수정합니다.
+              하나의 표현을 여러 예문으로 반복해서 보고, 연습 카드로 한 번 더
+              떠올려볼 수 있도록 구성했습니다. 어색한 표현이나 잘못된 설명은
+              발견하는 대로 고쳐갑니다.
             </Paragraph>
           </Section>
 
@@ -70,15 +56,7 @@ const AboutPageTemplate = () => {
             <SectionTitle>수정과 문의</SectionTitle>
             <Paragraph>
               영어 표현은 맥락과 지역에 따라 자연스러움이 달라질 수 있습니다.
-              부정확한 번역, 어색한 예문, 깨진 링크, 저작권 또는 기타 문의가
-              있으면{" "}
-              <ExternalLink
-                href="https://github.com/engple/engple.github.io/issues"
-                rel="noreferrer"
-              >
-                GitHub Issues
-              </ExternalLink>
-              를 통해 알려주세요.
+              부정확한 번역, 어색한 예문, 깨진 링크를 발견하면 알려주세요.
             </Paragraph>
             <ActionLink to="/">최근 학습 글 보기</ActionLink>
           </Section>
@@ -147,12 +125,6 @@ const Paragraph = styled.p`
   font-size: var(--text-base);
   line-height: 1.9;
   color: var(--color-text-2);
-`
-
-const ExternalLink = styled.a`
-  color: var(--color-blue);
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
 `
 
 const ActionLink = styled(Link)`

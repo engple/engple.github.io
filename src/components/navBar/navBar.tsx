@@ -16,6 +16,8 @@ import SearchBar from "./searchBar"
 import SearchIcon from "./searchIcon"
 import useMenu, { type UseMenuReturnType } from "./useMenu"
 
+const MENU_LIST_ID = "global-navigation-menu"
+
 interface NavBarProperties {
   links: UseSiteMetaDataReturnType["menuLinks"]
   title?: string | null
@@ -59,12 +61,16 @@ const NavBar: React.FC<NavBarProperties> = ({ links, title }) => {
         <Title onClick={() => setToggle(false)}>
           <Link to="/">{title}</Link>
         </Title>
-        <List ref={listReference} toggle={toggle}>
+        <List id={MENU_LIST_ID} ref={listReference} toggle={toggle}>
           <LinkList links={links} setToggle={setToggle} />
         </List>
         <Curtain ref={curtainReference} toggle={toggle} />
         <IconWrapper>
-          <MenuIcon handleClick={handleClick} toggle={toggle} />
+          <MenuIcon
+            controlsId={MENU_LIST_ID}
+            handleClick={handleClick}
+            toggle={toggle}
+          />
           <SearchIcon
             buttonRef={searchTriggerReference}
             onClick={handleOpenSearch}

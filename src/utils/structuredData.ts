@@ -146,6 +146,13 @@ export function createPracticeQuizJsonLd({
   title: string
 }) {
   const cards = getPracticeCards(html)
+  const aboutJsonLd = aboutId
+    ? {
+        "@type": "DefinedTerm",
+        "@id": aboutId,
+        name: expression || title,
+      }
+    : { "@type": "Thing", name: expression || title }
 
   if (cards.length === 0) return
 
@@ -153,9 +160,7 @@ export function createPracticeQuizJsonLd({
     "@type": "Quiz",
     "@id": id,
     name: `${title} 연습 문제`,
-    about: aboutId
-      ? { "@id": aboutId }
-      : { "@type": "Thing", name: expression },
+    about: aboutJsonLd,
     educationalAlignment: {
       "@type": "AlignmentObject",
       alignmentType: "educationalSubject",

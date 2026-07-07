@@ -184,8 +184,8 @@ const searchPlugins = [
   {
     resolve: "gatsby-plugin-robots-txt",
     options: {
-      host: "https://engple.github.io",
-      sitemap: "https://engple.github.io/sitemap-index.xml",
+      host: meta.siteUrl,
+      sitemap: `${meta.siteUrl}/sitemap-index.xml`,
       policy: [{ userAgent: "*", allow: "/" }],
     },
   },

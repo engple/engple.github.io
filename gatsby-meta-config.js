@@ -24,7 +24,7 @@ const metaConfig = {
   description:
     "잉플에서 실전 영어 표현과 영어 패턴을 한국어 예문으로 쉽게 익히세요. 발음, 상황별 예문, 연습 문제까지 한 번에 확인할 수 있습니다.",
   author: "solaqua",
-  siteUrl: "https://engple.github.io",
+  siteUrl: "https://engple.solaqua.dev",
   lang: "ko-KR",
   utterances: "",
   links: {

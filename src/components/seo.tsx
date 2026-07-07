@@ -2,9 +2,11 @@ import React from "react"
 
 import { Helmet } from "react-helmet"
 import {
+  type AboutPage,
   type CollectionPage,
   type EducationalOrganization,
   type Graph,
+  type Person,
   type Thing,
   type WebPage,
   type WebSite,
@@ -33,7 +35,7 @@ interface SEOProperties {
   ogType?: "website" | "article"
   noIndex?: boolean
   noFollow?: boolean
-  pageType?: "WebPage" | "CollectionPage"
+  pageType?: "WebPage" | "CollectionPage" | "AboutPage"
   mainEntityId?: string
   publishedTime?: Queries.Maybe<string>
   modifiedTime?: Queries.Maybe<string>
@@ -60,6 +62,9 @@ const SEO: React.FC<SEOProperties> = ({
 }) => {
   const site = useSiteMetadata()
   const siteUrl = site.siteUrl || ""
+  const aboutUrl = `${siteUrl}/about/`
+  const organizationId = `${aboutUrl}#organization`
+  const personId = `${aboutUrl}#person`
   const author = site.author || ""
   const naverSiteVerification = site.naverSiteVerification || ""
   const hasCustomTitle = Boolean(title)
@@ -105,10 +110,11 @@ const SEO: React.FC<SEOProperties> = ({
       ...jsonLds,
       {
         "@type": "EducationalOrganization",
-        "@id": `${siteUrl}/#organization`,
+        "@id": organizationId,
         name: "잉플",
         alternateName: "Engple",
         url: siteUrl,
+        mainEntityOfPage: { "@id": `${aboutUrl}#webpage` },
         logo: {
           "@type": "ImageObject",
           url: `${siteUrl}${defaultOpenGraphImage}`,
@@ -116,7 +122,20 @@ const SEO: React.FC<SEOProperties> = ({
         description:
           "영어 패턴 학습으로 자연스러운 영어 실력 향상을 돕는 교육 사이트",
         sameAs: ["https://github.com/engple"],
+        founder: { "@id": personId },
       } as EducationalOrganization,
+      {
+        "@type": "Person",
+        "@id": personId,
+        name: author || "solaqua",
+        url: aboutUrl,
+        affiliation: { "@id": organizationId },
+        knowsAbout: [
+          "English language learning",
+          "Korean explanations for English expressions",
+          "Example-based vocabulary learning",
+        ],
+      } as Person,
       {
         "@type": "WebSite",
         "@id": `${siteUrl}/#website`,
@@ -125,7 +144,7 @@ const SEO: React.FC<SEOProperties> = ({
         url: siteUrl,
         description: site.description,
         inLanguage: site.lang ?? DEFAULT_LANG,
-        publisher: { "@id": `${siteUrl}/#organization` },
+        publisher: { "@id": organizationId },
         potentialAction: {
           "@type": "SearchAction",
           target: {
@@ -205,7 +224,7 @@ function createWebPageJsonLd({
   imageUrl: string
   language: string
   mainEntityId?: string
-  pageType: "WebPage" | "CollectionPage"
+  pageType: "WebPage" | "CollectionPage" | "AboutPage"
   siteUrl: string
   title: string
   url: string
@@ -218,7 +237,7 @@ function createWebPageJsonLd({
     url,
     inLanguage: language,
     isPartOf: { "@id": `${siteUrl}/#website` },
-    publisher: { "@id": `${siteUrl}/#organization` },
+    publisher: { "@id": `${siteUrl}/about/#organization` },
     primaryImageOfPage: {
       "@type": "ImageObject",
       url: imageUrl,
@@ -226,7 +245,7 @@ function createWebPageJsonLd({
     ...(mainEntityId ? { mainEntity: { "@id": mainEntityId } } : {}),
   }
 
-  return pageJsonLd as CollectionPage | WebPage
+  return pageJsonLd as AboutPage | CollectionPage | WebPage
 }
 
 function truncateDescription(text: string, maxLength: number) {

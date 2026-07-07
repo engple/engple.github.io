@@ -154,8 +154,12 @@ export function createPracticeQuizJsonLd({
     "@id": id,
     name: `${title} 연습 문제`,
     about: aboutId
-      ? { "@id": aboutId }
-      : { "@type": "Thing", name: expression },
+      ? {
+          "@type": "DefinedTerm",
+          "@id": aboutId,
+          name: expression || title,
+        }
+      : { "@type": "Thing", name: expression || title },
     educationalAlignment: {
       "@type": "AlignmentObject",
       alignmentType: "educationalSubject",

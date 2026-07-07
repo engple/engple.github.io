@@ -7,7 +7,7 @@
 // that changed in this deploy, right after the site goes live.
 const { execSync } = require("child_process")
 
-const SITE_HOST = "engple.github.io"
+const SITE_HOST = "engple.solaqua.dev"
 const SITE_URL = `https://${SITE_HOST}`
 const INDEXNOW_KEY = "8741f96dfd427a60f4f080959aec0523"
 const INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow"

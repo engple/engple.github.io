@@ -13,7 +13,7 @@ import ThemeToggleButton from "../components/navBar/themeToggleButton"
 
 const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { theme, themeToggler } = useTheme()
-  const { title } = useSiteMetadata()
+  const { menuLinks, title } = useSiteMetadata()
   const copyrightString = `Copyright © engple 2024`
 
   return (
@@ -21,7 +21,7 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <ThemeContext.Provider value={theme}>
         <GlobalStyle />
         <Container>
-          <NavBar title={title} />
+          <NavBar links={menuLinks} title={title} />
           {children}
         </Container>
         <Footer role="contentinfo">

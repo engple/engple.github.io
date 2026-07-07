@@ -4,12 +4,23 @@ import styled from "styled-components"
 
 import type { UseMenuReturnType } from "./useMenu"
 
-const MenuIcon: React.FC<Omit<UseMenuReturnType, "setToggle">> = ({
+interface MenuIconProperties extends Omit<UseMenuReturnType, "setToggle"> {
+  controlsId: string
+}
+
+const MenuIcon: React.FC<MenuIconProperties> = ({
+  controlsId,
   toggle,
   handleClick,
 }) => {
   return (
-    <MenuIconButton onClick={handleClick} toggle={toggle} aria-label="Menu">
+    <MenuIconButton
+      onClick={handleClick}
+      toggle={toggle}
+      aria-controls={controlsId}
+      aria-expanded={toggle}
+      aria-label="Menu"
+    >
       <MenuIconBreadTop>
         <div />
       </MenuIconBreadTop>

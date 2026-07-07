@@ -107,6 +107,8 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
   const pageUrl = `${site.siteUrl}${slug}`
   const articleId = `${pageUrl}#article`
   const definedTermId = `${pageUrl}#definedterm`
+  const organizationId = `${site.siteUrl}/about/#organization`
+  const personId = `${site.siteUrl}/about/#person`
   const expression = getExpressionTerm({ category, title, faqs })
   const tocHeadings =
     faqItems.length > 0
@@ -135,16 +137,16 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
     dateModified: lastmod || date,
     author: {
       "@type": "Person",
-      "@id": `${site.siteUrl}/#person`,
-      name: "Engple Team",
-      url: "https://github.com/engple",
+      "@id": personId,
+      name: site.author || "solaqua",
+      url: `${site.siteUrl}/about/`,
     },
     description,
     url: pageUrl,
     thumbnailUrl: `${site.siteUrl}${ogImagePath}`,
     image: `${site.siteUrl}${ogImagePath}`,
-    copyrightHolder: { "@id": `${site.siteUrl}/#organization` },
-    publisher: { "@id": `${site.siteUrl}/#organization` },
+    copyrightHolder: { "@id": organizationId },
+    publisher: { "@id": organizationId },
     isPartOf: { "@id": `${site.siteUrl}/#website` },
     mainEntityOfPage: {
       "@type": "WebPage",
@@ -218,7 +220,7 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
       educationalRole: "student",
       audienceType: "Korean English learners",
     },
-    provider: { "@id": `${site.siteUrl}/#organization` },
+    provider: { "@id": organizationId },
   } as LearningResource
 
   const definedTermJsonLd = expression

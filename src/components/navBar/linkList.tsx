@@ -9,7 +9,7 @@ import type { UseMenuReturnType } from "./useMenu"
 
 const ROOT = "/"
 const EXTERNAL_LINK_EXP =
-  /(https?:\/\/)?[\w~\-]+(\.[\w~\-]+)+(\/[\w%:@~\-]*)*(#[\w-]*)?(\?\S*)?/gi
+  /(https?:\/\/)?[\w~-]+(\.[\w~-]+)+(\/[\w%:@~-]*)*(#[\w-]*)?(\?\S*)?/i
 
 interface LinkListProperties extends Pick<UseMenuReturnType, "setToggle"> {
   links: UseSiteMetaDataReturnType["menuLinks"]
@@ -38,7 +38,7 @@ const LinkList: React.FC<LinkListProperties> = ({ links, setToggle }) => {
     if (isExternalLink) {
       return (
         <li key={name}>
-          <a target="__blank" rel="noreferrer" href={safeLink}>
+          <a target="_blank" rel="noreferrer" href={safeLink}>
             {name}
           </a>
         </li>
@@ -46,7 +46,9 @@ const LinkList: React.FC<LinkListProperties> = ({ links, setToggle }) => {
     }
     return (
       <li key={name}>
-        <Link to={safeLink}>{name}</Link>
+        <Link to={safeLink} onClick={() => setToggle(false)}>
+          {name}
+        </Link>
       </li>
     )
   }

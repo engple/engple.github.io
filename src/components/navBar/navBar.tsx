@@ -8,16 +8,20 @@ import {
   curtainAnimationCSS,
   navBackgroundAnimationCSS,
 } from "~/src/styles/navBarAnimation"
+import type { UseSiteMetaDataReturnType } from "~/src/hooks/useSiteMetadata"
 
+import LinkList from "./linkList"
+import MenuIcon from "./menuIcon"
 import SearchBar from "./searchBar"
 import SearchIcon from "./searchIcon"
 import useMenu, { type UseMenuReturnType } from "./useMenu"
 
 interface NavBarProperties {
+  links: UseSiteMetaDataReturnType["menuLinks"]
   title?: string | null
 }
 
-const NavBar: React.FC<NavBarProperties> = ({ title }) => {
+const NavBar: React.FC<NavBarProperties> = ({ links, title }) => {
   const { device } = useContext(ThemeContext)!
   const navReference = useRef<HTMLElement>(null)
   const curtainReference = useRef<HTMLDivElement>(null)
@@ -25,7 +29,7 @@ const NavBar: React.FC<NavBarProperties> = ({ title }) => {
   const searchTriggerReference = useRef<HTMLButtonElement>(null)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
-  const { toggle, setToggle } = useMenu({
+  const { handleClick, toggle, setToggle } = useMenu({
     navRef: navReference,
     curtainRef: curtainReference,
     listRef: listReference,
@@ -55,8 +59,12 @@ const NavBar: React.FC<NavBarProperties> = ({ title }) => {
         <Title onClick={() => setToggle(false)}>
           <Link to="/">{title}</Link>
         </Title>
+        <List ref={listReference} toggle={toggle}>
+          <LinkList links={links} setToggle={setToggle} />
+        </List>
         <Curtain ref={curtainReference} toggle={toggle} />
         <IconWrapper>
+          <MenuIcon handleClick={handleClick} toggle={toggle} />
           <SearchIcon
             buttonRef={searchTriggerReference}
             onClick={handleOpenSearch}
@@ -126,6 +134,53 @@ const Title = styled.div`
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     font-size: var(--text-md);
+  }
+`
+
+const List = styled.ul<Toggleable>`
+  display: flex;
+  gap: var(--sizing-md);
+  align-items: center;
+  margin-left: auto;
+  margin-right: var(--sizing-base);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+
+  a {
+    color: var(--color-text-3);
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: var(--color-text);
+  }
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    z-index: 9998;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    height: calc(100vh - var(--nav-height));
+    box-sizing: border-box;
+    padding: var(--sizing-lg) var(--padding-lg);
+    margin: 0;
+    gap: var(--sizing-md);
+    background-color: var(--color-post-background);
+    opacity: ${({ toggle }) => (toggle ? 1 : 0)};
+    pointer-events: ${({ toggle }) => (toggle ? "auto" : "none")};
+    transform: translateY(${({ toggle }) => (toggle ? "0" : "-8px")});
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+
+    a {
+      display: block;
+      font-size: var(--text-lg);
+      color: var(--color-text);
+    }
   }
 `
 

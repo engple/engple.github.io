@@ -110,11 +110,11 @@ const Item = styled.li<{ $depth: number; $isActive: boolean }>`
 
   a {
     color: ${({ $isActive }) =>
-      $isActive ? "var(--color-text)" : "var(--color-text-2)"};
+      $isActive ? "var(--color-primary-strong)" : "var(--color-text-2)"};
     background-color: ${({ $isActive }) =>
-      $isActive ? "var(--color-post-background)" : "transparent"};
+      $isActive ? "var(--color-primary-soft)" : "transparent"};
     border-color: ${({ $isActive }) =>
-      $isActive ? "var(--color-gray-2)" : "transparent"};
+      $isActive ? "var(--color-primary)" : "transparent"};
     box-shadow: ${({ $isActive }) => ($isActive ? "var(--shadow-sm)" : "none")};
     font-weight: ${({ $isActive }) =>
       $isActive ? "var(--font-weight-semi-bold)" : "var(--font-weight-medium)"};

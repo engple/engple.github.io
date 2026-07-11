@@ -172,9 +172,16 @@ const Home = ({ pageContext, data }: PageProps<DataProps, PageContext>) => {
           <HeroSection>
             <HeroCopy>
               <HeroEyebrow>
-                {currentCategory ? "Category Archive" : "Explore Engple"}
+                {currentCategory
+                  ? "Expression Archive"
+                  : "Daily English Patterns"}
               </HeroEyebrow>
               <PostTitle>{postTitle}</PostTitle>
+              <HeroTagline>
+                {currentCategory
+                  ? `${currentCategory} 상황에서 바로 쓰는 영어 표현을 예문과 발음으로 익혀보세요.`
+                  : "실전 회화에서 바로 쓰는 영어 패턴을 매일 하나씩 — 예문, 발음, 연습 문제로 완성하세요."}
+              </HeroTagline>
             </HeroCopy>
             <CategoryShelf aria-label="카테고리 탐색">
               <CategoryPill $isActive={!currentCategory} to="/">
@@ -275,7 +282,7 @@ const HeroCopy = styled.div`
 
 const HeroEyebrow = styled.p`
   margin-bottom: 6px;
-  color: var(--color-text-3);
+  color: var(--color-primary);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.12em;
@@ -283,13 +290,34 @@ const HeroEyebrow = styled.p`
 `
 
 const PostTitle = styled.h1`
-  font-size: 2rem;
+  font-family: var(--font-display);
+  font-size: 2.25rem;
   font-weight: var(--font-weight-extra-bold);
   line-height: 1.21875;
 
-  @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: 1.75rem;
+  &::after {
+    content: "";
+    display: block;
+    width: 3.5rem;
+    height: 6px;
+    margin-top: 12px;
+    border-radius: 999px;
+    background-color: var(--color-accent-soft);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--color-accent) 18%, transparent);
   }
+
+  @media (max-width: ${({ theme }) => theme.device.sm}) {
+    font-size: 1.875rem;
+  }
+`
+
+const HeroTagline = styled.p`
+  margin-top: 14px;
+  color: var(--color-text-3);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 34rem;
 `
 
 const CategoryShelf = styled.nav`
@@ -306,12 +334,12 @@ const CategoryPill = styled(Link)<{ $isActive: boolean }>`
   padding: 0 14px;
   border: 1px solid
     ${({ $isActive }) =>
-      $isActive ? "var(--color-gray-4)" : "var(--color-gray-2)"};
+      $isActive ? "var(--color-primary)" : "var(--color-gray-2)"};
   border-radius: 999px;
   background-color: ${({ $isActive }) =>
-    $isActive ? "var(--color-card)" : "transparent"};
+    $isActive ? "var(--color-primary-soft)" : "transparent"};
   color: ${({ $isActive }) =>
-    $isActive ? "var(--color-text)" : "var(--color-text-2)"};
+    $isActive ? "var(--color-primary-strong)" : "var(--color-text-2)"};
   font-size: 0.9375rem;
   font-weight: ${({ $isActive }) =>
     $isActive ? "var(--font-weight-semi-bold)" : "var(--font-weight-medium)"};
@@ -324,8 +352,10 @@ const CategoryPill = styled(Link)<{ $isActive: boolean }>`
 
   &:hover {
     transform: translateY(-1px);
-    border-color: var(--color-gray-3);
-    background-color: var(--color-card);
+    border-color: ${({ $isActive }) =>
+      $isActive ? "var(--color-primary)" : "var(--color-gray-3)"};
+    background-color: ${({ $isActive }) =>
+      $isActive ? "var(--color-primary-soft)" : "var(--color-card)"};
     box-shadow: var(--shadow-md);
   }
 `
@@ -362,12 +392,12 @@ const PaginationLink = styled(Link)<{ $isActive?: boolean }>`
   padding: 0 12px;
   border: 1px solid
     ${({ $isActive }) =>
-      $isActive ? "var(--color-gray-4)" : "var(--color-gray-2)"};
+      $isActive ? "var(--color-primary)" : "var(--color-gray-2)"};
   border-radius: 999px;
   background-color: ${({ $isActive }) =>
-    $isActive ? "var(--color-card)" : "transparent"};
+    $isActive ? "var(--color-primary-soft)" : "transparent"};
   color: ${({ $isActive }) =>
-    $isActive ? "var(--color-text)" : "var(--color-text-2)"};
+    $isActive ? "var(--color-primary-strong)" : "var(--color-text-2)"};
   font-size: 0.9375rem;
   font-weight: ${({ $isActive }) =>
     $isActive ? "var(--font-weight-semi-bold)" : "var(--font-weight-medium)"};
@@ -378,8 +408,10 @@ const PaginationLink = styled(Link)<{ $isActive?: boolean }>`
 
   &:hover {
     transform: translateY(-1px);
-    border-color: var(--color-gray-3);
-    background-color: var(--color-card);
+    border-color: ${({ $isActive }) =>
+      $isActive ? "var(--color-primary)" : "var(--color-gray-3)"};
+    background-color: ${({ $isActive }) =>
+      $isActive ? "var(--color-primary-soft)" : "var(--color-card)"};
   }
 `
 

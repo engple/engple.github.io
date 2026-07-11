@@ -64,6 +64,9 @@ const GlobalStyle = createGlobalStyle`
     --color-outline: rgba(0,125,250,0.6);
     --speak-color: rgb(28, 73, 255);
 
+    --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+      "Times New Roman", serif;
+
     --gradient-surface: linear-gradient(
       180deg,
       var(--color-card) 0%,
@@ -77,23 +80,23 @@ const GlobalStyle = createGlobalStyle`
       --color-white: #ffffff;
       --color-nav-bar: rgba(255, 255, 255, 0.7);
       --color-nav-border: rgba(200, 200, 200, 0.7);
-      --color-category-button: #f2f2f2;
-      --color-background: #f2f2f2;
+      --color-category-button: #f2f0ea;
+      --color-background: #f7f5f0;
       --color-post-background: #ffffff;
       --color-card: #ffffff;
       --color-code: #f2f2f2;
       --color-code-block: #fafafa;
       --color-code-highlight: rgba(0, 0, 0, 0.05);
       --color-code-highlight-border: rgba(0, 0, 0, 0.2);
-      --color-gray-1: #f9f9f9;
-      --color-gray-2: #e8e8e8;
+      --color-gray-1: #f8f7f2;
+      --color-gray-2: #eae7df;
       --color-gray-3: #dadada;
       --color-gray-4: #a3a3a3;
       --color-gray-5: #8e8e8e;
       --color-gray-6: #878787;
       --color-divider: rgba(0, 0, 0, 0.15);
-      --color-inline-link-highlight: rgba(0, 102, 204, 0.12);
-      --color-inline-link-highlight-hover: rgba(0, 102, 204, 0.18);
+      --color-inline-link-highlight: rgba(59, 91, 219, 0.13);
+      --color-inline-link-highlight-hover: rgba(59, 91, 219, 0.2);
       --size-inline-link-highlight: 0.3em;
       --size-inline-link-highlight-hover: 0.5em;
       --color-dimmed: rgba(0, 0, 0, 0.15);
@@ -107,9 +110,11 @@ const GlobalStyle = createGlobalStyle`
       --color-floating-button-shadow-hover: rgba(0, 0, 0, 0.4);
       --color-blue: var(--color-primary);
       --color-icon: #2c2c2c;
-      --color-primary: #0066cc;
-      --color-primary-strong: #0054a8;
-      --color-primary-soft: rgba(0, 102, 204, 0.08);
+      --color-primary: #3b5bdb;
+      --color-primary-strong: #2f4ac2;
+      --color-primary-soft: rgba(59, 91, 219, 0.09);
+      --color-accent: #b45309;
+      --color-accent-soft: rgba(250, 204, 21, 0.35);
       --color-danger: #b42318;
       --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
       --shadow-md: 0 10px 24px rgba(15, 23, 42, 0.07);
@@ -139,8 +144,8 @@ const GlobalStyle = createGlobalStyle`
       --color-gray-5: #767676;
       --color-gray-6: #989898;
       --color-divider: rgba(255, 255, 255, 0.15);
-      --color-inline-link-highlight: rgba(10, 132, 255, 0.24);
-      --color-inline-link-highlight-hover: rgba(10, 132, 255, 0.34);
+      --color-inline-link-highlight: rgba(116, 143, 252, 0.28);
+      --color-inline-link-highlight-hover: rgba(116, 143, 252, 0.4);
       --size-inline-link-highlight: 0.48em;
       --size-inline-link-highlight-hover: 0.72em;
       --color-dimmed: rgba(0, 0, 0, 0.15);
@@ -154,9 +159,11 @@ const GlobalStyle = createGlobalStyle`
       --color-floating-button-shadow-hover: rgba(0, 0, 0, 0.4);
       --color-blue: var(--color-primary);
       --color-icon: #d1d1d1;
-      --color-primary: #0a84ff;
-      --color-primary-strong: #3b9dff;
-      --color-primary-soft: rgba(10, 132, 255, 0.16);
+      --color-primary: #748ffc;
+      --color-primary-strong: #91a7ff;
+      --color-primary-soft: rgba(116, 143, 252, 0.18);
+      --color-accent: #fbbf24;
+      --color-accent-soft: rgba(250, 204, 21, 0.2);
       --color-danger: #f97066;
       --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
       --shadow-md: 0 10px 24px rgba(0, 0, 0, 0.32);

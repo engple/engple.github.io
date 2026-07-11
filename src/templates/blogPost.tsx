@@ -557,9 +557,22 @@ const Divider = styled.div`
 `
 
 const Title = styled.h1`
+  font-family: var(--font-display);
   font-weight: var(--font-weight-bold);
   line-height: 1.1875;
   font-size: var(--text-xl);
+
+  &::after {
+    content: "";
+    display: block;
+    width: 3.5rem;
+    height: 6px;
+    margin-top: 14px;
+    border-radius: 999px;
+    background-color: var(--color-accent-soft);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--color-accent) 18%, transparent);
+  }
 
   @media (max-width: ${({ theme }) => theme.device.md}) {
     line-height: 1.21875;
@@ -743,7 +756,7 @@ const ContinueHeader = styled.div`
 
 const ContinueEyebrow = styled.p`
   margin-bottom: 6px;
-  color: var(--color-text-3);
+  color: var(--color-primary);
   font-size: 0.6875rem;
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.12em;
@@ -935,7 +948,7 @@ const FaqSummary = styled.summary`
 const FaqIndex = styled.span`
   flex-shrink: 0;
   min-width: 26px;
-  color: var(--color-text-3);
+  color: var(--color-primary);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.08em;

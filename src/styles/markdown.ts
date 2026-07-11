@@ -42,8 +42,29 @@ const Markdown = styled.article<{
     border-bottom: 1px solid var(--color-gray-3);
   }
 
+  /* 형광펜 하이라이트 — 핵심 표현이 단어장처럼 강조되도록 */
   strong {
     font-weight: var(--font-weight-semi-bold);
+    background-image: linear-gradient(
+      180deg,
+      transparent 62%,
+      var(--color-accent-soft) 62%
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    padding: 0 0.08em;
+    margin: 0 -0.08em;
+    border-radius: 2px;
+  }
+
+  a strong,
+  h1 strong,
+  h2 strong,
+  h3 strong,
+  h4 strong {
+    background-image: none;
+    padding: 0;
+    margin: 0;
   }
 
   a,
@@ -197,11 +218,18 @@ const Markdown = styled.article<{
   }
 
   blockquote {
-    border-left: 0.25rem solid var(--color-gray-2);
-    padding-left: var(--sizing-base);
+    border-left: 3px solid var(--color-primary);
+    border-radius: 0 var(--border-radius-base) var(--border-radius-base) 0;
+    background-color: var(--color-primary-soft);
+    padding: var(--padding-sm) var(--padding-md);
     margin: var(--sizing-md) 0;
+
     * {
-      color: var(--color-gray-6);
+      color: var(--color-text-2);
+    }
+
+    p:last-child {
+      margin-bottom: 0;
     }
   }
 
@@ -364,8 +392,8 @@ const Markdown = styled.article<{
       height: 1.5rem;
       padding: 0 0.5rem;
       border-radius: 999px;
-      background-color: rgba(15, 23, 42, 0.05);
-      color: var(--color-text-3);
+      background-color: var(--color-primary-soft);
+      color: var(--color-primary-strong);
       font-size: 0.6875rem;
       font-weight: var(--font-weight-bold);
       letter-spacing: 0.08em;
@@ -390,8 +418,8 @@ const Markdown = styled.article<{
   }
 
   [data-interactive-item][data-open="true"] [data-toggler]::before {
-    background-color: rgba(15, 23, 42, 0.08);
-    color: var(--color-text-2);
+    background-color: var(--color-primary-soft);
+    color: var(--color-primary-strong);
   }
 
   [data-interactive-item][data-open="true"] [data-toggler]::after {
@@ -449,16 +477,6 @@ const Markdown = styled.article<{
       box-shadow: 0 14px 32px rgba(0, 0, 0, 0.34);
     }
 
-    [data-toggler]::before {
-      background-color: rgba(255, 255, 255, 0.08);
-      color: var(--color-text-3);
-    }
-
-    [data-interactive-item][data-open="true"] [data-toggler]::before {
-      background-color: rgba(255, 255, 255, 0.12);
-      color: var(--color-text-2);
-    }
-
     [data-answer] {
       border-color: rgba(255, 255, 255, 0.08);
       background-color: rgba(255, 255, 255, 0.06);
@@ -487,11 +505,7 @@ const Markdown = styled.article<{
     }
 
     [data-interactive-item]:active [data-toggler]::before {
-      background-color: rgba(15, 23, 42, 0.08);
-    }
-
-    body.dark & [data-interactive-item]:active [data-toggler]::before {
-      background-color: rgba(255, 255, 255, 0.12);
+      background-color: var(--color-primary-soft);
     }
   }
 

@@ -71,7 +71,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [searchTerm, setSearchTerm] = useState("")
   const [activeIndex, setActiveIndex] = useState(NO_ACTIVE_INDEX)
   const [errorMessage, setErrorMessage] = useState("")
-  const [fusejsData, setFusejsData] = useState<FusejsIndexData | null>(null)
+  const [fusejsData, setFusejsData] = useState<FusejsIndexData>()
   const normalizedSearchTerm = useMemo(
     () => normalizeSearchTerm(searchTerm),
     [searchTerm],
@@ -722,7 +722,7 @@ const SearchResultItem = styled.li`
 const SearchError = styled.p`
   margin: 0;
   padding-left: 2px;
-  color: #b42318;
+  color: var(--color-danger);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-medium);
 `
@@ -736,9 +736,7 @@ const SearchResultButton = styled.button<{ $active: boolean }>`
   border: none;
   border-radius: 14px;
   background-color: ${({ $active }) =>
-    $active
-      ? "color-mix(in srgb, var(--color-blue) 10%, white 90%)"
-      : "transparent"};
+    $active ? "var(--color-primary-soft)" : "transparent"};
   color: var(--color-text);
   box-shadow: ${({ $active }) =>
     $active ? "inset 0 0 0 1px rgba(10, 132, 255, 0.12)" : "none"};
@@ -750,7 +748,7 @@ const SearchResultButton = styled.button<{ $active: boolean }>`
     transform 0.18s ease;
 
   &:hover {
-    background-color: color-mix(in srgb, var(--color-blue) 10%, white 90%);
+    background-color: var(--color-primary-soft);
   }
 
   &:focus-visible {

@@ -19,6 +19,7 @@ const GlobalStyle = createGlobalStyle`
     
     --padding-xs: 8px;
     --padding-sm: 16px;
+    --padding-md: 20px;
     --padding-lg: 22px;
     --padding-xl: 32px;
 
@@ -36,7 +37,7 @@ const GlobalStyle = createGlobalStyle`
     --sizing-xxl: 96px;
     --sizing-xxxl: 128px;
 
-    --text-xs: 0.625rem;
+    --text-xs: 0.6875rem;
     --text-sm: 0.75rem;
     --text-base: 1rem;
     --text-md: 1.125rem;
@@ -62,6 +63,12 @@ const GlobalStyle = createGlobalStyle`
 
     --color-outline: rgba(0,125,250,0.6);
     --speak-color: rgb(28, 73, 255);
+
+    --gradient-surface: linear-gradient(
+      180deg,
+      var(--color-card) 0%,
+      var(--color-gray-1) 100%
+    );
 
     body.light {
       --color-text: #1d1d1d;
@@ -98,8 +105,16 @@ const GlobalStyle = createGlobalStyle`
       --color-floating-button-text-hover: #f2f2f2;
       --color-floating-button-shadow: rgba(0, 0, 0, 0.2);
       --color-floating-button-shadow-hover: rgba(0, 0, 0, 0.4);
-      --color-blue: #0066cc;
+      --color-blue: var(--color-primary);
       --color-icon: #2c2c2c;
+      --color-primary: #0066cc;
+      --color-primary-strong: #0054a8;
+      --color-primary-soft: rgba(0, 102, 204, 0.08);
+      --color-danger: #b42318;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 10px 24px rgba(15, 23, 42, 0.07);
+      --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.08);
+      --shadow-hover: 0 20px 40px rgba(15, 23, 42, 0.1);
     }
 
     body.dark {
@@ -137,8 +152,16 @@ const GlobalStyle = createGlobalStyle`
       --color-floating-button-text-hover: #202020;
       --color-floating-button-shadow: rgba(0, 0, 0, 0.4);
       --color-floating-button-shadow-hover: rgba(0, 0, 0, 0.4);
-      --color-blue: #0a84ff;
+      --color-blue: var(--color-primary);
       --color-icon: #d1d1d1;
+      --color-primary: #0a84ff;
+      --color-primary-strong: #3b9dff;
+      --color-primary-soft: rgba(10, 132, 255, 0.16);
+      --color-danger: #f97066;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 10px 24px rgba(0, 0, 0, 0.32);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.38);
+      --shadow-hover: 0 20px 44px rgba(0, 0, 0, 0.44);
     }
 
     @media (min-width: ${({ theme }) => theme.device.xl}) {

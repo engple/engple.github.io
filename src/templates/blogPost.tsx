@@ -152,7 +152,10 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
       "@type": "WebPage",
       "@id": `${pageUrl}#webpage`,
     },
-    wordCount: html?.split(" ").length,
+    wordCount: html
+      ?.replaceAll(/<[^>]*>/g, " ")
+      .split(/\s+/)
+      .filter(Boolean).length,
     speakable: {
       "@type": "SpeakableSpecification",
       cssSelector: ["article h1", "article h2", "[data-answer]"],
@@ -271,6 +274,7 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
         mainEntityId={articleId}
         publishedTime={date}
         modifiedTime={lastmod || date}
+        section={category}
       />
       <main>
         <article ref={articleRef}>
@@ -600,7 +604,7 @@ const ExploreAction = styled(Link)`
   &:hover {
     color: var(--color-text);
     border-color: var(--color-gray-3);
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    box-shadow: var(--shadow-md);
     transform: translateY(-1px);
   }
 `
@@ -627,12 +631,8 @@ const FeatureMedia = styled.div`
   width: 100%;
   border: 1px solid var(--color-gray-2);
   border-radius: var(--border-radius-md);
-  background: linear-gradient(
-    180deg,
-    var(--color-card) 0%,
-    var(--color-gray-1) 100%
-  );
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
 `
 
@@ -666,12 +666,8 @@ const AsidePanel = styled.aside`
   padding: 18px;
   border: 1px solid var(--color-gray-2);
   border-radius: var(--border-radius-md);
-  background: linear-gradient(
-    180deg,
-    var(--color-card) 0%,
-    var(--color-gray-1) 100%
-  );
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-lg);
 `
 
 const AsideHeading = styled.h2`
@@ -780,12 +776,8 @@ const ContinueCardBase = styled(Link)`
   overflow: hidden;
   border: 1px solid var(--color-gray-2);
   border-radius: 18px;
-  background: linear-gradient(
-    180deg,
-    var(--color-card) 0%,
-    var(--color-gray-1) 100%
-  );
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.06);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-md);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
@@ -794,7 +786,7 @@ const ContinueCardBase = styled(Link)`
   &:hover {
     transform: translateY(-2px);
     border-color: var(--color-gray-3);
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+    box-shadow: var(--shadow-hover);
   }
 `
 

@@ -71,12 +71,8 @@ const TocNav = styled.nav`
   padding: 12px;
   border: 1px solid var(--color-gray-2);
   border-radius: var(--border-radius-md);
-  background: linear-gradient(
-    180deg,
-    var(--color-card) 0%,
-    var(--color-gray-1) 100%
-  );
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-lg);
   overflow: hidden auto;
   display: none;
 
@@ -119,8 +115,7 @@ const Item = styled.li<{ $depth: number; $isActive: boolean }>`
       $isActive ? "var(--color-post-background)" : "transparent"};
     border-color: ${({ $isActive }) =>
       $isActive ? "var(--color-gray-2)" : "transparent"};
-    box-shadow: ${({ $isActive }) =>
-      $isActive ? "0 6px 18px rgba(15, 23, 42, 0.08)" : "none"};
+    box-shadow: ${({ $isActive }) => ($isActive ? "var(--shadow-sm)" : "none")};
     font-weight: ${({ $isActive }) =>
       $isActive ? "var(--font-weight-semi-bold)" : "var(--font-weight-medium)"};
   }

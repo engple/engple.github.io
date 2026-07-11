@@ -326,7 +326,7 @@ const CategoryPill = styled(Link)<{ $isActive: boolean }>`
     transform: translateY(-1px);
     border-color: var(--color-gray-3);
     background-color: var(--color-card);
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    box-shadow: var(--shadow-md);
   }
 `
 

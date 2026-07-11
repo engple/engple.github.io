@@ -39,6 +39,7 @@ interface SEOProperties {
   mainEntityId?: string
   publishedTime?: Queries.Maybe<string>
   modifiedTime?: Queries.Maybe<string>
+  section?: Queries.Maybe<string>
   prevUrl?: Queries.Maybe<string>
   nextUrl?: Queries.Maybe<string>
 }
@@ -57,6 +58,7 @@ const SEO: React.FC<SEOProperties> = ({
   mainEntityId,
   publishedTime,
   modifiedTime,
+  section,
   prevUrl,
   nextUrl,
 }) => {
@@ -162,8 +164,18 @@ const SEO: React.FC<SEOProperties> = ({
       htmlAttributes={{ lang: site.lang ?? DEFAULT_LANG }}
       title={pageTitle}
     >
-      <meta property="image" content={ogImageUrl} />
       <meta name="description" content={metaDescription} />
+      <meta name="author" content={author} />
+      <meta
+        name="theme-color"
+        media="(prefers-color-scheme: light)"
+        content="#ffffff"
+      />
+      <meta
+        name="theme-color"
+        media="(prefers-color-scheme: dark)"
+        content="#1c1c1c"
+      />
       <meta name="naver-site-verification" content={naverSiteVerification} />
       <meta property="og:site_name" content={BRAND_NAME} />
       <meta property="og:locale" content={ogLocale} />
@@ -193,6 +205,9 @@ const SEO: React.FC<SEOProperties> = ({
           property="article:modified_time"
           content={modifiedTime || publishedTime || ""}
         />
+      )}
+      {ogType === "article" && section && (
+        <meta property="article:section" content={section} />
       )}
       <meta name="twitter:image" content={ogImageUrl} />
       <meta name="twitter:image:alt" content={ogImageAlt} />

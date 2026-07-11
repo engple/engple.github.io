@@ -43,7 +43,7 @@ const Wrapper = styled.div`
   overflow: hidden;
   height: 100%;
   border: 1px solid var(--color-gray-2);
-  border-radius: var(--border-radius-base);
+  border-radius: var(--border-radius-md);
   background-color: var(--color-card);
   box-shadow: var(--shadow-sm);
   transition:

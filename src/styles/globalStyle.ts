@@ -11,7 +11,7 @@ const GlobalStyle = createGlobalStyle`
     --max-width: 760px;
     --post-width: 720px;
     --nav-height: 54px;
-    --footer-height: 60px;
+    --footer-height: 150px;
 
     --grid-gap-sm: 10px;
     --grid-gap-lg: 24px;
@@ -114,7 +114,7 @@ const GlobalStyle = createGlobalStyle`
       --color-primary-strong: #2f4ac2;
       --color-primary-soft: rgba(59, 91, 219, 0.09);
       --color-accent: #b45309;
-      --color-accent-soft: rgba(250, 204, 21, 0.35);
+      --color-accent-soft: rgba(250, 204, 21, 0.32);
       --color-danger: #b42318;
       --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
       --shadow-md: 0 10px 24px rgba(15, 23, 42, 0.07);
@@ -163,7 +163,7 @@ const GlobalStyle = createGlobalStyle`
       --color-primary-strong: #91a7ff;
       --color-primary-soft: rgba(116, 143, 252, 0.18);
       --color-accent: #fbbf24;
-      --color-accent-soft: rgba(250, 204, 21, 0.2);
+      --color-accent-soft: rgba(251, 191, 36, 0.28);
       --color-danger: #f97066;
       --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
       --shadow-md: 0 10px 24px rgba(0, 0, 0, 0.32);

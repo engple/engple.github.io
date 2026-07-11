@@ -176,7 +176,7 @@ const Home = ({ pageContext, data }: PageProps<DataProps, PageContext>) => {
                   ? "Expression Archive"
                   : "Daily English Patterns"}
               </HeroEyebrow>
-              <PostTitle>{postTitle}</PostTitle>
+              <PostTitle>{currentCategory ?? "패턴으로 배우는 영어"}</PostTitle>
               <HeroTagline>
                 {currentCategory
                   ? `${currentCategory} 상황에서 바로 쓰는 영어 표현을 예문과 발음으로 익혀보세요.`
@@ -291,24 +291,27 @@ const HeroEyebrow = styled.p`
 
 const PostTitle = styled.h1`
   font-family: var(--font-display);
-  font-size: 2.25rem;
+  font-size: 2.5rem;
   font-weight: var(--font-weight-extra-bold);
   line-height: 1.21875;
 
   &::after {
     content: "";
     display: block;
-    width: 3.5rem;
-    height: 6px;
-    margin-top: 12px;
+    width: 4.5rem;
+    height: 4px;
+    margin-top: 14px;
     border-radius: 999px;
-    background-color: var(--color-accent-soft);
-    box-shadow: inset 0 0 0 1px
-      color-mix(in srgb, var(--color-accent) 18%, transparent);
+    background: linear-gradient(
+      90deg,
+      var(--color-accent) 0%,
+      var(--color-accent-soft) 100%
+    );
+    opacity: 0.75;
   }
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: 1.875rem;
+    font-size: 2rem;
   }
 `
 
@@ -356,7 +359,7 @@ const CategoryPill = styled(Link)<{ $isActive: boolean }>`
       $isActive ? "var(--color-primary)" : "var(--color-gray-3)"};
     background-color: ${({ $isActive }) =>
       $isActive ? "var(--color-primary-soft)" : "var(--color-card)"};
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-sm);
   }
 `
 

@@ -281,9 +281,6 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
           <OuterWrapper>
             <InnerWrapper>
               <ContentHeader>
-                <Info>
-                  <Time dateTime={date!}>{date?.split("T")[0]}</Time>
-                </Info>
                 <BreadcrumbNav aria-label="Breadcrumb">
                   <BreadcrumbList>
                     <BreadcrumbItem>
@@ -302,6 +299,9 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
                   </BreadcrumbList>
                 </BreadcrumbNav>
                 <Title>{title}</Title>
+                <Info>
+                  <Time dateTime={date!}>{date?.split("T")[0]}</Time>
+                </Info>
                 <ExploreActions aria-label="탐색 바로가기">
                   <ExploreAction to={categoryPath}>
                     {category} 전체 보기
@@ -540,7 +540,7 @@ const ContentWrapper = styled.div`
 `
 
 const Info = styled.div`
-  margin-bottom: var(--sizing-sm);
+  margin-top: var(--sizing-xs);
 `
 
 const Time = styled(DateTime)`
@@ -565,13 +565,16 @@ const Title = styled.h1`
   &::after {
     content: "";
     display: block;
-    width: 3.5rem;
-    height: 6px;
-    margin-top: 14px;
+    width: 4.5rem;
+    height: 4px;
+    margin-top: 16px;
     border-radius: 999px;
-    background-color: var(--color-accent-soft);
-    box-shadow: inset 0 0 0 1px
-      color-mix(in srgb, var(--color-accent) 18%, transparent);
+    background: linear-gradient(
+      90deg,
+      var(--color-accent) 0%,
+      var(--color-accent-soft) 100%
+    );
+    opacity: 0.75;
   }
 
   @media (max-width: ${({ theme }) => theme.device.md}) {
@@ -617,7 +620,7 @@ const ExploreAction = styled(Link)`
   &:hover {
     color: var(--color-text);
     border-color: var(--color-gray-3);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-sm);
     transform: translateY(-1px);
   }
 `

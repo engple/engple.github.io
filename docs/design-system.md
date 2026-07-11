@@ -36,7 +36,7 @@
 | `--color-primary-strong` | `#2f4ac2`                   | `#91a7ff`               | 인디고 강조 텍스트/hover                               |
 | `--color-primary-soft`   | `rgba(59,91,219,.09)`       | `rgba(116,143,252,.18)` | 인디고 배경 틴트(칩, 활성 필, 블록쿼트, 연습문제 배지) |
 | `--color-accent`         | `#b45309`                   | `#fbbf24`               | 앰버 액센트 텍스트(브랜드 도트, 마커 테두리)           |
-| `--color-accent-soft`    | `rgba(250,204,21,.35)`      | `rgba(250,204,21,.2)`   | 형광펜 하이라이트(`strong`), 마커 바                   |
+| `--color-accent-soft`    | `rgba(250,204,21,.32)`      | `rgba(251,191,36,.28)`  | 형광펜 하이라이트(`strong`), 마커 바                   |
 | `--color-danger`         | `#b42318`                   | `#f97066`               | 오류 메시지                                            |
 | `--color-blue`           | `var(--color-primary)` 별칭 | 〃                      | 레거시 호환용 — 신규 코드에서는 `--color-primary` 사용 |
 

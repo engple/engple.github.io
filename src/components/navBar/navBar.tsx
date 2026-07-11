@@ -128,6 +128,10 @@ const Content = styled.div`
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     padding: 0 var(--padding-sm);
   }
+
+  @media (min-width: ${({ theme }) => theme.device.lg}) {
+    max-width: 1360px;
+  }
 `
 
 const Title = styled.div`

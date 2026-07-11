@@ -84,18 +84,36 @@ const Header = styled.header`
 `
 
 const Eyebrow = styled.p`
-  margin-bottom: var(--sizing-sm);
-  font-size: var(--text-sm);
+  margin-bottom: 6px;
+  color: var(--color-primary);
+  font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
-  color: var(--color-blue);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 `
 
 const Title = styled.h1`
   margin-bottom: var(--sizing-md);
+  font-family: var(--font-display);
   font-size: 2.25rem;
   line-height: 1.25;
   font-weight: var(--font-weight-extra-bold);
   color: var(--color-text);
+
+  &::after {
+    content: "";
+    display: block;
+    width: 4.5rem;
+    height: 4px;
+    margin-top: 14px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      var(--color-accent) 0%,
+      var(--color-accent-soft) 100%
+    );
+    opacity: 0.75;
+  }
 
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     font-size: var(--text-lg);
@@ -130,13 +148,23 @@ const Paragraph = styled.p`
 const ActionLink = styled(Link)`
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
-  padding: 0 var(--padding-sm);
-  border: 1px solid var(--color-divider);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text);
+  min-height: 2.75rem;
+  padding: 0 18px;
+  border: 1px solid var(--color-primary);
+  border-radius: 999px;
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
 `
 
 export default AboutPageTemplate

@@ -51,7 +51,7 @@ def render_expression_thumbnail(path: str, image_url: str, ko: str) -> None:
             content=[
                 TextPart(
                     text=f"'{ko}'\n",
-                    color="#1FFFAA",
+                    color="#FBBF24",
                     size=112,
                     font=os.path.join(font_dir, "JalnanGothic.otf"),
                     effects=[Stroke(width=8, color="#000000")],
@@ -71,7 +71,6 @@ def render_expression_thumbnail(path: str, image_url: str, ko: str) -> None:
             align=("center", "middle"),
             bold=True,
         )
-        .outline(width=16, color="#1FFFAA")
     )
     canvas.render(path)
 
@@ -94,7 +93,7 @@ def render_topic_thumbnail(path: str, image_url: str, topic: str) -> None:
             content=[
                 TextPart(
                     text=f"{topic}\n",
-                    color="#FFBF1F",
+                    color="#FBBF24",
                     size=120,
                     font=os.path.join(font_dir, "JalnanGothic.otf"),
                     effects=[Stroke(width=8, color="#000000")],
@@ -114,6 +113,5 @@ def render_topic_thumbnail(path: str, image_url: str, topic: str) -> None:
             align=("center", "middle"),
             bold=True,
         )
-        .outline(width=16, color="#FFBF1F")
     )
     canvas.render(path)

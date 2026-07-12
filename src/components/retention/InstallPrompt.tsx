@@ -158,7 +158,7 @@ const IOSGuide: React.FC<IOSGuideProps> = ({ placement, onDismiss }) => {
                 <ActionBadge aria-label="더보기">
                   <MoreIcon />
                 </ActionBadge>{" "}
-                더보기를 누르세요
+                누르세요
               </span>
             ) : (
               <span>
@@ -185,13 +185,7 @@ const IOSGuide: React.FC<IOSGuideProps> = ({ placement, onDismiss }) => {
             <StepIndex aria-hidden="true">
               {placement === "iphone" ? "3" : "2"}
             </StepIndex>
-            <span>
-              공유 화면에서{" "}
-              <ActionBadge aria-label="더보기">
-                <MoreIcon />
-              </ActionBadge>{" "}
-              더보기를 누르세요
-            </span>
+            <span>공유 화면에서 더보기를 누르세요</span>
           </GuideStep>
           <GuideStep>
             <StepIndex aria-hidden="true">
@@ -325,9 +319,8 @@ const GuideCard = styled.div<{ $placement: IOSPlacement }>`
 const GuideHeader = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
   margin-bottom: 4px;
+  padding-right: 2.75rem;
 `
 
 const GuideTitle = styled.p`
@@ -338,6 +331,9 @@ const GuideTitle = styled.p`
 `
 
 const GuideClose = styled.button`
+  position: absolute;
+  top: 6px;
+  right: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -347,7 +343,8 @@ const GuideClose = styled.button`
   border-radius: 999px;
   background: none;
   color: var(--color-text-3);
-  font-size: 0.875rem;
+  font-size: 1.375rem;
+  line-height: 1;
   cursor: pointer;
 
   &:hover {

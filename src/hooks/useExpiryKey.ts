@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 interface UseExpiryKeyOptions {
   /** Time to live in milliseconds */
@@ -10,29 +10,52 @@ interface UseExpiryKeyOptions {
  */
 export const useExpiryKey = (key: string, { ttl }: UseExpiryKeyOptions) => {
   const [isExpired, setIsKeyExpired] = useState<boolean>(true)
-
-  const refresh = useCallback(() => {
-    localStorage.setItem(getStorageKey(key), Date.now().toString())
-    setIsKeyExpired(false)
-  }, [key])
+  const timeoutReference = useRef<number>()
 
   const updateExpiry = useCallback(() => {
-    const timestamp = getTimestamp(key)
-    const expired = !timestamp || Date.now() - timestamp > ttl
-
-    if (expired !== isExpired) {
-      setIsKeyExpired(expired)
+    if (timeoutReference.current !== undefined) {
+      window.clearTimeout(timeoutReference.current)
+      timeoutReference.current = undefined
     }
-  }, [key, ttl, isExpired])
+
+    const timestamp = getTimestamp(key)
+    const expired = !timestamp || Date.now() - timestamp >= ttl
+    setIsKeyExpired(expired)
+
+    if (!expired && timestamp) {
+      const delay = Math.max(timestamp + ttl - Date.now() + 1, 1)
+      timeoutReference.current = window.setTimeout(updateExpiry, delay)
+    }
+  }, [key, ttl])
+
+  const refresh = useCallback(() => {
+    try {
+      window.localStorage.setItem(getStorageKey(key), Date.now().toString())
+    } catch {
+      // Storage may be unavailable; the current session can still dismiss it.
+    }
+
+    updateExpiry()
+  }, [key, updateExpiry])
 
   useEffect(() => {
     updateExpiry()
 
-    const interval = setInterval(() => {
-      updateExpiry()
-    }, 1000)
+    const syncWhenVisible = () => {
+      if (document.visibilityState === "visible") updateExpiry()
+    }
 
-    return () => clearInterval(interval)
+    document.addEventListener("visibilitychange", syncWhenVisible)
+    window.addEventListener("focus", syncWhenVisible)
+
+    return () => {
+      document.removeEventListener("visibilitychange", syncWhenVisible)
+      window.removeEventListener("focus", syncWhenVisible)
+
+      if (timeoutReference.current !== undefined) {
+        window.clearTimeout(timeoutReference.current)
+      }
+    }
   }, [updateExpiry])
 
   return {
@@ -46,6 +69,12 @@ function getStorageKey(key: string) {
 }
 
 function getTimestamp(key: string): number | undefined {
-  const value = localStorage.getItem(getStorageKey(key))
-  return value ? Number.parseInt(value, 10) : undefined
+  try {
+    const value = window.localStorage.getItem(getStorageKey(key))
+    const timestamp = value ? Number.parseInt(value, 10) : Number.NaN
+
+    return Number.isFinite(timestamp) ? timestamp : undefined
+  } catch {
+    return undefined
+  }
 }

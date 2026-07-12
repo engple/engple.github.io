@@ -75,7 +75,6 @@ const FooterInner = styled.div`
 `
 
 const FooterBrand = styled.p`
-  font-family: var(--font-display);
   font-size: var(--text-title);
   font-weight: var(--font-weight-bold);
   color: var(--color-text);

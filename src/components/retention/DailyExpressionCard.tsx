@@ -21,8 +21,44 @@ const DailyExpressionCard: React.FC<DailyExpressionCardProps> = ({ posts }) => {
   useEffect(() => {
     if (posts.length === 0) return
 
-    const daysSinceEpoch = Math.floor(Date.now() / 86_400_000)
-    setPick(posts[daysSinceEpoch % posts.length])
+    let timeoutId: number | undefined
+
+    const updatePick = () => {
+      const localDay = getLocalDayNumber(new Date())
+      setPick(posts[localDay % posts.length])
+    }
+
+    const scheduleNextMidnight = () => {
+      const now = new Date()
+      const nextMidnight = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+      )
+      const delay = Math.max(nextMidnight.getTime() - now.getTime(), 1)
+
+      timeoutId = window.setTimeout(() => {
+        updatePick()
+        scheduleNextMidnight()
+      }, delay)
+    }
+
+    const syncWhenVisible = () => {
+      if (document.visibilityState !== "visible") return
+
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId)
+      updatePick()
+      scheduleNextMidnight()
+    }
+
+    updatePick()
+    scheduleNextMidnight()
+    document.addEventListener("visibilitychange", syncWhenVisible)
+
+    return () => {
+      document.removeEventListener("visibilitychange", syncWhenVisible)
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId)
+    }
   }, [posts])
 
   if (!pick?.slug) return
@@ -40,6 +76,12 @@ const DailyExpressionCard: React.FC<DailyExpressionCardProps> = ({ posts }) => {
         1분이면 충분해요 <ActionArrow>→</ActionArrow>
       </Action>
     </Card>
+  )
+}
+
+function getLocalDayNumber(date: Date): number {
+  return Math.floor(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86_400_000,
   )
 }
 

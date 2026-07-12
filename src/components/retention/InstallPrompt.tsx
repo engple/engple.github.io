@@ -13,6 +13,15 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>
 }
 
+let deferredInstallPrompt: BeforeInstallPromptEvent | undefined
+const installPromptSubscribers = new Set<
+  (event: BeforeInstallPromptEvent | undefined) => void
+>()
+
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeinstallprompt", captureInstallPrompt)
+}
+
 /** Where the iOS Safari share button lives, which decides guide placement. */
 type IOSPlacement = "iphone" | "ipad"
 
@@ -26,7 +35,9 @@ type IOSPlacement = "iphone" | "ipad"
  *   with an up-arrow on iPad.
  */
 const InstallPrompt: React.FC = () => {
-  const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent>()
+  const [installEvent, setInstallEvent] = useState<
+    BeforeInstallPromptEvent | undefined
+  >(deferredInstallPrompt)
   const [iosPlacement, setIosPlacement] = useState<IOSPlacement>()
   const [isHidden, setIsHidden] = useState(false)
   const { history, loaded } = useReadingHistory()
@@ -35,13 +46,16 @@ const InstallPrompt: React.FC = () => {
   })
 
   useEffect(() => {
-    const handler = (event: Event) => {
-      event.preventDefault()
-      setInstallEvent(event as BeforeInstallPromptEvent)
+    const syncInstallPrompt = (event: BeforeInstallPromptEvent | undefined) => {
+      setInstallEvent(event)
     }
 
-    window.addEventListener("beforeinstallprompt", handler)
-    return () => window.removeEventListener("beforeinstallprompt", handler)
+    installPromptSubscribers.add(syncInstallPrompt)
+    syncInstallPrompt(deferredInstallPrompt)
+
+    return () => {
+      installPromptSubscribers.delete(syncInstallPrompt)
+    }
   }, [])
 
   useEffect(() => {
@@ -67,6 +81,7 @@ const InstallPrompt: React.FC = () => {
 
   const handleDismiss = () => {
     refresh()
+    clearInstallPrompt()
     setIsHidden(true)
   }
 
@@ -77,14 +92,21 @@ const InstallPrompt: React.FC = () => {
   const handleInstall = async () => {
     if (!installEvent) return
 
-    await installEvent.prompt()
-    const choice = await installEvent.userChoice
+    try {
+      await installEvent.prompt()
+      const choice = await installEvent.userChoice
 
-    if (choice.outcome === "accepted") {
-      trackEvent("pwa_install_accepted")
+      if (choice.outcome === "accepted") {
+        trackEvent("pwa_install_accepted")
+      } else {
+        refresh()
+      }
+    } catch {
+      // The browser may reject the prompt when its install state changes.
+    } finally {
+      clearInstallPrompt()
+      setIsHidden(true)
     }
-
-    setIsHidden(true)
   }
 
   return (
@@ -270,8 +292,8 @@ const GuideClose = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: none;
   border-radius: 999px;
   background: none;
@@ -391,7 +413,7 @@ const Actions = styled.div`
 `
 
 const InstallButton = styled.button`
-  min-height: 2.25rem;
+  min-height: 2.75rem;
   padding: 0 12px;
   border: 1px solid var(--color-primary);
   border-radius: 999px;
@@ -403,7 +425,7 @@ const InstallButton = styled.button`
 `
 
 const DismissButton = styled.button`
-  min-height: 2.25rem;
+  min-height: 2.75rem;
   padding: 0 10px;
   border: none;
   border-radius: 999px;
@@ -419,3 +441,20 @@ const DismissButton = styled.button`
 `
 
 export default InstallPrompt
+
+function captureInstallPrompt(event: Event): void {
+  event.preventDefault()
+  deferredInstallPrompt = event as BeforeInstallPromptEvent
+
+  for (const subscriber of installPromptSubscribers) {
+    subscriber(deferredInstallPrompt)
+  }
+}
+
+function clearInstallPrompt(): void {
+  deferredInstallPrompt = undefined
+
+  for (const subscriber of installPromptSubscribers) {
+    subscriber()
+  }
+}

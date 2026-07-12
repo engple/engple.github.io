@@ -303,7 +303,6 @@ const HeroEyebrow = styled.p`
 `
 
 const PostTitle = styled.h1`
-  font-family: var(--font-display);
   font-size: 2.5rem;
   font-weight: var(--font-weight-extra-bold);
   line-height: 1.21875;

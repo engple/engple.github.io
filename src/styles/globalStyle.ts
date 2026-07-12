@@ -64,9 +64,6 @@ const GlobalStyle = createGlobalStyle`
     --color-outline: rgba(0,125,250,0.6);
     --speak-color: rgb(28, 73, 255);
 
-    --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
-      "Times New Roman", serif;
-
     --gradient-surface: linear-gradient(
       180deg,
       var(--color-card) 0%,
@@ -76,25 +73,25 @@ const GlobalStyle = createGlobalStyle`
     body.light {
       --color-text: #1d1d1d;
       --color-text-2: #1d1d1d;
-      --color-text-3: #696969;
+      --color-text-3: #64748b;
       --color-white: #ffffff;
       --color-nav-bar: rgba(255, 255, 255, 0.7);
-      --color-nav-border: rgba(200, 200, 200, 0.7);
-      --color-category-button: #f2f0ea;
-      --color-background: #f7f5f0;
-      --color-post-background: #ffffff;
+      --color-nav-border: rgba(148, 163, 184, 0.65);
+      --color-category-button: #eef2f7;
+      --color-background: #f1f5f9;
+      --color-post-background: #f8fafc;
       --color-card: #ffffff;
-      --color-code: #f2f2f2;
-      --color-code-block: #fafafa;
+      --color-code: #eef2f7;
+      --color-code-block: #f8fafc;
       --color-code-highlight: rgba(0, 0, 0, 0.05);
       --color-code-highlight-border: rgba(0, 0, 0, 0.2);
-      --color-gray-1: #f8f7f2;
-      --color-gray-2: #eae7df;
-      --color-gray-3: #dadada;
-      --color-gray-4: #a3a3a3;
-      --color-gray-5: #8e8e8e;
-      --color-gray-6: #878787;
-      --color-divider: rgba(0, 0, 0, 0.15);
+      --color-gray-1: #f4f7fa;
+      --color-gray-2: #e2e8f0;
+      --color-gray-3: #cbd5e1;
+      --color-gray-4: #94a3b8;
+      --color-gray-5: #64748b;
+      --color-gray-6: #475569;
+      --color-divider: rgba(51, 65, 85, 0.16);
       --color-inline-link-highlight: rgba(59, 91, 219, 0.13);
       --color-inline-link-highlight-hover: rgba(59, 91, 219, 0.2);
       --size-inline-link-highlight: 0.3em;

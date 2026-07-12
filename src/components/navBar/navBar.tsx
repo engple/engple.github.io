@@ -138,7 +138,6 @@ const Title = styled.div`
   z-index: 9999;
   padding: 0;
   border: none;
-  font-family: var(--font-display);
   font-size: var(--text-title);
   font-weight: var(--font-weight-bold);
   color: var(--color-text);

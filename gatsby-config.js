@@ -255,8 +255,9 @@ const pwaPlugins = [
       description: meta.description,
       lang: meta.lang,
       start_url: "/",
-      background_color: "#ffffff",
-      theme_color: "#ffffff",
+      background_color: "#f1f5f9",
+      theme_color: "#f1f5f9",
+      theme_color_in_head: false,
       display: "standalone",
       icon: meta.favicon,
       icon_options: {

@@ -563,7 +563,6 @@ const Divider = styled.div`
 `
 
 const Title = styled.h1`
-  font-family: var(--font-display);
   font-weight: var(--font-weight-bold);
   line-height: 1.1875;
   font-size: var(--text-xl);

@@ -94,7 +94,6 @@ const Eyebrow = styled.p`
 
 const Title = styled.h1`
   margin-bottom: var(--sizing-md);
-  font-family: var(--font-display);
   font-size: 2.25rem;
   line-height: 1.25;
   font-weight: var(--font-weight-extra-bold);

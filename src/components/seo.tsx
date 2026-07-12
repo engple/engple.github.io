@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useContext } from "react"
 
 import { Helmet } from "react-helmet"
 import {
@@ -12,7 +12,9 @@ import {
   type WebSite,
 } from "schema-dts"
 
+import { DARK } from "~/src/constants"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
+import ThemeContext from "~/src/stores/themeContext"
 
 import defaultOpenGraphImage from "../images/og-thumbnail.png"
 
@@ -24,6 +26,8 @@ const MAX_META_DESCRIPTION_LENGTH = 80
 // per-post thumbnails render at whatever size gatsby-plugin-sharp produced.
 const DEFAULT_OG_IMAGE_WIDTH = 1280
 const DEFAULT_OG_IMAGE_HEIGHT = 720
+const LIGHT_THEME_COLOR = "#f1f5f9"
+const DARK_THEME_COLOR = "#1c1c1c"
 
 interface SEOProperties {
   title?: Queries.Maybe<string>
@@ -63,6 +67,7 @@ const SEO: React.FC<SEOProperties> = ({
   nextUrl,
 }) => {
   const site = useSiteMetadata()
+  const theme = useContext(ThemeContext)
   const siteUrl = site.siteUrl || ""
   const aboutUrl = `${siteUrl}/about/`
   const organizationId = `${aboutUrl}#organization`
@@ -168,13 +173,7 @@ const SEO: React.FC<SEOProperties> = ({
       <meta name="author" content={author} />
       <meta
         name="theme-color"
-        media="(prefers-color-scheme: light)"
-        content="#ffffff"
-      />
-      <meta
-        name="theme-color"
-        media="(prefers-color-scheme: dark)"
-        content="#1c1c1c"
+        content={theme === DARK ? DARK_THEME_COLOR : LIGHT_THEME_COLOR}
       />
       <meta name="naver-site-verification" content={naverSiteVerification} />
       <meta property="og:site_name" content={BRAND_NAME} />

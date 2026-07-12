@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 
 import { Link } from "gatsby"
 import styled from "styled-components"
 
-import {
-  type ReadingHistoryEntry,
-  useReadingHistory,
-} from "~/src/hooks/useReadingHistory"
+import { useReadingHistory } from "~/src/hooks/useReadingHistory"
 import { trackEvent } from "~/src/utils/analytics"
 
 const REVIEW_AFTER_MS = 2 * 24 * 60 * 60 * 1000
@@ -23,18 +20,13 @@ interface ReviewNudgeProps {
  */
 const ReviewNudge: React.FC<ReviewNudgeProps> = ({ currentSlug }) => {
   const { history, loaded } = useReadingHistory()
-  const [target, setTarget] = useState<ReadingHistoryEntry>()
-
-  useEffect(() => {
-    if (!loaded) return
-
-    const dueForReview = history.find(
-      item =>
-        item.slug !== currentSlug &&
-        Date.now() - item.visitedAt >= REVIEW_AFTER_MS,
-    )
-    setTarget(dueForReview)
-  }, [loaded, history, currentSlug])
+  const target = loaded
+    ? history.find(
+        item =>
+          item.slug !== currentSlug &&
+          Date.now() - item.visitedAt >= REVIEW_AFTER_MS,
+      )
+    : undefined
 
   if (!target) return
 

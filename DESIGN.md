@@ -9,8 +9,8 @@ Engple uses a study-note visual language:
 
 - Indigo is the primary educational color for links, active states, and learning UI.
 - Amber is the highlighter accent for `strong` text, marker bars, and the brand dot.
-- Light mode uses a warm paper background (`--color-background: #f7f5f0`).
-- `--font-display` is a system serif stack reserved for page H1 headings and the navigation brand.
+- Light mode uses a cool gray-blue background (`--color-background: #f1f5f9`).
+- Use the existing system sans-serif stack for UI and headings; do not introduce a display serif.
 
 ## Rules
 
@@ -65,8 +65,7 @@ Light shadows use a navy tint (`rgba(15,23,42,...)`); dark shadows use deep blac
 | `--text-lg`    | 1.5rem           | Section headings                                |
 | `--text-xl`    | 3rem             | Post H1                                         |
 
-- Use system font stacks; do not add web fonts for UI text. Korean body text uses global `word-break: keep-all`.
-- Use `--font-display` only for page H1 headings (home hero and post titles) and the navigation brand—not body, card, or button text.
+- Use the existing system font stack; do not add web fonts. Korean body text uses global `word-break: keep-all`.
 - Padding: `--padding-xs(8)` / `sm(16)` / `md(20)` / `lg(22)` / `xl(32)`.
 - Sizing: `--sizing-xs(4)` through `--sizing-xxxl(128)`.
 - Radius: `--border-radius-sm(6)` / `base(8)` / `md(12)` / `lg(28)`; pills use `999px`.
@@ -86,4 +85,4 @@ Light shadows use a navy tint (`rgba(15,23,42,...)`); dark shadows use deep blac
 - Each page has exactly one H1: the collection title on the home page or the post title on a post page. Markdown starts at H2.
 - Every image requires frontmatter `alt`; images outside the body use `loading="lazy"`.
 - Post pages automatically emit `article:published_time`, `article:modified_time`, and `article:section`.
-- SEO emits light `#ffffff` and dark `#1c1c1c` `theme-color` metadata.
+- SEO emits the active theme color: light `#f1f5f9` or dark `#1c1c1c`.

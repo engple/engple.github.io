@@ -363,7 +363,7 @@ const Markdown = styled.article<{
 
   [data-interactive-item][data-open="true"] {
     border-color: rgba(15, 23, 42, 0.12);
-    background-color: rgba(251, 250, 247, 0.98);
+    background-color: var(--color-card);
     box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
   }
 

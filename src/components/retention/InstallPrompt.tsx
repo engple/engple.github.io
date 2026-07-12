@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import styled, { css, keyframes } from "styled-components"
+import styled, { css } from "styled-components"
 
 import { useExpiryKey } from "~/src/hooks/useExpiryKey"
 import { useReadingHistory } from "~/src/hooks/useReadingHistory"
@@ -30,9 +30,8 @@ type IOSPlacement = "iphone" | "ipad"
  * history), dismissible for 30 days.
  *
  * - Android/Chromium: native install via beforeinstallprompt.
- * - iOS Safari (no install API): a visual guide anchored toward the share
- *   button — bottom-center with a bouncing down-arrow on iPhone, top-right
- *   with an up-arrow on iPad.
+ * - iOS Safari (no install API): a compact visual guide anchored toward the
+ *   share button — bottom-right on iPhone and top-right on iPad.
  */
 const InstallPrompt: React.FC = () => {
   const [installEvent, setInstallEvent] = useState<
@@ -139,12 +138,9 @@ const IOSGuide: React.FC<IOSGuideProps> = ({ placement, onDismiss }) => {
       role="complementary"
       aria-label="앱 설치 안내"
     >
-      {placement === "ipad" && (
-        <GuideArrow $placement={placement} aria-hidden="true" />
-      )}
-      <GuideCard>
+      <GuideCard $placement={placement}>
         <GuideHeader>
-          <GuideTitle>잉플, 앱처럼 쓸 수 있어요</GuideTitle>
+          <GuideTitle>매일 영어 공부, 홈 화면에서 바로 시작하세요</GuideTitle>
           <GuideClose
             type="button"
             aria-label="설치 안내 닫기"
@@ -172,9 +168,6 @@ const IOSGuide: React.FC<IOSGuideProps> = ({ placement, onDismiss }) => {
           </GuideStep>
         </GuideSteps>
       </GuideCard>
-      {placement === "iphone" && (
-        <GuideArrow $placement={placement} aria-hidden="true" />
-      )}
     </GuideWrap>
   )
 }
@@ -231,60 +224,89 @@ function detectIOSPlacement(): IOSPlacement | undefined {
   return isIPad ? "ipad" : "iphone"
 }
 
-const bob = keyframes`
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(7px); }
-`
-
-const bobUp = keyframes`
-  0%, 100% { transform: translateY(0) rotate(180deg); }
-  50% { transform: translateY(-7px) rotate(180deg); }
-`
-
 const GuideWrap = styled.div<{ $placement: IOSPlacement }>`
   position: fixed;
   /* 테마 토글(z 100) 위로 — 가이드가 떠 있는 동안에는 카드가 우선 */
   z-index: 110;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
 
   ${({ $placement }) =>
     $placement === "iphone"
       ? css`
-          left: 50%;
-          bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-          transform: translateX(-50%);
-          width: min(21rem, calc(100vw - 32px));
+          right: 12px;
+          bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+          width: min(20rem, calc(100vw - 24px));
         `
       : css`
-          top: calc(10px + env(safe-area-inset-top, 0px));
-          right: 16px;
-          width: min(21rem, calc(100vw - 32px));
+          top: calc(12px + env(safe-area-inset-top, 0px));
+          right: 12px;
+          width: min(20rem, calc(100vw - 24px));
         `}
 `
 
-const GuideCard = styled.div`
+const GuideCard = styled.div<{ $placement: IOSPlacement }>`
+  position: relative;
   width: 100%;
-  padding: 14px 16px;
+  padding: 10px 12px 12px;
   border: 1px solid var(--color-gray-2);
-  border-radius: var(--border-radius-md);
+  border-radius: 16px;
   background-color: var(--color-card);
   box-shadow: var(--shadow-lg);
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    right: 24px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+  }
+
+  &::before {
+    ${({ $placement }) =>
+      $placement === "iphone"
+        ? css`
+            bottom: -12px;
+            border-top: 12px solid var(--color-gray-2);
+          `
+        : css`
+            top: -12px;
+            border-bottom: 12px solid var(--color-gray-2);
+          `}
+  }
+
+  &::after {
+    right: 25px;
+
+    ${({ $placement }) =>
+      $placement === "iphone"
+        ? css`
+            bottom: -10px;
+            border-left-width: 9px;
+            border-right-width: 9px;
+            border-top: 11px solid var(--color-card);
+          `
+        : css`
+            top: -10px;
+            border-left-width: 9px;
+            border-right-width: 9px;
+            border-bottom: 11px solid var(--color-card);
+          `}
 `
 
 const GuideHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 4px;
 `
 
 const GuideTitle = styled.p`
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: var(--font-weight-bold);
+  line-height: 1.35;
   color: var(--color-text);
 `
 
@@ -310,7 +332,7 @@ const GuideClose = styled.button`
 const GuideSteps = styled.ol`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -326,7 +348,7 @@ const GuideStep = styled.li`
   gap: 8px;
   color: var(--color-text-2);
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.35;
 
   strong {
     color: var(--color-text);
@@ -359,29 +381,6 @@ const ShareBadge = styled.span`
   background-color: var(--color-primary-soft);
   color: var(--color-primary-strong);
   vertical-align: -0.35em;
-`
-
-const GuideArrow = styled.span<{ $placement: IOSPlacement }>`
-  display: block;
-  width: 0;
-  height: 0;
-  border-left: 9px solid transparent;
-  border-right: 9px solid transparent;
-  border-top: 11px solid var(--color-primary);
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.18));
-  animation: ${({ $placement }) => ($placement === "iphone" ? bob : bobUp)} 1.4s
-    ease-in-out infinite;
-
-  ${({ $placement }) =>
-    $placement === "ipad" &&
-    css`
-      align-self: flex-end;
-      margin-right: 28px;
-    `}
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
 `
 
 const Bar = styled.div`

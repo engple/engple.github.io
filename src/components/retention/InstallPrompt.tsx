@@ -252,7 +252,6 @@ const GuideCard = styled.div<{ $placement: IOSPlacement }>`
   background-color: var(--color-card);
   box-shadow: var(--shadow-lg);
 
-  &::before,
   &::after {
     content: "";
     position: absolute;
@@ -261,37 +260,16 @@ const GuideCard = styled.div<{ $placement: IOSPlacement }>`
     height: 0;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-  }
-
-  &::before {
-    ${({ $placement }) =>
-      $placement === "iphone"
-        ? css`
-            bottom: -12px;
-            border-top: 12px solid var(--color-gray-2);
-          `
-        : css`
-            top: -12px;
-            border-bottom: 12px solid var(--color-gray-2);
-          `}
-  }
-
-  &::after {
-    right: 25px;
 
     ${({ $placement }) =>
       $placement === "iphone"
         ? css`
-            bottom: -10px;
-            border-left-width: 9px;
-            border-right-width: 9px;
-            border-top: 11px solid var(--color-card);
+            bottom: -11px;
+            border-top: 12px solid var(--color-card);
           `
         : css`
-            top: -10px;
-            border-left-width: 9px;
-            border-right-width: 9px;
-            border-bottom: 11px solid var(--color-card);
+            top: -11px;
+            border-bottom: 12px solid var(--color-card);
           `}
 `
 

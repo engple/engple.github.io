@@ -186,6 +186,18 @@ const IOSGuide: React.FC<IOSGuideProps> = ({ placement, onDismiss }) => {
               {placement === "iphone" ? "3" : "2"}
             </StepIndex>
             <span>
+              공유 화면에서{" "}
+              <ActionBadge aria-label="더보기">
+                <MoreIcon />
+              </ActionBadge>{" "}
+              더보기를 누르세요
+            </span>
+          </GuideStep>
+          <GuideStep>
+            <StepIndex aria-hidden="true">
+              {placement === "iphone" ? "4" : "3"}
+            </StepIndex>
+            <span>
               <strong>&lsquo;홈 화면에 추가&rsquo;</strong>를 선택하세요
             </span>
           </GuideStep>

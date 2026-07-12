@@ -332,7 +332,6 @@ const HeroTagline = styled.p`
   color: var(--color-text-3);
   font-size: 1rem;
   line-height: 1.6;
-  max-width: 34rem;
 `
 
 const StreakRow = styled.div`
@@ -347,7 +346,6 @@ const RetentionArea = styled.div`
   display: flex;
   flex-direction: column;
   gap: var(--sizing-base);
-  max-width: 34rem;
 
   &:empty {
     display: none;

@@ -56,11 +56,6 @@ const Container = styled.div`
 const Footer = styled.footer`
   border-top: 1px solid var(--color-divider);
   background-color: var(--color-gray-1);
-
-  margin-top: var(--sizing-xxl);
-  @media (min-width: ${({ theme }) => theme.device.sm}) {
-    margin-top: var(--sizing-xl);
-  }
 `
 
 const FooterInner = styled.div`

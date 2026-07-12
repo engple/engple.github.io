@@ -221,7 +221,8 @@ const bobUp = keyframes`
 
 const GuideWrap = styled.div<{ $placement: IOSPlacement }>`
   position: fixed;
-  z-index: 20;
+  /* 테마 토글(z 100) 위로 — 가이드가 떠 있는 동안에는 카드가 우선 */
+  z-index: 110;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -152,16 +152,39 @@ const IOSGuide: React.FC<IOSGuideProps> = ({ placement, onDismiss }) => {
         <GuideSteps>
           <GuideStep>
             <StepIndex aria-hidden="true">1</StepIndex>
-            <span>
-              {placement === "iphone" ? "아래" : "우측 상단"}{" "}
-              <ShareBadge aria-label="공유">
-                <ShareIcon />
-              </ShareBadge>{" "}
-              버튼을 누르고
-            </span>
+            {placement === "iphone" ? (
+              <span>
+                오른쪽 하단의{" "}
+                <ActionBadge aria-label="더보기">
+                  <MoreIcon />
+                </ActionBadge>{" "}
+                더보기를 누르세요
+              </span>
+            ) : (
+              <span>
+                상단의{" "}
+                <ActionBadge aria-label="공유">
+                  <ShareIcon />
+                </ActionBadge>{" "}
+                공유 버튼을 누르세요
+              </span>
+            )}
           </GuideStep>
+          {placement === "iphone" && (
+            <GuideStep>
+              <StepIndex aria-hidden="true">2</StepIndex>
+              <span>
+                <ActionBadge aria-label="공유">
+                  <ShareIcon />
+                </ActionBadge>{" "}
+                공유 버튼을 누르세요
+              </span>
+            </GuideStep>
+          )}
           <GuideStep>
-            <StepIndex aria-hidden="true">2</StepIndex>
+            <StepIndex aria-hidden="true">
+              {placement === "iphone" ? "3" : "2"}
+            </StepIndex>
             <span>
               <strong>&lsquo;홈 화면에 추가&rsquo;</strong>를 선택하세요
             </span>
@@ -187,6 +210,20 @@ const ShareIcon: React.FC = () => (
     <path d="M12 15V3" />
     <path d="M8 7l4-4 4 4" />
     <path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8" />
+  </svg>
+)
+
+const MoreIcon: React.FC = () => (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <circle cx="5" cy="12" r="1.75" />
+    <circle cx="12" cy="12" r="1.75" />
+    <circle cx="19" cy="12" r="1.75" />
   </svg>
 )
 
@@ -348,7 +385,7 @@ const StepIndex = styled.span`
   font-weight: var(--font-weight-bold);
 `
 
-const ShareBadge = styled.span`
+const ActionBadge = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;

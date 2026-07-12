@@ -90,12 +90,12 @@ const InstallPrompt: React.FC = () => {
   return (
     <Bar role="complementary" aria-label="앱 설치 안내">
       <Message>
-        <span aria-hidden="true">📱</span> 잉플을 홈 화면에 추가하고 매일 한
-        표현씩 배워보세요
+        <span aria-hidden="true">📱</span> 홈 화면에 추가하면 오늘의 표현을
+        앱처럼 바로 열어볼 수 있어요
       </Message>
       <Actions>
         <InstallButton type="button" onClick={handleInstall}>
-          추가하기
+          홈에 추가
         </InstallButton>
         <DismissButton type="button" onClick={handleDismiss}>
           닫기
@@ -122,7 +122,7 @@ const IOSGuide: React.FC<IOSGuideProps> = ({ placement, onDismiss }) => {
       )}
       <GuideCard>
         <GuideHeader>
-          <GuideTitle>잉플을 앱처럼 쓰세요</GuideTitle>
+          <GuideTitle>잉플, 앱처럼 쓸 수 있어요</GuideTitle>
           <GuideClose
             type="button"
             aria-label="설치 안내 닫기"

@@ -20,7 +20,7 @@ const RecentPosts: React.FC = () => {
 
   return (
     <Section aria-label="최근 본 글">
-      <Label>이어서 학습하기</Label>
+      <Label>보던 글 이어보기</Label>
       <List>
         {items.map(item => (
           <Item key={item.slug}>
@@ -47,10 +47,8 @@ const Section = styled.nav`
 
 const Label = styled.p`
   color: var(--color-text-3);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 `
 
 const List = styled.ul`

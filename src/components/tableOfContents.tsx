@@ -48,7 +48,7 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ headings }) => {
   return (
     <TocNav aria-label="이 글의 목차">
       <Header>
-        <Title>On This Page</Title>
+        <Title>목차</Title>
       </Header>
       <List>
         {headings.map(heading => (
@@ -88,12 +88,10 @@ const Header = styled.div`
 `
 
 const Title = styled.h2`
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: var(--font-weight-bold);
   line-height: 1.4;
   color: var(--color-text-3);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 `
 
 const List = styled.ul`

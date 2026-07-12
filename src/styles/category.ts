@@ -10,7 +10,6 @@ const Category = styled.span`
   color: var(--color-primary-strong);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.02em;
 `
 
 export default Category

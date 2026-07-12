@@ -339,7 +339,7 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
                   <TableOfContents headings={compactTocHeadings} />
                   <AsidePanel aria-labelledby="explore-panel-heading">
                     <AsideHeading id="explore-panel-heading">
-                      Keep Exploring
+                      함께 보면 좋은 글
                     </AsideHeading>
                     <AsidePostList>
                       {continuePosts.map(post => (
@@ -385,9 +385,9 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
               {continuePosts.length > 0 && (
                 <ContinueSection aria-labelledby="continue-heading">
                   <ContinueHeader>
-                    <ContinueEyebrow>Continue Learning</ContinueEyebrow>
+                    <ContinueEyebrow>다음 학습</ContinueEyebrow>
                     <ContinueHeading id="continue-heading">
-                      이 글 다음으로 이어서 보기
+                      이 글 다음으로 보면 좋아요
                     </ContinueHeading>
                   </ContinueHeader>
                   <ContinueGrid>
@@ -694,11 +694,9 @@ const AsidePanel = styled.aside`
 
 const AsideHeading = styled.h2`
   color: var(--color-text-3);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: var(--font-weight-bold);
   line-height: 1.45;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 `
 
 const AsidePostList = styled.ul`
@@ -737,8 +735,6 @@ const AsidePostCategory = styled.span`
   color: var(--color-text-3);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 `
 
 const AsidePostTitle = styled.span`
@@ -766,10 +762,8 @@ const ContinueHeader = styled.div`
 const ContinueEyebrow = styled.p`
   margin-bottom: 6px;
   color: var(--color-primary);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 `
 
 const ContinueHeading = styled.h2`
@@ -874,8 +868,6 @@ const ContinueCardCategory = styled.span`
   color: var(--color-text-3);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 `
 
 const ContinueCardContext = styled.span`

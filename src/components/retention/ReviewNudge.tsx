@@ -44,7 +44,7 @@ const ReviewNudge: React.FC<ReviewNudgeProps> = ({ currentSlug }) => {
         <Label>
           <span aria-hidden="true">🔁</span> 복습 타임
         </Label>
-        <Question>며칠 전에 본 이 표현, 아직 기억나세요?</Question>
+        <Question>며칠 전에 본 표현이에요. 아직 기억나요?</Question>
       </Copy>
       <ReviewLink
         to={target.slug}
@@ -76,10 +76,8 @@ const Copy = styled.div`
 
 const Label = styled.p`
   color: var(--color-primary-strong);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 `
 
 const Question = styled.p`

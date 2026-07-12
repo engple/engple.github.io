@@ -183,8 +183,8 @@ const Home = ({ pageContext, data }: PageProps<DataProps, PageContext>) => {
               <PostTitle>{currentCategory ?? "패턴으로 배우는 영어"}</PostTitle>
               <HeroTagline>
                 {currentCategory
-                  ? `${currentCategory} 상황에서 바로 쓰는 영어 표현을 예문과 발음으로 익혀보세요.`
-                  : "실전 회화에서 바로 쓰는 영어 패턴을 매일 하나씩 — 예문, 발음, 연습 문제로 완성하세요."}
+                  ? `'${currentCategory}' 상황에서 바로 쓰는 표현들이에요. 예문과 발음으로 가볍게 익혀 보세요.`
+                  : "하루 한 표현이면 충분해요. 오늘 배워서 내일 바로 쓰는 영어 — 예문, 발음, 연습 문제까지 한 번에."}
               </HeroTagline>
               <StreakRow>
                 <StreakBadge />

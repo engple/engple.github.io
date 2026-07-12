@@ -36,18 +36,25 @@ const DailyExpressionCard: React.FC<DailyExpressionCardProps> = ({ posts }) => {
         <EyebrowIcon aria-hidden="true">📌</EyebrowIcon> 오늘의 표현
       </Eyebrow>
       <Title>{pick.title}</Title>
-      <Action aria-hidden="true">지금 배워보기 →</Action>
+      <Action aria-hidden="true">
+        1분이면 충분해요 <ActionArrow>→</ActionArrow>
+      </Action>
     </Card>
   )
 }
+
+const ActionArrow = styled.span`
+  display: inline-block;
+  transition: transform 0.2s ease;
+`
 
 const Card = styled(Link)`
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: var(--padding-md);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--border-radius-md);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+  border-radius: 16px;
   background:
     linear-gradient(
       100deg,
@@ -59,20 +66,24 @@ const Card = styled(Link)`
   box-shadow: var(--shadow-sm);
   transition:
     transform 0.2s ease,
+    border-color 0.2s ease,
     box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
+    border-color: var(--color-primary);
     box-shadow: var(--shadow-md);
+
+    ${ActionArrow} {
+      transform: translateX(3px);
+    }
   }
 `
 
 const Eyebrow = styled.span`
   color: var(--color-primary-strong);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 `
 
 const EyebrowIcon = styled.span`

@@ -6,6 +6,9 @@ import styled from "styled-components"
 
 import Adsense from "~/src/components/adsense"
 import PostGrid from "~/src/components/postGrid"
+import DailyExpressionCard from "~/src/components/retention/DailyExpressionCard"
+import RecentPosts from "~/src/components/retention/RecentPosts"
+import StreakBadge from "~/src/components/retention/StreakBadge"
 import SEO from "~/src/components/seo"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
@@ -143,6 +146,7 @@ const Home = ({ pageContext, data }: PageProps<DataProps, PageContext>) => {
     () => getPaginationItems(currentPage, totalPages),
     [currentPage, totalPages],
   )
+  const isMainHome = !currentCategory && currentPage === 1
 
   return (
     <Layout>
@@ -172,10 +176,26 @@ const Home = ({ pageContext, data }: PageProps<DataProps, PageContext>) => {
           <HeroSection>
             <HeroCopy>
               <HeroEyebrow>
-                {currentCategory ? "Category Archive" : "Explore Engple"}
+                {currentCategory
+                  ? "Expression Archive"
+                  : "Daily English Patterns"}
               </HeroEyebrow>
-              <PostTitle>{postTitle}</PostTitle>
+              <PostTitle>{currentCategory ?? "패턴으로 배우는 영어"}</PostTitle>
+              <HeroTagline>
+                {currentCategory
+                  ? `'${currentCategory}' 상황에서 바로 쓰는 표현들이에요. 예문과 발음으로 가볍게 익혀 보세요.`
+                  : "하루 한 표현이면 충분해요. 오늘 배워서 내일 바로 쓰는 영어 — 예문, 발음, 연습 문제까지 한 번에."}
+              </HeroTagline>
+              <StreakRow>
+                <StreakBadge />
+              </StreakRow>
             </HeroCopy>
+            {isMainHome && (
+              <RetentionArea>
+                <DailyExpressionCard posts={posts} />
+                <RecentPosts />
+              </RetentionArea>
+            )}
             <CategoryShelf aria-label="카테고리 탐색">
               <CategoryPill $isActive={!currentCategory} to="/">
                 전체
@@ -275,7 +295,7 @@ const HeroCopy = styled.div`
 
 const HeroEyebrow = styled.p`
   margin-bottom: 6px;
-  color: var(--color-text-3);
+  color: var(--color-primary);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.12em;
@@ -283,12 +303,52 @@ const HeroEyebrow = styled.p`
 `
 
 const PostTitle = styled.h1`
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: var(--font-weight-extra-bold);
   line-height: 1.21875;
 
+  &::after {
+    content: "";
+    display: block;
+    width: 4.5rem;
+    height: 4px;
+    margin-top: 14px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      var(--color-accent) 0%,
+      var(--color-accent-soft) 100%
+    );
+    opacity: 0.75;
+  }
+
   @media (max-width: ${({ theme }) => theme.device.sm}) {
-    font-size: 1.75rem;
+    font-size: 2rem;
+  }
+`
+
+const HeroTagline = styled.p`
+  margin-top: 14px;
+  color: var(--color-text-3);
+  font-size: 1rem;
+  line-height: 1.6;
+`
+
+const StreakRow = styled.div`
+  margin-top: 12px;
+
+  &:empty {
+    display: none;
+  }
+`
+
+const RetentionArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--sizing-base);
+
+  &:empty {
+    display: none;
   }
 `
 
@@ -306,12 +366,12 @@ const CategoryPill = styled(Link)<{ $isActive: boolean }>`
   padding: 0 14px;
   border: 1px solid
     ${({ $isActive }) =>
-      $isActive ? "var(--color-gray-4)" : "var(--color-gray-2)"};
+      $isActive ? "var(--color-primary)" : "var(--color-gray-2)"};
   border-radius: 999px;
   background-color: ${({ $isActive }) =>
-    $isActive ? "var(--color-card)" : "transparent"};
+    $isActive ? "var(--color-primary-soft)" : "transparent"};
   color: ${({ $isActive }) =>
-    $isActive ? "var(--color-text)" : "var(--color-text-2)"};
+    $isActive ? "var(--color-primary-strong)" : "var(--color-text-2)"};
   font-size: 0.9375rem;
   font-weight: ${({ $isActive }) =>
     $isActive ? "var(--font-weight-semi-bold)" : "var(--font-weight-medium)"};
@@ -324,9 +384,11 @@ const CategoryPill = styled(Link)<{ $isActive: boolean }>`
 
   &:hover {
     transform: translateY(-1px);
-    border-color: var(--color-gray-3);
-    background-color: var(--color-card);
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    border-color: ${({ $isActive }) =>
+      $isActive ? "var(--color-primary)" : "var(--color-gray-3)"};
+    background-color: ${({ $isActive }) =>
+      $isActive ? "var(--color-primary-soft)" : "var(--color-card)"};
+    box-shadow: var(--shadow-sm);
   }
 `
 
@@ -362,12 +424,12 @@ const PaginationLink = styled(Link)<{ $isActive?: boolean }>`
   padding: 0 12px;
   border: 1px solid
     ${({ $isActive }) =>
-      $isActive ? "var(--color-gray-4)" : "var(--color-gray-2)"};
+      $isActive ? "var(--color-primary)" : "var(--color-gray-2)"};
   border-radius: 999px;
   background-color: ${({ $isActive }) =>
-    $isActive ? "var(--color-card)" : "transparent"};
+    $isActive ? "var(--color-primary-soft)" : "transparent"};
   color: ${({ $isActive }) =>
-    $isActive ? "var(--color-text)" : "var(--color-text-2)"};
+    $isActive ? "var(--color-primary-strong)" : "var(--color-text-2)"};
   font-size: 0.9375rem;
   font-weight: ${({ $isActive }) =>
     $isActive ? "var(--font-weight-semi-bold)" : "var(--font-weight-medium)"};
@@ -378,8 +440,10 @@ const PaginationLink = styled(Link)<{ $isActive?: boolean }>`
 
   &:hover {
     transform: translateY(-1px);
-    border-color: var(--color-gray-3);
-    background-color: var(--color-card);
+    border-color: ${({ $isActive }) =>
+      $isActive ? "var(--color-primary)" : "var(--color-gray-3)"};
+    background-color: ${({ $isActive }) =>
+      $isActive ? "var(--color-primary-soft)" : "var(--color-card)"};
   }
 `
 

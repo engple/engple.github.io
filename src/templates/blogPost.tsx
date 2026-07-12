@@ -21,9 +21,11 @@ import type Post from "~/src/types/Post"
 
 import Pronunciation from "../components/Pronunciation"
 import Adsense from "../components/adsense"
+import ReviewNudge from "../components/retention/ReviewNudge"
 import TableOfContents from "../components/tableOfContents"
 import { HORIZONTAL_AD_SLOT, VERTICAL_AD_SLOT } from "../constants"
 import { useInteractiveList } from "../hooks/useInteractiveList"
+import { recordPostVisit } from "../hooks/useReadingHistory"
 import {
   initializeInlineAdsenseSlots,
   withInlineAdsense,
@@ -84,6 +86,9 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
       : (html ?? "")
 
   useInteractiveList([html], { initialState: "first-expanded" })
+  React.useEffect(() => {
+    if (slug && title) recordPostVisit(slug, title)
+  }, [slug, title])
   React.useEffect(() => {
     if (!site.googleAdsense || process.env.NODE_ENV === "development") return
 
@@ -152,7 +157,10 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
       "@type": "WebPage",
       "@id": `${pageUrl}#webpage`,
     },
-    wordCount: html?.split(" ").length,
+    wordCount: html
+      ?.replaceAll(/<[^>]*>/g, " ")
+      .split(/\s+/)
+      .filter(Boolean).length,
     speakable: {
       "@type": "SpeakableSpecification",
       cssSelector: ["article h1", "article h2", "[data-answer]"],
@@ -271,15 +279,13 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
         mainEntityId={articleId}
         publishedTime={date}
         modifiedTime={lastmod || date}
+        section={category}
       />
       <main>
         <article ref={articleRef}>
           <OuterWrapper>
             <InnerWrapper>
               <ContentHeader>
-                <Info>
-                  <Time dateTime={date!}>{date?.split("T")[0]}</Time>
-                </Info>
                 <BreadcrumbNav aria-label="Breadcrumb">
                   <BreadcrumbList>
                     <BreadcrumbItem>
@@ -298,6 +304,9 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
                   </BreadcrumbList>
                 </BreadcrumbNav>
                 <Title>{title}</Title>
+                <Info>
+                  <Time dateTime={date!}>{date?.split("T")[0]}</Time>
+                </Info>
                 <ExploreActions aria-label="탐색 바로가기">
                   <ExploreAction to={categoryPath}>
                     {category} 전체 보기
@@ -330,7 +339,7 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
                   <TableOfContents headings={compactTocHeadings} />
                   <AsidePanel aria-labelledby="explore-panel-heading">
                     <AsideHeading id="explore-panel-heading">
-                      Keep Exploring
+                      함께 보면 좋은 글
                     </AsideHeading>
                     <AsidePostList>
                       {continuePosts.map(post => (
@@ -372,12 +381,13 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
                   </FaqList>
                 </FaqSection>
               )}
+              <ReviewNudge currentSlug={slug} />
               {continuePosts.length > 0 && (
                 <ContinueSection aria-labelledby="continue-heading">
                   <ContinueHeader>
-                    <ContinueEyebrow>Continue Learning</ContinueEyebrow>
+                    <ContinueEyebrow>다음 학습</ContinueEyebrow>
                     <ContinueHeading id="continue-heading">
-                      이 글 다음으로 이어서 보기
+                      이 글 다음으로 보면 좋아요
                     </ContinueHeading>
                   </ContinueHeader>
                   <ContinueGrid>
@@ -536,7 +546,7 @@ const ContentWrapper = styled.div`
 `
 
 const Info = styled.div`
-  margin-bottom: var(--sizing-sm);
+  margin-top: var(--sizing-xs);
 `
 
 const Time = styled(DateTime)`
@@ -556,6 +566,21 @@ const Title = styled.h1`
   font-weight: var(--font-weight-bold);
   line-height: 1.1875;
   font-size: var(--text-xl);
+
+  &::after {
+    content: "";
+    display: block;
+    width: 4.5rem;
+    height: 4px;
+    margin-top: 16px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      var(--color-accent) 0%,
+      var(--color-accent-soft) 100%
+    );
+    opacity: 0.75;
+  }
 
   @media (max-width: ${({ theme }) => theme.device.md}) {
     line-height: 1.21875;
@@ -600,7 +625,7 @@ const ExploreAction = styled(Link)`
   &:hover {
     color: var(--color-text);
     border-color: var(--color-gray-3);
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    box-shadow: var(--shadow-sm);
     transform: translateY(-1px);
   }
 `
@@ -627,12 +652,8 @@ const FeatureMedia = styled.div`
   width: 100%;
   border: 1px solid var(--color-gray-2);
   border-radius: var(--border-radius-md);
-  background: linear-gradient(
-    180deg,
-    var(--color-card) 0%,
-    var(--color-gray-1) 100%
-  );
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
 `
 
@@ -666,21 +687,15 @@ const AsidePanel = styled.aside`
   padding: 18px;
   border: 1px solid var(--color-gray-2);
   border-radius: var(--border-radius-md);
-  background: linear-gradient(
-    180deg,
-    var(--color-card) 0%,
-    var(--color-gray-1) 100%
-  );
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-lg);
 `
 
 const AsideHeading = styled.h2`
   color: var(--color-text-3);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: var(--font-weight-bold);
   line-height: 1.45;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 `
 
 const AsidePostList = styled.ul`
@@ -719,8 +734,6 @@ const AsidePostCategory = styled.span`
   color: var(--color-text-3);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 `
 
 const AsidePostTitle = styled.span`
@@ -747,11 +760,9 @@ const ContinueHeader = styled.div`
 
 const ContinueEyebrow = styled.p`
   margin-bottom: 6px;
-  color: var(--color-text-3);
-  font-size: 0.6875rem;
+  color: var(--color-primary);
+  font-size: 0.8125rem;
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 `
 
 const ContinueHeading = styled.h2`
@@ -780,12 +791,8 @@ const ContinueCardBase = styled(Link)`
   overflow: hidden;
   border: 1px solid var(--color-gray-2);
   border-radius: 18px;
-  background: linear-gradient(
-    180deg,
-    var(--color-card) 0%,
-    var(--color-gray-1) 100%
-  );
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.06);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-md);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
@@ -794,7 +801,7 @@ const ContinueCardBase = styled(Link)`
   &:hover {
     transform: translateY(-2px);
     border-color: var(--color-gray-3);
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+    box-shadow: var(--shadow-hover);
   }
 `
 
@@ -860,8 +867,6 @@ const ContinueCardCategory = styled.span`
   color: var(--color-text-3);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 `
 
 const ContinueCardContext = styled.span`
@@ -943,7 +948,7 @@ const FaqSummary = styled.summary`
 const FaqIndex = styled.span`
   flex-shrink: 0;
   min-width: 26px;
-  color: var(--color-text-3);
+  color: var(--color-primary);
   font-size: 0.75rem;
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.08em;

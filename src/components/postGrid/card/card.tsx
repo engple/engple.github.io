@@ -42,11 +42,23 @@ const Wrapper = styled.div`
   flex-direction: column;
   overflow: hidden;
   height: 100%;
-  border-radius: var(--border-radius-base);
+  border: 1px solid var(--color-gray-2);
+  border-radius: var(--border-radius-md);
   background-color: var(--color-card);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 
   /* Fix Safari overflow:hidden with border radius not working error */
   transform: translateZ(0);
+
+  &:hover {
+    transform: translateZ(0) translateY(-2px);
+    border-color: var(--color-gray-3);
+    box-shadow: var(--shadow-md);
+  }
 `
 
 const Text = styled.div`

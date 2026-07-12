@@ -48,7 +48,7 @@ const TableOfContents: React.FC<TableOfContentsProps> = ({ headings }) => {
   return (
     <TocNav aria-label="이 글의 목차">
       <Header>
-        <Title>On This Page</Title>
+        <Title>목차</Title>
       </Header>
       <List>
         {headings.map(heading => (
@@ -71,12 +71,8 @@ const TocNav = styled.nav`
   padding: 12px;
   border: 1px solid var(--color-gray-2);
   border-radius: var(--border-radius-md);
-  background: linear-gradient(
-    180deg,
-    var(--color-card) 0%,
-    var(--color-gray-1) 100%
-  );
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-lg);
   overflow: hidden auto;
   display: none;
 
@@ -92,12 +88,10 @@ const Header = styled.div`
 `
 
 const Title = styled.h2`
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: var(--font-weight-bold);
   line-height: 1.4;
   color: var(--color-text-3);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 `
 
 const List = styled.ul`
@@ -114,13 +108,12 @@ const Item = styled.li<{ $depth: number; $isActive: boolean }>`
 
   a {
     color: ${({ $isActive }) =>
-      $isActive ? "var(--color-text)" : "var(--color-text-2)"};
+      $isActive ? "var(--color-primary-strong)" : "var(--color-text-2)"};
     background-color: ${({ $isActive }) =>
-      $isActive ? "var(--color-post-background)" : "transparent"};
+      $isActive ? "var(--color-primary-soft)" : "transparent"};
     border-color: ${({ $isActive }) =>
-      $isActive ? "var(--color-gray-2)" : "transparent"};
-    box-shadow: ${({ $isActive }) =>
-      $isActive ? "0 6px 18px rgba(15, 23, 42, 0.08)" : "none"};
+      $isActive ? "var(--color-primary)" : "transparent"};
+    box-shadow: ${({ $isActive }) => ($isActive ? "var(--shadow-sm)" : "none")};
     font-weight: ${({ $isActive }) =>
       $isActive ? "var(--font-weight-semi-bold)" : "var(--font-weight-medium)"};
   }

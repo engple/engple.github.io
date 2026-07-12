@@ -3,12 +3,12 @@ import React, { useContext, useRef, useState } from "react"
 import { Link, navigate } from "gatsby"
 import styled, { ThemeContext } from "styled-components"
 
+import type { UseSiteMetaDataReturnType } from "~/src/hooks/useSiteMetadata"
 import Background from "~/src/styles/background"
 import {
   curtainAnimationCSS,
   navBackgroundAnimationCSS,
 } from "~/src/styles/navBarAnimation"
-import type { UseSiteMetaDataReturnType } from "~/src/hooks/useSiteMetadata"
 
 import LinkList from "./linkList"
 import MenuIcon from "./menuIcon"
@@ -24,6 +24,7 @@ interface NavBarProperties {
 }
 
 const NavBar: React.FC<NavBarProperties> = ({ links, title }) => {
+  const brandName = title?.split("|")[0]?.trim() || title
   const { device } = useContext(ThemeContext)!
   const navReference = useRef<HTMLElement>(null)
   const curtainReference = useRef<HTMLDivElement>(null)
@@ -59,7 +60,10 @@ const NavBar: React.FC<NavBarProperties> = ({ links, title }) => {
       <NavBackground toggle={toggle} />
       <Content>
         <Title onClick={() => setToggle(false)}>
-          <Link to="/">{title}</Link>
+          <Link to="/" aria-label={title ?? undefined}>
+            {brandName}
+            <BrandDot aria-hidden="true">.</BrandDot>
+          </Link>
         </Title>
         <List id={MENU_LIST_ID} ref={listReference} toggle={toggle}>
           <LinkList links={links} setToggle={setToggle} />
@@ -124,6 +128,10 @@ const Content = styled.div`
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     padding: 0 var(--padding-sm);
   }
+
+  @media (min-width: ${({ theme }) => theme.device.lg}) {
+    max-width: 1360px;
+  }
 `
 
 const Title = styled.div`
@@ -131,7 +139,7 @@ const Title = styled.div`
   padding: 0;
   border: none;
   font-size: var(--text-title);
-  font-weight: var(--font-weight-semi-bold);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text);
 
   a {
@@ -141,6 +149,10 @@ const Title = styled.div`
   @media (max-width: ${({ theme }) => theme.device.sm}) {
     font-size: var(--text-md);
   }
+`
+
+const BrandDot = styled.span`
+  color: var(--color-accent);
 `
 
 const List = styled.ul<Toggleable>`

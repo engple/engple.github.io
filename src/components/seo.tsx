@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useContext } from "react"
 
 import { Helmet } from "react-helmet"
 import {
@@ -12,7 +12,9 @@ import {
   type WebSite,
 } from "schema-dts"
 
+import { DARK } from "~/src/constants"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
+import ThemeContext from "~/src/stores/themeContext"
 
 import defaultOpenGraphImage from "../images/og-thumbnail.png"
 
@@ -24,6 +26,8 @@ const MAX_META_DESCRIPTION_LENGTH = 80
 // per-post thumbnails render at whatever size gatsby-plugin-sharp produced.
 const DEFAULT_OG_IMAGE_WIDTH = 1280
 const DEFAULT_OG_IMAGE_HEIGHT = 720
+const LIGHT_THEME_COLOR = "#f5f7fb"
+const DARK_THEME_COLOR = "#1c1c1c"
 
 interface SEOProperties {
   title?: Queries.Maybe<string>
@@ -39,6 +43,7 @@ interface SEOProperties {
   mainEntityId?: string
   publishedTime?: Queries.Maybe<string>
   modifiedTime?: Queries.Maybe<string>
+  section?: Queries.Maybe<string>
   prevUrl?: Queries.Maybe<string>
   nextUrl?: Queries.Maybe<string>
 }
@@ -57,10 +62,12 @@ const SEO: React.FC<SEOProperties> = ({
   mainEntityId,
   publishedTime,
   modifiedTime,
+  section,
   prevUrl,
   nextUrl,
 }) => {
   const site = useSiteMetadata()
+  const theme = useContext(ThemeContext)
   const siteUrl = site.siteUrl || ""
   const aboutUrl = `${siteUrl}/about/`
   const organizationId = `${aboutUrl}#organization`
@@ -162,8 +169,12 @@ const SEO: React.FC<SEOProperties> = ({
       htmlAttributes={{ lang: site.lang ?? DEFAULT_LANG }}
       title={pageTitle}
     >
-      <meta property="image" content={ogImageUrl} />
       <meta name="description" content={metaDescription} />
+      <meta name="author" content={author} />
+      <meta
+        name="theme-color"
+        content={theme === DARK ? DARK_THEME_COLOR : LIGHT_THEME_COLOR}
+      />
       <meta name="naver-site-verification" content={naverSiteVerification} />
       <meta property="og:site_name" content={BRAND_NAME} />
       <meta property="og:locale" content={ogLocale} />
@@ -193,6 +204,9 @@ const SEO: React.FC<SEOProperties> = ({
           property="article:modified_time"
           content={modifiedTime || publishedTime || ""}
         />
+      )}
+      {ogType === "article" && section && (
+        <meta property="article:section" content={section} />
       )}
       <meta name="twitter:image" content={ogImageUrl} />
       <meta name="twitter:image:alt" content={ogImageAlt} />

@@ -42,8 +42,29 @@ const Markdown = styled.article<{
     border-bottom: 1px solid var(--color-gray-3);
   }
 
+  /* 형광펜 하이라이트 — 핵심 표현이 단어장처럼 강조되도록 */
   strong {
     font-weight: var(--font-weight-semi-bold);
+    background-image: linear-gradient(
+      180deg,
+      transparent 62%,
+      var(--color-accent-soft) 62%
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    padding: 0 0.08em;
+    margin: 0 -0.08em;
+    border-radius: 2px;
+  }
+
+  a strong,
+  h1 strong,
+  h2 strong,
+  h3 strong,
+  h4 strong {
+    background-image: none;
+    padding: 0;
+    margin: 0;
   }
 
   a,
@@ -197,11 +218,18 @@ const Markdown = styled.article<{
   }
 
   blockquote {
-    border-left: 0.25rem solid var(--color-gray-2);
-    padding-left: var(--sizing-base);
+    border-left: 3px solid var(--color-primary);
+    border-radius: 0 var(--border-radius-base) var(--border-radius-base) 0;
+    background-color: var(--color-primary-soft);
+    padding: var(--padding-sm) var(--padding-md);
     margin: var(--sizing-md) 0;
+
     * {
-      color: var(--color-gray-6);
+      color: var(--color-text-2);
+    }
+
+    p:last-child {
+      margin-bottom: 0;
     }
   }
 
@@ -308,13 +336,13 @@ const Markdown = styled.article<{
   }
 
   [data-interactive-item] {
-    background-color: rgba(255, 255, 255, 0.94);
-    border: 1px solid rgba(15, 23, 42, 0.08);
+    background-color: var(--color-card);
+    border: 1px solid var(--color-gray-2);
     border-radius: 14px;
     margin-bottom: 12px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+    box-shadow: var(--shadow-sm);
     transition:
       border-color 0.2s ease,
       box-shadow 0.2s ease,
@@ -327,16 +355,16 @@ const Markdown = styled.article<{
     }
 
     &:hover {
-      border-color: rgba(15, 23, 42, 0.12);
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+      border-color: var(--color-gray-3);
+      box-shadow: var(--shadow-md);
       transform: translateY(-1px);
     }
   }
 
   [data-interactive-item][data-open="true"] {
-    border-color: rgba(15, 23, 42, 0.12);
-    background-color: rgba(251, 250, 247, 0.98);
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+    border-color: var(--color-gray-3);
+    background-color: var(--color-card);
+    box-shadow: var(--shadow-md);
   }
 
   [data-toggler] {
@@ -364,8 +392,8 @@ const Markdown = styled.article<{
       height: 1.5rem;
       padding: 0 0.5rem;
       border-radius: 999px;
-      background-color: rgba(15, 23, 42, 0.05);
-      color: var(--color-text-3);
+      background-color: var(--color-primary-soft);
+      color: var(--color-primary-strong);
       font-size: 0.6875rem;
       font-weight: var(--font-weight-bold);
       letter-spacing: 0.08em;
@@ -390,8 +418,8 @@ const Markdown = styled.article<{
   }
 
   [data-interactive-item][data-open="true"] [data-toggler]::before {
-    background-color: rgba(15, 23, 42, 0.08);
-    color: var(--color-text-2);
+    background-color: var(--color-primary-soft);
+    color: var(--color-primary-strong);
   }
 
   [data-interactive-item][data-open="true"] [data-toggler]::after {
@@ -402,9 +430,9 @@ const Markdown = styled.article<{
     display: none;
     margin: 0 1rem 1rem;
     padding: 0.875rem 1rem;
-    border: 1px solid rgba(15, 23, 42, 0.05);
+    border: 1px solid var(--color-gray-2);
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.78);
+    background-color: var(--color-post-background);
     color: var(--color-text-2);
     font-size: 0.9375rem;
     line-height: 1.72;
@@ -412,7 +440,7 @@ const Markdown = styled.article<{
     a {
       color: inherit;
       text-decoration: underline;
-      text-decoration-color: rgba(15, 23, 42, 0.24);
+      text-decoration-color: var(--color-gray-4);
       font-weight: var(--font-weight-semi-bold);
     }
   }
@@ -449,16 +477,6 @@ const Markdown = styled.article<{
       box-shadow: 0 14px 32px rgba(0, 0, 0, 0.34);
     }
 
-    [data-toggler]::before {
-      background-color: rgba(255, 255, 255, 0.08);
-      color: var(--color-text-3);
-    }
-
-    [data-interactive-item][data-open="true"] [data-toggler]::before {
-      background-color: rgba(255, 255, 255, 0.12);
-      color: var(--color-text-2);
-    }
-
     [data-answer] {
       border-color: rgba(255, 255, 255, 0.08);
       background-color: rgba(255, 255, 255, 0.06);
@@ -473,25 +491,21 @@ const Markdown = styled.article<{
 
   @media (hover: none) and (pointer: coarse) {
     [data-interactive-item] {
-      border-color: rgba(15, 23, 42, 0.1);
-      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.055);
+      border-color: var(--color-gray-3);
+      box-shadow: var(--shadow-sm);
     }
 
     [data-interactive-item][data-open="true"] {
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+      box-shadow: var(--shadow-md);
     }
 
     [data-interactive-item]:active {
       transform: translateY(1px);
-      box-shadow: 0 5px 12px rgba(15, 23, 42, 0.045);
+      box-shadow: var(--shadow-sm);
     }
 
     [data-interactive-item]:active [data-toggler]::before {
-      background-color: rgba(15, 23, 42, 0.08);
-    }
-
-    body.dark & [data-interactive-item]:active [data-toggler]::before {
-      background-color: rgba(255, 255, 255, 0.12);
+      background-color: var(--color-primary-soft);
     }
   }
 
@@ -531,20 +545,24 @@ const Markdown = styled.article<{
       text-decoration: none !important;
       display: block;
       padding: var(--sizing-md);
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      background: linear-gradient(
+        135deg,
+        var(--color-card) 0%,
+        var(--color-gray-2) 100%
+      );
       border-radius: var(--border-radius-md);
       transition: all 0.3s ease;
-      border: 2px solid #3b82f6;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+      border: 2px solid var(--color-primary);
+      box-shadow: var(--shadow-sm);
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.25);
-        border-color: #2563eb;
+        box-shadow: var(--shadow-md);
+        border-color: var(--color-primary-strong);
 
         .inline-banner-button {
           transform: scale(1.05);
-          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+          box-shadow: var(--shadow-md);
         }
       }
     }
@@ -575,7 +593,7 @@ const Markdown = styled.article<{
     }
 
     .inline-banner-title {
-      color: #1e293b;
+      color: var(--color-text);
       font-weight: var(--font-weight-bold);
       font-size: 1.3rem;
       line-height: 1.4;
@@ -583,7 +601,7 @@ const Markdown = styled.article<{
 
     .inline-banner-subtext {
       font-size: 1.05rem;
-      color: #3b82f6;
+      color: var(--color-primary);
       font-weight: 600;
       line-height: 1.4;
     }
@@ -593,15 +611,19 @@ const Markdown = styled.article<{
     }
 
     .inline-banner-button {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: white;
+      background: linear-gradient(
+        135deg,
+        var(--color-primary),
+        var(--color-primary-strong)
+      );
+      color: var(--color-white);
       padding: 0.7rem 1.4rem;
       border-radius: 8px;
       font-weight: 700;
       font-size: 1rem;
       white-space: nowrap;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+      box-shadow: var(--shadow-md);
     }
 
     .inline-banner-caption {
@@ -653,16 +675,20 @@ const Markdown = styled.article<{
   body.dark {
     .inline-banner {
       a {
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-        border-color: #3b82f6;
+        background: linear-gradient(
+          135deg,
+          var(--color-gray-2) 0%,
+          var(--color-gray-3) 100%
+        );
+        border-color: var(--color-primary);
       }
 
       .inline-banner-title {
-        color: white;
+        color: var(--color-text);
       }
 
       .inline-banner-subtext {
-        color: #60a5fa;
+        color: var(--color-primary-strong);
       }
     }
 

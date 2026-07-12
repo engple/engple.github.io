@@ -21,9 +21,11 @@ import type Post from "~/src/types/Post"
 
 import Pronunciation from "../components/Pronunciation"
 import Adsense from "../components/adsense"
+import ReviewNudge from "../components/retention/ReviewNudge"
 import TableOfContents from "../components/tableOfContents"
 import { HORIZONTAL_AD_SLOT, VERTICAL_AD_SLOT } from "../constants"
 import { useInteractiveList } from "../hooks/useInteractiveList"
+import { recordPostVisit } from "../hooks/useReadingHistory"
 import {
   initializeInlineAdsenseSlots,
   withInlineAdsense,
@@ -84,6 +86,9 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
       : (html ?? "")
 
   useInteractiveList([html], { initialState: "first-expanded" })
+  React.useEffect(() => {
+    if (slug && title) recordPostVisit(slug, title)
+  }, [slug, title])
   React.useEffect(() => {
     if (!site.googleAdsense || process.env.NODE_ENV === "development") return
 
@@ -376,6 +381,7 @@ const BlogPost: React.FC<PageProps<DataProps, PageContext>> = ({
                   </FaqList>
                 </FaqSection>
               )}
+              <ReviewNudge currentSlug={slug} />
               {continuePosts.length > 0 && (
                 <ContinueSection aria-labelledby="continue-heading">
                   <ContinueHeader>

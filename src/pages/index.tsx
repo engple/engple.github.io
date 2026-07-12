@@ -6,6 +6,9 @@ import styled from "styled-components"
 
 import Adsense from "~/src/components/adsense"
 import PostGrid from "~/src/components/postGrid"
+import DailyExpressionCard from "~/src/components/retention/DailyExpressionCard"
+import RecentPosts from "~/src/components/retention/RecentPosts"
+import StreakBadge from "~/src/components/retention/StreakBadge"
 import SEO from "~/src/components/seo"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import Layout from "~/src/layouts/layout"
@@ -143,6 +146,7 @@ const Home = ({ pageContext, data }: PageProps<DataProps, PageContext>) => {
     () => getPaginationItems(currentPage, totalPages),
     [currentPage, totalPages],
   )
+  const isMainHome = !currentCategory && currentPage === 1
 
   return (
     <Layout>
@@ -182,7 +186,16 @@ const Home = ({ pageContext, data }: PageProps<DataProps, PageContext>) => {
                   ? `${currentCategory} 상황에서 바로 쓰는 영어 표현을 예문과 발음으로 익혀보세요.`
                   : "실전 회화에서 바로 쓰는 영어 패턴을 매일 하나씩 — 예문, 발음, 연습 문제로 완성하세요."}
               </HeroTagline>
+              <StreakRow>
+                <StreakBadge />
+              </StreakRow>
             </HeroCopy>
+            {isMainHome && (
+              <RetentionArea>
+                <DailyExpressionCard posts={posts} />
+                <RecentPosts />
+              </RetentionArea>
+            )}
             <CategoryShelf aria-label="카테고리 탐색">
               <CategoryPill $isActive={!currentCategory} to="/">
                 전체
@@ -321,6 +334,25 @@ const HeroTagline = styled.p`
   font-size: 1rem;
   line-height: 1.6;
   max-width: 34rem;
+`
+
+const StreakRow = styled.div`
+  margin-top: 12px;
+
+  &:empty {
+    display: none;
+  }
+`
+
+const RetentionArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--sizing-base);
+  max-width: 34rem;
+
+  &:empty {
+    display: none;
+  }
 `
 
 const CategoryShelf = styled.nav`

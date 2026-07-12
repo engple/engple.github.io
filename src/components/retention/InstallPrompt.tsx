@@ -332,13 +332,14 @@ const GuideTitle = styled.p`
 
 const GuideClose = styled.button`
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 0;
+  right: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 2.75rem;
   height: 2.75rem;
+  padding: 0;
   border: none;
   border-radius: 999px;
   background: none;

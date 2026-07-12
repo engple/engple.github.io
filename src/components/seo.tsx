@@ -26,7 +26,7 @@ const MAX_META_DESCRIPTION_LENGTH = 80
 // per-post thumbnails render at whatever size gatsby-plugin-sharp produced.
 const DEFAULT_OG_IMAGE_WIDTH = 1280
 const DEFAULT_OG_IMAGE_HEIGHT = 720
-const LIGHT_THEME_COLOR = "#f1f5f9"
+const LIGHT_THEME_COLOR = "#f5f7fb"
 const DARK_THEME_COLOR = "#1c1c1c"
 
 interface SEOProperties {

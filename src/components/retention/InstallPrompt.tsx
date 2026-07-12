@@ -455,6 +455,6 @@ function clearInstallPrompt(): void {
   deferredInstallPrompt = undefined
 
   for (const subscriber of installPromptSubscribers) {
-    subscriber()
+    subscriber(deferredInstallPrompt)
   }
 }

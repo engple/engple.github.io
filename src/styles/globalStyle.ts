@@ -61,7 +61,7 @@ const GlobalStyle = createGlobalStyle`
     --font-weight-bold: 700;
     --font-weight-extra-bold: 800;
 
-    --color-outline: rgba(0,125,250,0.6);
+    --color-outline: rgba(79, 102, 200, 0.55);
     --speak-color: rgb(28, 73, 255);
 
     --gradient-surface: linear-gradient(
@@ -71,45 +71,45 @@ const GlobalStyle = createGlobalStyle`
     );
 
     body.light {
-      --color-text: #1d1d1d;
-      --color-text-2: #1d1d1d;
-      --color-text-3: #64748b;
+      --color-text: #263449;
+      --color-text-2: #415066;
+      --color-text-3: #65748a;
       --color-white: #ffffff;
-      --color-nav-bar: rgba(255, 255, 255, 0.7);
-      --color-nav-border: rgba(148, 163, 184, 0.65);
-      --color-category-button: #eef2f7;
-      --color-background: #f1f5f9;
-      --color-post-background: #f8fafc;
+      --color-nav-bar: rgba(255, 255, 255, 0.78);
+      --color-nav-border: rgba(148, 163, 184, 0.48);
+      --color-category-button: #f2f5fa;
+      --color-background: #f5f7fb;
+      --color-post-background: #fbfcfe;
       --color-card: #ffffff;
-      --color-code: #eef2f7;
+      --color-code: #f2f5f9;
       --color-code-block: #f8fafc;
-      --color-code-highlight: rgba(0, 0, 0, 0.05);
-      --color-code-highlight-border: rgba(0, 0, 0, 0.2);
-      --color-gray-1: #f4f7fa;
-      --color-gray-2: #e2e8f0;
-      --color-gray-3: #cbd5e1;
-      --color-gray-4: #94a3b8;
-      --color-gray-5: #64748b;
-      --color-gray-6: #475569;
-      --color-divider: rgba(51, 65, 85, 0.16);
-      --color-inline-link-highlight: rgba(59, 91, 219, 0.13);
-      --color-inline-link-highlight-hover: rgba(59, 91, 219, 0.2);
+      --color-code-highlight: rgba(71, 85, 105, 0.06);
+      --color-code-highlight-border: rgba(71, 85, 105, 0.2);
+      --color-gray-1: #f7f9fc;
+      --color-gray-2: #e7edf4;
+      --color-gray-3: #d6e0eb;
+      --color-gray-4: #a7b5c7;
+      --color-gray-5: #65748a;
+      --color-gray-6: #526174;
+      --color-divider: rgba(71, 85, 105, 0.14);
+      --color-inline-link-highlight: rgba(79, 102, 200, 0.12);
+      --color-inline-link-highlight-hover: rgba(79, 102, 200, 0.18);
       --size-inline-link-highlight: 0.3em;
       --size-inline-link-highlight-hover: 0.5em;
       --color-dimmed: rgba(0, 0, 0, 0.15);
-      --color-floating-button: rgba(255, 255, 255, 0.7);
-      --color-floating-button-hover: rgba(50, 50, 50, 0.9);
-      --color-floating-button-border: rgba(230, 230, 230, 0.7);
+      --color-floating-button: rgba(255, 255, 255, 0.82);
+      --color-floating-button-hover: rgba(38, 52, 73, 0.9);
+      --color-floating-button-border: rgba(167, 181, 199, 0.7);
       --color-floating-button-border-hover: rgba(255, 255, 255, 0.2);
-      --color-floating-button-text: #202020;
-      --color-floating-button-text-hover: #f2f2f2;
+      --color-floating-button-text: #415066;
+      --color-floating-button-text-hover: #f8fafc;
       --color-floating-button-shadow: rgba(0, 0, 0, 0.2);
       --color-floating-button-shadow-hover: rgba(0, 0, 0, 0.4);
       --color-blue: var(--color-primary);
-      --color-icon: #2c2c2c;
-      --color-primary: #3b5bdb;
-      --color-primary-strong: #2f4ac2;
-      --color-primary-soft: rgba(59, 91, 219, 0.09);
+      --color-icon: #4b5b70;
+      --color-primary: #4f66c8;
+      --color-primary-strong: #3f55ae;
+      --color-primary-soft: rgba(79, 102, 200, 0.1);
       --color-accent: #b45309;
       --color-accent-soft: rgba(250, 204, 21, 0.32);
       --color-danger: #b42318;
@@ -120,6 +120,7 @@ const GlobalStyle = createGlobalStyle`
     }
 
     body.dark {
+      --color-outline: rgba(145, 167, 255, 0.75);
       --color-text: #e6e6e6;
       --color-text-2: #d1d1d1;
       --color-text-3: #8c8c8c;

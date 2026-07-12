@@ -553,16 +553,16 @@ const OverlayCloseButton = styled.button`
   justify-content: center;
   border: none;
   border-radius: 999px;
-  background-color: rgba(255, 255, 255, 0.94);
+  background-color: var(--color-card);
   color: var(--color-text-2);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+  box-shadow: var(--shadow-md);
   cursor: pointer;
 
   &:focus-visible {
     outline: none;
     box-shadow:
-      0 0 0 2px rgba(10, 132, 255, 0.14),
-      0 10px 24px rgba(15, 23, 42, 0.14);
+      0 0 0 2px var(--color-primary-soft),
+      var(--shadow-md);
   }
 `
 
@@ -623,8 +623,8 @@ const SearchField = styled.div`
       var(--color-gray-3)
     );
     box-shadow:
-      0 0 0 3px rgba(10, 132, 255, 0.08),
-      0 8px 18px rgba(10, 132, 255, 0.04);
+      0 0 0 3px var(--color-primary-soft),
+      var(--shadow-sm);
   }
 `
 
@@ -683,7 +683,7 @@ const FieldControlButton = styled.button`
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.14);
+    box-shadow: 0 0 0 2px var(--color-primary-soft);
   }
 `
 
@@ -739,7 +739,9 @@ const SearchResultButton = styled.button<{ $active: boolean }>`
     $active ? "var(--color-primary-soft)" : "transparent"};
   color: var(--color-text);
   box-shadow: ${({ $active }) =>
-    $active ? "inset 0 0 0 1px rgba(10, 132, 255, 0.12)" : "none"};
+    $active
+      ? "inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 18%, transparent)"
+      : "none"};
   cursor: pointer;
   text-align: left;
   transition:

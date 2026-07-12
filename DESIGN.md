@@ -9,7 +9,7 @@ Engple uses a study-note visual language:
 
 - Indigo is the primary educational color for links, active states, and learning UI.
 - Amber is the highlighter accent for `strong` text, marker bars, and the brand dot.
-- Light mode uses a cool gray-blue background (`--color-background: #f1f5f9`).
+- Light mode uses a pale cool gray-blue background (`--color-background: #f5f7fb`).
 - Use the existing system sans-serif stack for UI and headings; do not introduce a display serif.
 
 ## Rules
@@ -23,9 +23,9 @@ Engple uses a study-note visual language:
 
 | Token                    | Light                           | Dark                    | Usage                                                 |
 | ------------------------ | ------------------------------- | ----------------------- | ----------------------------------------------------- |
-| `--color-primary`        | `#3b5bdb`                       | `#748ffc`               | Links, pronunciation buttons, and active states       |
-| `--color-primary-strong` | `#2f4ac2`                       | `#91a7ff`               | Emphasized indigo text and hover states               |
-| `--color-primary-soft`   | `rgba(59,91,219,.09)`           | `rgba(116,143,252,.18)` | Chips, active pills, blockquotes, and exercise badges |
+| `--color-primary`        | `#4f66c8`                       | `#748ffc`               | Links, pronunciation buttons, and active states       |
+| `--color-primary-strong` | `#3f55ae`                       | `#91a7ff`               | Emphasized indigo text and hover states               |
+| `--color-primary-soft`   | `rgba(79,102,200,.10)`          | `rgba(116,143,252,.18)` | Chips, active pills, blockquotes, and exercise badges |
 | `--color-accent`         | `#b45309`                       | `#fbbf24`               | Brand dot and marker borders                          |
 | `--color-accent-soft`    | `rgba(250,204,21,.32)`          | `rgba(251,191,36,.28)`  | `strong` highlights and marker bars                   |
 | `--color-danger`         | `#b42318`                       | `#f97066`               | Error messages                                        |
@@ -85,4 +85,4 @@ Light shadows use a navy tint (`rgba(15,23,42,...)`); dark shadows use deep blac
 - Each page has exactly one H1: the collection title on the home page or the post title on a post page. Markdown starts at H2.
 - Every image requires frontmatter `alt`; images outside the body use `loading="lazy"`.
 - Post pages automatically emit `article:published_time`, `article:modified_time`, and `article:section`.
-- SEO emits the active theme color: light `#f1f5f9` or dark `#1c1c1c`.
+- SEO emits the active theme color: light `#f5f7fb` or dark `#1c1c1c`.

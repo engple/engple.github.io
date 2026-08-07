@@ -30,7 +30,7 @@ const metaConfig = {
   links: {
     github: "https://github.com/engple/engple",
   },
-  favicon: "src/images/icon.png",
+  favicon: "src/images/engple-brand/engple-favicon.png",
   gtagTrackingId: "G-02627QJ9HV",
   googleAdsense: "ca-pub-1465612013356152",
   naverSiteVerification: "7f4cdd0b74209a3bbf5b0c15b445fa439a8a2b9c",

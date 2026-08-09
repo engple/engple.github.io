@@ -19,6 +19,7 @@ except ImportError:  # pragma: no cover - exercised in environments without deps
 
 
 DEFAULT_WORD_POOL_SIZE = 5000
+MAX_WORD_POOL_SIZE = 100_000
 DEFAULT_DATAMUSE_RESULTS = 32
 DEFAULT_MIN_ZIPF = 3.8
 DEFAULT_CANDIDATE_POOL_MULTIPLIER = 6
@@ -427,6 +428,12 @@ class CandidateOption:
     is_multiword: bool
 
 
+@dataclass(frozen=True)
+class WordfreqCandidateBatch:
+    expressions: list[str]
+    exhausted: bool
+
+
 class ExpressionCandidateCreator:
     BASE_URL = "https://api.datamuse.com"
 
@@ -485,9 +492,22 @@ class ExpressionCandidateCreator:
         count: int,
     ) -> list[CandidateOption]:
         grouped_candidates: dict[str, CandidateOption] = {}
+        wordfreq_windows: list[int] = []
+        wordfreq_window = min(
+            max(self.word_pool_size, count * 8),
+            MAX_WORD_POOL_SIZE,
+        )
+        datamuse_candidates_collected = 0
+        datamuse_candidates: list[str] | None = None
 
-        for limit in self._build_candidate_limits(count):
-            for expression in self._get_wordfreq_candidates(limit=limit):
+        while True:
+            wordfreq_batch = self._get_wordfreq_candidates(
+                window_size=wordfreq_window,
+                known_expressions=known_expressions,
+                known_families=known_families,
+            )
+            wordfreq_windows.append(wordfreq_window)
+            for expression in wordfreq_batch.expressions:
                 self._add_candidate(
                     grouped_candidates,
                     expression,
@@ -496,18 +516,40 @@ class ExpressionCandidateCreator:
                     source_bonus=0.0,
                 )
 
-            for expression in await self._get_datamuse_candidates(limit=limit):
-                self._add_candidate(
-                    grouped_candidates,
-                    expression,
-                    known_expressions,
-                    known_families,
-                    source_bonus=0.15,
+            if datamuse_candidates is None:
+                datamuse_candidates = await self._get_datamuse_candidates(
+                    known_expressions=known_expressions,
+                    known_families=known_families,
                 )
+                datamuse_candidates_collected = len(datamuse_candidates)
+                for expression in datamuse_candidates:
+                    self._add_candidate(
+                        grouped_candidates,
+                        expression,
+                        known_expressions,
+                        known_families,
+                        source_bonus=0.15,
+                    )
 
             if len(grouped_candidates) >= self._get_target_pool_size(count):
                 break
 
+            if wordfreq_batch.exhausted or wordfreq_window >= MAX_WORD_POOL_SIZE:
+                break
+
+            next_window = min(wordfreq_window * 2, MAX_WORD_POOL_SIZE)
+            if next_window == wordfreq_window:
+                break
+            wordfreq_window = next_window
+
+        logger.info(
+            "Candidate pool: {} existing expressions; checked wordfreq windows "
+            "{} and {} Datamuse candidates; retained {} unique candidates.",
+            len(known_expressions),
+            wordfreq_windows,
+            datamuse_candidates_collected,
+            len(grouped_candidates),
+        )
         return list(grouped_candidates.values())
 
     def _select_candidates(
@@ -649,36 +691,58 @@ class ExpressionCandidateCreator:
             if candidate.family_key not in selected_families
         ]
 
-    def _build_candidate_limits(self, count: int) -> list[int]:
-        limits: list[int] = []
-        for multiplier in (8, 20, 40):
-            limit = max(count * multiplier, count)
-            if limit not in limits:
-                limits.append(limit)
-        return limits
-
     def _get_target_pool_size(self, count: int) -> int:
         return max(count * DEFAULT_CANDIDATE_POOL_MULTIPLIER, DEFAULT_CANDIDATE_POOL_MINIMUM)
 
-    def _get_wordfreq_candidates(self, limit: int) -> list[str]:
+    def _get_wordfreq_candidates(
+        self,
+        *,
+        window_size: int,
+        known_expressions: set[str],
+        known_families: set[str],
+    ) -> WordfreqCandidateBatch:
         if top_n_list is None:
             logger.warning(
                 "wordfreq is not installed. Candidate generation will rely on Datamuse only."
             )
-            return []
+            return WordfreqCandidateBatch(expressions=[], exhausted=True)
 
         candidates: list[str] = []
-        for expression in top_n_list("en", self.word_pool_size):
+        seen_families = set(known_families)
+        source_expressions = top_n_list("en", window_size)
+        for expression in source_expressions:
             if not self._is_candidate_expression(expression):
                 continue
 
-            candidates.append(clean_expression(expression))
-            if len(candidates) >= limit:
-                break
+            cleaned_expression = clean_expression(expression)
+            if not self._is_available_candidate(
+                cleaned_expression,
+                known_expressions,
+                known_families,
+            ):
+                continue
 
-        return candidates
+            family_key = self._get_candidate_family_key(cleaned_expression)
+            if family_key in seen_families:
+                continue
 
-    async def _get_datamuse_candidates(self, limit: int) -> list[str]:
+            if self._score_expression(cleaned_expression) <= 0:
+                continue
+
+            candidates.append(cleaned_expression)
+            seen_families.add(family_key)
+
+        return WordfreqCandidateBatch(
+            expressions=candidates,
+            exhausted=len(source_expressions) < window_size,
+        )
+
+    async def _get_datamuse_candidates(
+        self,
+        *,
+        known_expressions: set[str],
+        known_families: set[str],
+    ) -> list[str]:
         tasks = [
             self._fetch_datamuse_topic(seed, self.datamuse_results)
             for seed in DATAMUSE_TOPIC_SEEDS
@@ -686,6 +750,7 @@ class ExpressionCandidateCreator:
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         candidates: list[str] = []
+        seen_families = set(known_families)
         for result in results:
             if isinstance(result, Exception):
                 logger.warning("Datamuse lookup failed: {}", result)
@@ -695,11 +760,37 @@ class ExpressionCandidateCreator:
                 if not self._is_candidate_expression(expression):
                     continue
 
-                candidates.append(clean_expression(expression))
-                if len(candidates) >= limit:
-                    return candidates
+                cleaned_expression = clean_expression(expression)
+                if not self._is_available_candidate(
+                    cleaned_expression,
+                    known_expressions,
+                    known_families,
+                ):
+                    continue
+
+                family_key = self._get_candidate_family_key(cleaned_expression)
+                if family_key in seen_families:
+                    continue
+
+                if self._score_expression(cleaned_expression) + 0.15 <= 0:
+                    continue
+
+                candidates.append(cleaned_expression)
+                seen_families.add(family_key)
 
         return candidates
+
+    def _is_available_candidate(
+        self,
+        expression: str,
+        known_expressions: set[str],
+        known_families: set[str],
+    ) -> bool:
+        normalized = normalize_expression(expression)
+        if not normalized or normalized in known_expressions:
+            return False
+
+        return self._get_candidate_family_key(expression) not in known_families
 
     async def _fetch_datamuse_topic(self, topic: str, limit: int) -> list[str]:
         response = await self._client.get(
@@ -723,8 +814,11 @@ class ExpressionCandidateCreator:
         *,
         source_bonus: float,
     ) -> None:
-        normalized = normalize_expression(expression)
-        if not normalized or normalized in known_expressions:
+        if not self._is_available_candidate(
+            expression,
+            known_expressions,
+            known_families,
+        ):
             return
 
         score = self._score_expression(expression) + source_bonus
@@ -732,8 +826,6 @@ class ExpressionCandidateCreator:
             return
 
         family_key = self._get_candidate_family_key(expression)
-        if family_key in known_families:
-            return
 
         option = CandidateOption(
             expression=clean_expression(expression),

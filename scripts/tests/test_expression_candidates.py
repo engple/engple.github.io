@@ -1,7 +1,9 @@
 """Tests for candidate expression generation outcomes."""
 
 import asyncio
+from itertools import product
 import random
+import string
 
 from engple.core import expression_candidates as expression_candidates_module
 from engple.core.expression_candidates import ExpressionCandidateCreator
@@ -181,6 +183,47 @@ def test_generate_expands_candidate_search_when_top_results_are_exhausted(
     generated = asyncio.run(creator.generate(existing_expressions, 1))
 
     # Then: The generator should widen the search enough to find a fresh candidate.
+    assert generated == ["fresh phrase"]
+
+
+def test_generate_skips_a_large_known_prefix_before_applying_the_source_limit(
+    monkeypatch,
+):
+    """`generate` should find new candidates beyond a large published prefix."""
+    known_expressions = [
+        f"knownword{''.join(suffix)}"
+        for length in range(1, 3)
+        for suffix in product(string.ascii_lowercase, repeat=length)
+    ][:320]
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "top_n_list",
+        _build_top_n_list([*known_expressions, "fresh phrase"]),
+    )
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "zipf_frequency",
+        _build_zipf_frequency_lookup(
+            {
+                ("fresh phrase", "en"): 5.0,
+                ("fresh", "en"): 4.9,
+                ("phrase", "en"): 4.9,
+            }
+        ),
+    )
+
+    creator = ExpressionCandidateCreator(
+        client=_FakeAsyncClient({}),
+        rng=random.Random(19),
+        word_pool_size=321,
+        datamuse_results=1,
+    )
+
+    # Given: The first 320 source candidates are already published.
+    # When: Candidate generation requests one new expression.
+    generated = asyncio.run(creator.generate(known_expressions, 1))
+
+    # Then: The first unseen source candidate should be returned.
     assert generated == ["fresh phrase"]
 
 

@@ -16,16 +16,17 @@ import { DARK } from "~/src/constants"
 import useSiteMetadata from "~/src/hooks/useSiteMetadata"
 import ThemeContext from "~/src/stores/themeContext"
 
-import defaultOpenGraphImage from "../images/og-thumbnail.png"
+import defaultLogoImage from "../images/engple-brand/engple-logo.png"
+import defaultOpenGraphImage from "../images/engple-brand/engple-social-preview.png"
 
 const DEFAULT_LANG = "en-US"
 const BRAND_NAME = "잉플"
 const MAX_META_DESCRIPTION_LENGTH = 80
-// Actual pixel dimensions of ../images/og-thumbnail.png - only safe to
+// Actual pixel dimensions of ../images/engple-brand/engple-social-preview.png - only safe to
 // assert og:image:width/height when that exact asset is being used, since
 // per-post thumbnails render at whatever size gatsby-plugin-sharp produced.
-const DEFAULT_OG_IMAGE_WIDTH = 1280
-const DEFAULT_OG_IMAGE_HEIGHT = 720
+const DEFAULT_OG_IMAGE_WIDTH = 1200
+const DEFAULT_OG_IMAGE_HEIGHT = 630
 const LIGHT_THEME_COLOR = "#f5f7fb"
 const DARK_THEME_COLOR = "#1c1c1c"
 
@@ -124,7 +125,7 @@ const SEO: React.FC<SEOProperties> = ({
         mainEntityOfPage: { "@id": `${aboutUrl}#webpage` },
         logo: {
           "@type": "ImageObject",
-          url: `${siteUrl}${defaultOpenGraphImage}`,
+          url: getAbsoluteUrl(defaultLogoImage as string, siteUrl),
         },
         description:
           "영어 패턴 학습으로 자연스러운 영어 실력 향상을 돕는 교육 사이트",

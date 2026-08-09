@@ -186,10 +186,10 @@ def test_generate_expands_candidate_search_when_top_results_are_exhausted(
     assert generated == ["fresh phrase"]
 
 
-def test_generate_skips_a_large_known_prefix_before_applying_the_source_limit(
+def test_generate_expands_wordfreq_pool_past_a_large_known_prefix(
     monkeypatch,
 ):
-    """`generate` should find new candidates beyond a large published prefix."""
+    """`generate` should expand the wordfreq pool beyond its initial window."""
     known_expressions = [
         f"knownword{''.join(suffix)}"
         for length in range(1, 3)
@@ -215,16 +215,89 @@ def test_generate_skips_a_large_known_prefix_before_applying_the_source_limit(
     creator = ExpressionCandidateCreator(
         client=_FakeAsyncClient({}),
         rng=random.Random(19),
-        word_pool_size=321,
+        word_pool_size=8,
         datamuse_results=1,
     )
 
-    # Given: The first 320 source candidates are already published.
+    # Given: The first 320 source candidates are already published beyond the initial window.
     # When: Candidate generation requests one new expression.
     generated = asyncio.run(creator.generate(known_expressions, 1))
 
     # Then: The first unseen source candidate should be returned.
     assert generated == ["fresh phrase"]
+
+
+def test_generate_filters_datamuse_family_duplicates(
+    monkeypatch,
+):
+    """`generate` should exclude known spelling families from Datamuse results."""
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "top_n_list",
+        _build_top_n_list([]),
+    )
+
+    creator = ExpressionCandidateCreator(
+        client=_FakeAsyncClient(
+            {
+                "work": ["traveller", "fresh phrase", "backup phrase"],
+            }
+        ),
+        rng=random.Random(23),
+        word_pool_size=1,
+        datamuse_results=3,
+    )
+
+    # Given: A spelling-family equivalent already exists, alongside new Datamuse results.
+    existing_expressions = ["traveler"]
+
+    # When: Candidate generation requests two new expressions.
+    generated = asyncio.run(creator.generate(existing_expressions, 2))
+
+    # Then: The existing family is excluded while new Datamuse candidates remain eligible.
+    assert "traveller" not in generated
+    assert set(generated) == {"backup phrase", "fresh phrase"}
+
+
+def test_generate_collects_enough_candidates_after_source_duplicates_and_low_scores(
+    monkeypatch,
+):
+    """`generate` should fill its result after rejecting duplicate and low-score source entries."""
+    source_words = (
+        ["repeat phrase"] * 8
+        + ["weak phrase"] * 8
+        + ["fresh phrase", "backup phrase"]
+    )
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "top_n_list",
+        _build_top_n_list(source_words),
+    )
+    monkeypatch.setattr(
+        expression_candidates_module,
+        "zipf_frequency",
+        _build_zipf_frequency_lookup(
+            {
+                ("weak phrase", "en"): 3.0,
+                ("fresh phrase", "en"): 5.0,
+                ("backup phrase", "en"): 4.9,
+            }
+        ),
+    )
+
+    creator = ExpressionCandidateCreator(
+        client=_FakeAsyncClient({}),
+        rng=random.Random(29),
+        word_pool_size=len(source_words),
+        datamuse_results=1,
+    )
+
+    # Given: The source contains repeated families and candidates below the score threshold.
+    # When: Candidate generation requests two new expressions.
+    generated = asyncio.run(creator.generate([], 2))
+
+    # Then: Both eligible candidates should survive source filtering.
+    assert set(generated) == {"backup phrase", "fresh phrase"}
 
 
 def test_generate_rejects_foreign_dominant_words(
@@ -431,8 +504,8 @@ class _FakeResponse:
 
 
 def _build_top_n_list(words: list[str]):
-    def fake_top_n_list(_language: str, _pool_size: int) -> list[str]:
-        return words
+    def fake_top_n_list(_language: str, pool_size: int) -> list[str]:
+        return words[:pool_size]
 
     return fake_top_n_list
 

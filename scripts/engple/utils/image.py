@@ -7,6 +7,9 @@ import requests
 from quickthumb import Canvas, TextPart, Stroke, FitMode
 from PIL import Image
 
+EXPRESSION_THUMBNAIL_ACCENT_COLOR = "#1FFFAA"
+TOPIC_THUMBNAIL_ACCENT_COLOR = "#FBBF24"
+
 
 def url_to_file(url: str, image_format: str = "WEBP") -> io.BytesIO:
     """
@@ -51,7 +54,7 @@ def render_expression_thumbnail(path: str, image_url: str, ko: str) -> None:
             content=[
                 TextPart(
                     text=f"'{ko}'\n",
-                    color="#FBBF24",
+                    color=EXPRESSION_THUMBNAIL_ACCENT_COLOR,
                     size=112,
                     font=os.path.join(font_dir, "JalnanGothic.otf"),
                     effects=[Stroke(width=8, color="#000000")],
@@ -93,7 +96,7 @@ def render_topic_thumbnail(path: str, image_url: str, topic: str) -> None:
             content=[
                 TextPart(
                     text=f"{topic}\n",
-                    color="#FBBF24",
+                    color=TOPIC_THUMBNAIL_ACCENT_COLOR,
                     size=120,
                     font=os.path.join(font_dir, "JalnanGothic.otf"),
                     effects=[Stroke(width=8, color="#000000")],

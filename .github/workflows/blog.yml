@@ -1,9 +1,6 @@
 name: Daily Blog Generation
 
 on:
-  schedule:
-    # Runs daily at 4:00 PM KST
-    - cron: "0 7 * * *"
   workflow_dispatch:
 
 defaults:

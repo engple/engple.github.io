@@ -164,7 +164,7 @@ const searchPlugins = [
         allMarkdownRemark: { nodes: allPosts },
       }) => {
         const postsByPath = allPosts.reduce((acc, post) => {
-          const { slug, lastmod } = post.fields
+          const { slug } = post.fields
           acc[slug] = post
           return acc
         }, {})
@@ -173,10 +173,10 @@ const searchPlugins = [
           return { ...page, ...postsByPath[page.path] }
         })
       },
-      serialize: ({ path, frontmatter, lastmod }) => {
+      serialize: ({ path, frontmatter, fields }) => {
         return {
           url: path,
-          lastmod: lastmod || frontmatter?.date,
+          lastmod: fields?.lastmod || frontmatter?.date,
         }
       },
     },

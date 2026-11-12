@@ -24,6 +24,7 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "scripts/uv.lock"
           python-version: "3.12"
+          version: "0.13.4"
 
       - name: Install dependencies
         run: |

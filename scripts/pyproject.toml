@@ -12,7 +12,7 @@ dependencies = [
     "loguru>=0.7.3,<1.0.0",
     "notion-client>=2.5.0",
     "pillow>=10.0.0",
-    "pip>=25.2",
+    "pip>=26.2.2",
     "pydantic>=2.11.7",
     "pydantic-ai-slim[google,logfire,openai]>=1.70.0",
     "pydantic-settings>=2.10.1",
@@ -30,6 +30,7 @@ dev = [
 ]
 
 [tool.uv]
+required-version = ">=0.13.4"
 override-dependencies = [
     "pillow>=12.2.0,<13",
 ]

@@ -13,17 +13,24 @@ interface CenteredImgProperties extends Pick<Post, "alt"> {
 const DEFAULT_ALT = "Thumbnail Image"
 
 const CenteredImg: React.FC<CenteredImgProperties> = ({ src, alt }) => {
-  const data = useStaticQuery<Queries.Query>(graphql`
+  const data = useStaticQuery<Queries.CenteredImgQuery>(graphql`
     query CenteredImg {
-      allImageSharp {
-        edges {
-          node {
-            id
-            gatsbyImageData(
-              layout: CONSTRAINED
-              aspectRatio: 1.77777777778
-              placeholder: BLURRED
-            )
+      allMarkdownRemark(
+        filter: { fileAbsolutePath: { regex: "/(posts/blog)/" } }
+      ) {
+        nodes {
+          frontmatter {
+            thumbnail {
+              childImageSharp {
+                id
+                gatsbyImageData(
+                  layout: CONSTRAINED
+                  width: 640
+                  aspectRatio: 1.77777777778
+                  placeholder: BLURRED
+                )
+              }
+            }
           }
         }
       }
@@ -31,21 +38,26 @@ const CenteredImg: React.FC<CenteredImgProperties> = ({ src, alt }) => {
   `)
 
   const image = useMemo(() => {
-    const imageSharp = data.allImageSharp.edges.find(
-      edge => edge.node.id === src,
-    )
-    return imageSharp?.node.gatsbyImageData as IGatsbyImageData
-  }, [src, data.allImageSharp.edges])
+    for (const node of data.allMarkdownRemark.nodes) {
+      const thumbnail = node.frontmatter?.thumbnail?.childImageSharp
+      if (thumbnail && thumbnail.id === src) {
+        return thumbnail.gatsbyImageData as IGatsbyImageData | undefined
+      }
+    }
+    return undefined
+  }, [src, data.allMarkdownRemark.nodes])
 
   return (
     <ThumbnailWrapper>
       <InnerWrapper>
-        <GatsbyImage
-          image={image}
-          loading="eager"
-          alt={alt ?? DEFAULT_ALT}
-          imgStyle={{ aspectRatio: "16 / 9", width: "100%" }}
-        />
+        {image && (
+          <GatsbyImage
+            image={image}
+            loading="eager"
+            alt={alt ?? DEFAULT_ALT}
+            imgStyle={{ aspectRatio: "16 / 9", width: "100%" }}
+          />
+        )}
       </InnerWrapper>
     </ThumbnailWrapper>
   )
